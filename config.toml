@@ -6,3 +6,17 @@ moderators = []
 
 [features]
 tts = false
+
+[markov]
+train_on_chat = true
+ngram_path = "data.pkl"
+split_strategy = "character"
+character_count = 4
+autosave_interval = 50
+length_to_generate = 200
+max_retries = 3
+cooldown = 0
+
+[moderation]
+ignored_users = ["streamelements", "creatisbot", "nightbot", "fossabot"]
+bad_words = []

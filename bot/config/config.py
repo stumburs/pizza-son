@@ -19,9 +19,27 @@ class FeaturesConfig(BaseModel):
     tts: bool = False
 
 
+class MarkovConfig(BaseModel):
+    train_on_chat: bool = True
+    ngram_path: str = "data.pkl"
+    split_strategy: str = "character"
+    character_count: int = 4
+    autosave_interval: int = 50
+    length_to_generate: int = 200
+    max_retries: int = 3
+    cooldown: int = 0
+
+
+class Moderation(BaseModel):
+    ignored_users: List[str] = []
+    bad_words: List[str] = []
+
+
 class Settings(BaseModel):
     twitch: TwitchConfig
     features: FeaturesConfig
+    markov: MarkovConfig
+    moderation: Moderation
 
 
 _settings: Settings | None = None

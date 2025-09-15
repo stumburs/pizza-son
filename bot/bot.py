@@ -9,16 +9,10 @@ import asyncio
 from typing import List
 import config.config as config
 import token_store.token_store as token_store
-
-
-async def on_ready(ready_event_data: EventData) -> None:
-    settings: config.Settings = config.get_settings()
-    await ready_event_data.chat.join_room(settings.twitch.target_channel)
-    print(f"Bot successfully connected to {settings.twitch.target_channel}'s chat!")
-
-
-async def on_message(msg: ChatMessage) -> None:
-    print(f"{msg.user.display_name}: {msg.text}")
+import commands.loader
+import on_message
+import on_ready
+import markov.markov as markov
 
 
 async def run_bot() -> None:
@@ -48,14 +42,22 @@ async def run_bot() -> None:
 
     chat = await Chat(bot)
 
-    chat.register_event(ChatEvent.READY, on_ready)
-    chat.register_event(ChatEvent.MESSAGE, on_message)
+    # Register events
+    chat.register_event(ChatEvent.READY, on_ready.on_ready)
+    chat.register_event(ChatEvent.MESSAGE, on_message.on_message)
+
+    # Register all commands
+    print("Loading commands...")
+    for command in commands.loader.load_commands():
+        chat.register_command(name=command.name, handler=command.execute)
+        print(f"Registered command: {command.name}")
 
     chat.start()
 
     try:
         input("Press ENTER to stop! \n")
     finally:
+        await markov.save_ngrams_to_binary(path=settings.markov.ngram_path)
         chat.stop()
         await bot.close()
 
