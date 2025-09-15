@@ -1,0 +1,8 @@
+[twitch]
+client_id = ""
+client_secret = ""
+target_channel = ""
+moderators = []
+
+[features]
+tts = false
