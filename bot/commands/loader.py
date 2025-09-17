@@ -12,7 +12,7 @@ def load_commands() -> List[BaseCommand]:
         if file.stem in ["__init__", "base_command", "loader", "ollama_commands"]:
             continue
 
-        module_path = f"commands.{file.stem}"
+        module_path = f"bot.commands.{file.stem}"
         module = importlib.import_module(module_path)
 
         for attr_name in dir(module):
