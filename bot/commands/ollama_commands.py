@@ -9,6 +9,10 @@ def create_ollama_command(prompt_name: str):
         def name(self) -> str:
             return prompt_name.lower()
 
+        @property
+        def description(self) -> str:
+            return f"Replies as '{prompt_name} using an AI. Usage: !{prompt_name.lower()} <question>"
+
         async def execute(self, cmd: ChatCommand) -> None:
             response = await services.ollama_service.ollama_service.get_llm_response(
                 cmd

@@ -8,6 +8,10 @@ class BaseCommand(ABC):
     def name(self) -> str:
         pass
 
+    @property
+    def description(self) -> str:
+        return "No description provided."
+
     @abstractmethod
     async def execute(self, cmd: ChatCommand) -> None:
         pass

@@ -9,6 +9,10 @@ class GameCommand(BaseCommand):
     def name(self) -> str:
         return "game"
 
+    @property
+    def description(self) -> str:
+        return f"Replies with the current game being played on this stream. Usage !game"
+
     async def execute(self, cmd: ChatCommand) -> None:
         info = await services.twitch_service.get_channel_info(
             username=config.get_settings().twitch.target_channel

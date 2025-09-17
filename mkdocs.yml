@@ -1,0 +1,7 @@
+site_name: pizza_son bot commands
+theme:
+  name: material
+
+nav:
+  - Home: index.md
+  - Commands: commands.md
