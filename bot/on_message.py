@@ -2,6 +2,8 @@ from twitchAPI.chat import ChatMessage
 import config.config as config
 import markov.markov as markov
 import filter.filter as filter
+import services.ollama_service
+
 
 message_counter: int = 0
 
@@ -37,14 +39,14 @@ async def on_message(msg: ChatMessage) -> None:
 
     print(f"{msg.user.display_name}: {msg.text}")
 
+    await services.ollama_service.ollama_service.on_message(msg=msg)
+
     # train bot
     if _config.markov.train_on_chat:
-        print(
-            await markov.build_ngrams(
-                split_strategy=_config.markov.split_strategy,
-                character_count=_config.markov.character_count,
-                optional_text=msg.text,
-            )
+        await markov.build_ngrams(
+            split_strategy=_config.markov.split_strategy,
+            character_count=_config.markov.character_count,
+            optional_text=msg.text,
         )
 
         message_counter += 1

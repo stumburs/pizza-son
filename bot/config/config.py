@@ -30,16 +30,24 @@ class MarkovConfig(BaseModel):
     cooldown: int = 0
 
 
-class Moderation(BaseModel):
+class ModerationConfig(BaseModel):
     ignored_users: List[str] = []
     bad_words: List[str] = []
+
+
+class OllamaConfig(BaseModel):
+    host: str = None
+    model: str = None
+    num_predict: int = 80
+    max_history: int = 80
 
 
 class Settings(BaseModel):
     twitch: TwitchConfig
     features: FeaturesConfig
     markov: MarkovConfig
-    moderation: Moderation
+    moderation: ModerationConfig
+    ollama: OllamaConfig
 
 
 _settings: Settings | None = None

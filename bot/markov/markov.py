@@ -55,7 +55,7 @@ async def generate_text(length: int) -> str:
 
 async def build_ngrams(
     split_strategy: str, character_count: int, optional_text: str | None = None
-) -> str:
+):
     text_to_use = optional_text if optional_text is not None else SOURCE_TEXT
 
     if split_strategy == "word":

@@ -1,4 +1,3 @@
-import os
 import importlib
 from pathlib import Path
 from typing import List
@@ -10,7 +9,7 @@ def load_commands() -> List[BaseCommand]:
     commands_dir = Path(__file__).parent
 
     for file in commands_dir.glob("*.py"):
-        if file.stem in ["__init__", "base_command", "loader"]:
+        if file.stem in ["__init__", "base_command", "loader", "ollama_commands"]:
             continue
 
         module_path = f"commands.{file.stem}"
@@ -24,5 +23,11 @@ def load_commands() -> List[BaseCommand]:
                 and attr != BaseCommand
             ):
                 commands.append(attr())
+
+    from services.ollama_service import ollama_service
+    from .ollama_commands import create_ollama_command
+
+    for prompt in ollama_service.get_available_prompts():
+        commands.append(create_ollama_command(prompt_name=prompt))
 
     return commands

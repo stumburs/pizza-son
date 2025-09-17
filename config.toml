@@ -20,3 +20,9 @@ cooldown = 0
 [moderation]
 ignored_users = ["streamelements", "creatisbot", "nightbot", "fossabot"]
 bad_words = []
+
+[ollama]
+host = "192.168.0.101:11434"
+model = "mistral:latest"
+num_predict = 80
+max_history = 80

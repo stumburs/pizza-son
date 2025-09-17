@@ -1,9 +1,8 @@
-from twitchAPI.chat import Chat, EventData, ChatMessage, ChatCommand
+from twitchAPI.chat import Chat
 from twitchAPI.type import ChatEvent
 from twitchAPI.oauth import UserAuthenticator
 from twitchAPI.twitch import Twitch
 from twitchAPI.type import AuthScope
-
 
 import asyncio
 from typing import List
@@ -13,21 +12,26 @@ import commands.loader
 import on_message
 import on_ready
 import markov.markov as markov
+import services.twitch_client, services.ollama_service
 
 
 async def run_bot() -> None:
 
     print("Loading config...")
     await config.reload_settings()
-
     settings: config.Settings = config.get_settings()
 
+    if settings.ollama.host is not None:
+        print("Initializing Ollama service...")
+        services.ollama_service.ollama_service.init_client(settings=settings)
+
+    print("Authenticating with Twitch...")
     bot = await Twitch(
         app_id=settings.twitch.client_id, app_secret=settings.twitch.client_secret
     )
 
-    print("Authenticating with Twitch...")
     scopes: List[AuthScope] = [AuthScope.CHAT_READ, AuthScope.CHAT_EDIT]
+
     creds = token_store.load_tokens()
     if creds:
         token, refresh_token = creds
@@ -39,6 +43,8 @@ async def run_bot() -> None:
     await bot.set_user_authentication(
         token=token, scope=scopes, refresh_token=refresh_token
     )
+
+    services.twitch_client.set_twitch(client=bot)
 
     chat = await Chat(bot)
 
