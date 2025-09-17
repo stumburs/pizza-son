@@ -1,6 +1,6 @@
 from .base_command import BaseCommand
 from twitchAPI.chat import ChatCommand
-import markov.markov as markov
+from markov import markov
 import config.config as config
 
 
