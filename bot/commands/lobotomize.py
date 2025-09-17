@@ -1,4 +1,4 @@
-from .base_command import BaseCommand
+from .base_command import BaseCommand, PermissionLevel
 from twitchAPI.chat import ChatCommand
 from bot.services import ollama_service
 
@@ -10,7 +10,15 @@ class LobotomizeCommand(BaseCommand):
 
     @property
     def description(self) -> str:
-        return f"Clears the AI's memory. Note: This command is only available to moderators listed in the bots configuration file. Usage !lobotomize"
+        return f"Clears the AI's memory."
+
+    @property
+    def usage(self) -> str:
+        return "!lobotomize"
+
+    @property
+    def permissions(self) -> list[PermissionLevel]:
+        return [PermissionLevel.BOT_MODERATOR]
 
     async def execute(self, cmd: ChatCommand) -> None:
         await ollama_service.lobotomize()

@@ -1,4 +1,4 @@
-from .base_command import BaseCommand
+from .base_command import BaseCommand, PermissionLevel
 from twitchAPI.chat import ChatCommand
 from bot.services import twitch_service
 from bot.config import config
@@ -11,7 +11,15 @@ class GameCommand(BaseCommand):
 
     @property
     def description(self) -> str:
-        return f"Replies with the current game being played on this stream. Usage !game"
+        return f"Replies with the current game being played on this stream."
+
+    @property
+    def usage(self) -> str:
+        return "!game"
+
+    @property
+    def permissions(self) -> list[PermissionLevel]:
+        return [PermissionLevel.ALL]
 
     async def execute(self, cmd: ChatCommand) -> None:
         info = await twitch_service.get_channel_info(
