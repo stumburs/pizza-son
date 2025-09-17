@@ -25,9 +25,9 @@ jobs:
           pip install -r requirements.txt
           pip install mkdocs mkdocs-material
 
-      # 4. Install your project locally
-      - name: Install project
-        run: pip install -e .
+      # # 4. Install your project locally
+      # - name: Install project
+      #   run: pip install -e .
 
       # 5. Generate docs
       - name: Generate documentation

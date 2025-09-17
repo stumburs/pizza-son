@@ -1,7 +1,7 @@
 from .base_command import BaseCommand
 from twitchAPI.chat import ChatCommand
-import services.twitch_service
-import config.config as config
+from bot.services import twitch_service
+from bot.config import config
 
 
 class GameCommand(BaseCommand):
@@ -14,7 +14,7 @@ class GameCommand(BaseCommand):
         return f"Replies with the current game being played on this stream. Usage !game"
 
     async def execute(self, cmd: ChatCommand) -> None:
-        info = await services.twitch_service.get_channel_info(
+        info = await twitch_service.get_channel_info(
             username=config.get_settings().twitch.target_channel
         )
         await cmd.reply(

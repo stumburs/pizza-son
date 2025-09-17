@@ -1,5 +1,5 @@
 from twitchAPI.object.api import ChannelInformation, TwitchUser
-import services.twitch_client as twitch_client
+from bot.services import twitch_client
 from twitchAPI.helper import first
 
 

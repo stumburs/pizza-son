@@ -1,6 +1,6 @@
 from twitchAPI.chat import EventData
-import config.config as config
-import markov.markov as markov
+from bot.config import config
+from bot.markov import markov
 
 
 async def on_ready(ready_event_data: EventData) -> None:

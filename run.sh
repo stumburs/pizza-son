@@ -14,7 +14,7 @@ echo "Installing dependencies..."
 pip install --upgrade -r requirements.txt
 
 # Run the bot
-python3 bot/bot.py
+python3 -m bot.bot
 
 # Deactivate venv
 deactivate

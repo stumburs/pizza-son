@@ -24,8 +24,8 @@ def load_commands() -> List[BaseCommand]:
             ):
                 commands.append(attr())
 
-    from services.ollama_service import ollama_service
-    from .ollama_commands import create_ollama_command
+    from bot.services.ollama_service import ollama_service
+    from bot.commands.ollama_commands import create_ollama_command
 
     for prompt in ollama_service.get_available_prompts():
         commands.append(create_ollama_command(prompt_name=prompt))

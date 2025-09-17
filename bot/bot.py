@@ -6,13 +6,13 @@ from twitchAPI.type import AuthScope
 
 import asyncio
 from typing import List
-import config.config as config
-import token_store.token_store as token_store
-import commands.loader
-import on_message
-import on_ready
-import markov.markov as markov
-import services.twitch_client, services.ollama_service
+from bot.token_store import token_store
+from bot.commands import loader
+from bot.on_message import on_message
+from bot.on_ready import on_ready
+from bot.markov import markov
+from bot.services import ollama_service, twitch_service
+from bot.config import config
 
 
 async def run_bot() -> None:
@@ -23,7 +23,7 @@ async def run_bot() -> None:
 
     if settings.ollama.host is not None:
         print("Initializing Ollama service...")
-        services.ollama_service.ollama_service.init_client(settings=settings)
+        ollama_service.ollama_service.init_client(settings=settings)
 
     print("Authenticating with Twitch...")
     bot = await Twitch(
@@ -44,17 +44,17 @@ async def run_bot() -> None:
         token=token, scope=scopes, refresh_token=refresh_token
     )
 
-    services.twitch_client.set_twitch(client=bot)
+    twitch_service.twitch_client.set_twitch(client=bot)
 
     chat = await Chat(bot)
 
     # Register events
-    chat.register_event(ChatEvent.READY, on_ready.on_ready)
-    chat.register_event(ChatEvent.MESSAGE, on_message.on_message)
+    chat.register_event(ChatEvent.READY, on_ready)
+    chat.register_event(ChatEvent.MESSAGE, on_message)
 
     # Register all commands
     print("Loading commands...")
-    for command in commands.loader.load_commands():
+    for command in loader.load_commands():
         chat.register_command(name=command.name, handler=command.execute)
         print(f"Registered command: {command.name}")
 
@@ -68,4 +68,15 @@ async def run_bot() -> None:
         await bot.close()
 
 
-asyncio.run(run_bot())
+if __name__ == "__main__":
+    try:
+        loop = asyncio.get_running_loop()
+    except RuntimeError:  # no loop running
+        loop = None
+
+    if loop and loop.is_running():
+        # We're in an environment with an already running loop
+        asyncio.create_task(run_bot())
+    else:
+        # Normal script execution
+        asyncio.run(run_bot())

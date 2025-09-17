@@ -3,7 +3,7 @@ from twitchAPI.chat import ChatMessage, ChatCommand
 from collections import deque
 from typing import Dict, Optional
 import os
-import config.config as config
+from bot.config import config
 
 
 class OllamaService:
