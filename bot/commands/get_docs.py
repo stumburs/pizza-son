@@ -13,7 +13,7 @@ class GetDocsCommand(BaseCommand):
 
     @property
     def usage(self) -> str:
-        return "!commands"
+        return f"!{self.name()}"
 
     @property
     def permissions(self) -> list[PermissionLevel]:

@@ -15,7 +15,7 @@ class MarkCommand(BaseCommand):
 
     @property
     def usage(self) -> str:
-        return "!mark"
+        return f"!{self.name()}"
 
     @property
     def permissions(self) -> list[PermissionLevel]:

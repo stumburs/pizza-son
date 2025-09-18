@@ -14,7 +14,7 @@ class PingCommand(BaseCommand):
 
     @property
     def usage(self) -> str:
-        return f"!hug [user]"
+        return f"!{self.name()} [user]"
 
     @property
     def permissions(self) -> list[PermissionLevel]:

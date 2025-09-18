@@ -13,7 +13,7 @@ class PingCommand(BaseCommand):
 
     @property
     def usage(self) -> str:
-        return f"!ping"
+        return f"!{self.name()}"
 
     @property
     def permissions(self) -> list[PermissionLevel]:

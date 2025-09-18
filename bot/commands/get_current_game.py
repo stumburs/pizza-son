@@ -15,7 +15,7 @@ class GameCommand(BaseCommand):
 
     @property
     def usage(self) -> str:
-        return "!game"
+        return f"!{self.name()}"
 
     @property
     def permissions(self) -> list[PermissionLevel]:
