@@ -30,7 +30,12 @@ async def run_bot() -> None:
         app_id=settings.twitch.client_id, app_secret=settings.twitch.client_secret
     )
 
-    scopes: List[AuthScope] = [AuthScope.CHAT_READ, AuthScope.CHAT_EDIT]
+    scopes: List[AuthScope] = [
+        AuthScope.CHAT_READ,
+        AuthScope.CHAT_EDIT,
+        AuthScope.MODERATION_READ,
+        AuthScope.CHANNEL_READ_VIPS,
+    ]
 
     creds = token_store.load_tokens()
     if creds:
