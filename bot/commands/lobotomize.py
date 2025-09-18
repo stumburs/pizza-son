@@ -14,7 +14,7 @@ class LobotomizeCommand(BaseCommand):
 
     @property
     def usage(self) -> str:
-        return f"!{self.name()}"
+        return f"!{self.name}"
 
     @property
     def permissions(self) -> list[PermissionLevel]:

@@ -14,7 +14,7 @@ class PingCommand(BaseCommand):
 
     @property
     def usage(self) -> str:
-        return f"!{self.name()} <user>"
+        return f"!{self.name} <user>"
 
     @property
     def permissions(self) -> list[PermissionLevel]:
@@ -22,7 +22,7 @@ class PingCommand(BaseCommand):
 
     async def execute(self, cmd: ChatCommand) -> None:
         if not cmd.parameter:
-            await cmd.reply(f"Usage: {self.usage()}")
+            await cmd.reply(f"Usage: {self.usage}")
             return
 
         target = cmd.parameter.removeprefix("@").strip()
