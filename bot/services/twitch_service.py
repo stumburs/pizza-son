@@ -2,6 +2,8 @@ from twitchAPI.object.api import ChannelInformation, TwitchUser, Moderator, Chan
 from bot.services import twitch_client
 from twitchAPI.helper import first
 from typing import AsyncGenerator
+from bot.commands.base_command import PermissionLevel
+from bot.config import config
 
 
 async def get_user_by_name(username: str) -> TwitchUser:
@@ -39,3 +41,47 @@ async def get_channel_vips(username: str) -> list[ChannelVIP]:
     )
     vips: list[Moderator] = [item async for item in vip_async_gen]
     return vips
+
+
+async def has_permissions(username: str, permissions: list[PermissionLevel]) -> bool:
+    target_channel: str = config.get_settings().twitch.target_channel
+
+    # All
+    if PermissionLevel.ALL in permissions:
+        return True
+
+    # Streamer
+    if (
+        PermissionLevel.STREAMER in permissions
+        and username.lower() == target_channel.lower()
+    ):
+        return True
+
+    # Moderators
+    if PermissionLevel.MODERATOR in permissions:
+        moderators = await get_channel_moderators(target_channel)
+        moderator_names = [mod.user_login.lower() for mod in moderators]
+        if username.lower() in moderator_names:
+            return True
+
+    # VIPs
+    if PermissionLevel.VIP in permissions:
+        vips = await get_channel_vips(target_channel)
+        vip_names = [vip.user_login.lower() for vip in vips]
+        if username.lower() in vip_names:
+            return True
+
+    # Subscribers
+    # TODO: implement a `get_channel_subscribers` helper
+    if PermissionLevel.SUBSCRIBER in permissions:
+        return False
+        # subscribers = await get_channel_subscribers(target_channel)
+        # sub_names = [sub.user_login.lower() for sub in subscribers]
+        # if username.lower() in sub_names:
+        #     return True
+
+    # Bot moderators
+    if PermissionLevel.BOT_MODERATOR in permissions:
+        bot_mods = config.get_settings().twitch.moderators
+        if username.lower() in [m.lower() for m in bot_mods]:
+            return True
