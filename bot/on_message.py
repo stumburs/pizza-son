@@ -17,11 +17,16 @@ async def on_message(msg: ChatMessage) -> None:
     if msg.text.startswith("!"):
         return
 
-    if "subathon" in msg.text.lower():
-        if "jonathon" in msg.text.lower():
+    no_space_text = "".join(msg.text.lower().split())
+
+    if "subathon" in no_space_text:
+        if "jonathon" in no_space_text:
             await msg.reply("fricc u")
             return
         await msg.reply("Jonathon* xddNerd")
+
+    if "fricc" in no_space_text:
+        await msg.reply("fricc u too")
 
     # ignore specific users
     if msg.user.name.lower() in _config.moderation.ignored_users:
@@ -53,4 +58,4 @@ async def on_message(msg: ChatMessage) -> None:
 
         if message_counter >= _config.markov.autosave_interval:
             message_counter = 0
-            await markov.save_ngrams(path=_config.markov.ngram_path)
+            await markov.save_ngrams_to_binary(path=_config.markov.ngram_path)
