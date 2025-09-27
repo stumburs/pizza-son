@@ -2,6 +2,7 @@ import importlib
 from pathlib import Path
 from typing import List
 from .base_command import BaseCommand
+from bot.config import config
 
 
 def load_commands() -> List[BaseCommand]:
@@ -24,10 +25,13 @@ def load_commands() -> List[BaseCommand]:
             ):
                 commands.append(attr())
 
-    from bot.services.ollama_service import ollama_service
+    from bot.services.ollama_service import ollama_service, OllamaService
     from bot.commands.ollama_commands import create_ollama_command
 
-    for prompt in ollama_service.get_available_prompts():
+    temp_client = OllamaService()
+    temp_client.init_client(config.get_settings())
+
+    for prompt in temp_client.get_available_prompts():
         commands.append(create_ollama_command(prompt_name=prompt))
 
     return commands
