@@ -59,7 +59,8 @@ async def run_bot() -> None:
 
     # Register all commands
     print("Loading commands...")
-    for command in loader.load_commands():
+    commands = await loader.load_commands()
+    for command in commands:
         chat.register_command(name=command.name, handler=command.execute)
         print(f"Registered command: {command.name}")
 

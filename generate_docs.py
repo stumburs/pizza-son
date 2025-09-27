@@ -1,36 +1,44 @@
 from pathlib import Path
 from bot.commands.loader import load_commands
 from bot.commands.base_command import PermissionLevel
+import asyncio
 
-docs_path = Path("docs/commands.md")
-docs_path.parent.mkdir(exist_ok=True)
 
-commands = load_commands()
+async def main():
+    docs_path = Path("docs/commands.md")
+    docs_path.parent.mkdir(exist_ok=True)
 
-with docs_path.open("w", encoding="utf-8") as f:
-    f.write("# pizza_son Commands\n\n")
-    f.write("This page lists all* available bot commands.\n\n")
+    commands = await load_commands()
+    print("Loaded commands:", [cmd.name for cmd in commands])
 
-    for cmd in commands:
-        name = f"!{cmd.name}"
-        description = getattr(cmd, "description", "No description provided.")
-        usage = getattr(cmd, "usage", f"!{cmd.name}")
-        permissions = getattr(cmd, "permissions", [PermissionLevel.ALL])
+    with docs_path.open("w", encoding="utf-8") as f:
+        f.write("# pizza_son Commands\n\n")
+        f.write("This page lists all* available bot commands.\n\n")
 
-        if isinstance(permissions, list):
-            perm_str = ", ".join(
-                [
-                    p.value if isinstance(p, PermissionLevel) else str(p)
-                    for p in permissions
-                ]
-            )
-        else:
-            perm_str = str(permissions)
+        for cmd in commands:
+            name = f"!{cmd.name}"
+            description = getattr(cmd, "description", "No description provided.")
+            usage = getattr(cmd, "usage", f"!{cmd.name}")
+            permissions = getattr(cmd, "permissions", [PermissionLevel.ALL])
 
-        f.write(f"## {name}\n\n")
-        f.write(f"**Description:**\n\n{description}\n\n")
-        f.write(f"**Usage:**\n\n```\n{usage}\n```\n\n")
-        f.write(f"**Permissions:**\n\n{perm_str}\n\n")
-        f.write("---\n\n")
+            if isinstance(permissions, list):
+                perm_str = ", ".join(
+                    [
+                        p.value if isinstance(p, PermissionLevel) else str(p)
+                        for p in permissions
+                    ]
+                )
+            else:
+                perm_str = str(permissions)
 
-print("Generated docs/commands.md")
+            f.write(f"## {name}\n\n")
+            f.write(f"**Description:**\n\n{description}\n\n")
+            f.write(f"**Usage:**\n\n```\n{usage}\n```\n\n")
+            f.write(f"**Permissions:**\n\n{perm_str}\n\n")
+            f.write("---\n\n")
+
+    print("Generated docs/commands.md")
+
+
+if __name__ == "__main__":
+    asyncio.run(main())

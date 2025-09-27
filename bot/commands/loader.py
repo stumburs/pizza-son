@@ -5,7 +5,7 @@ from .base_command import BaseCommand
 from bot.config import config
 
 
-def load_commands() -> List[BaseCommand]:
+async def load_commands() -> List[BaseCommand]:
     commands = []
     commands_dir = Path(__file__).parent
 
@@ -28,12 +28,15 @@ def load_commands() -> List[BaseCommand]:
     from bot.services.ollama_service import ollama_service, OllamaService
     from bot.commands.ollama_commands import create_ollama_command
 
-    # use the running service if it's initialized
-    try:
+    await config.reload_settings()
+
+    prompts: list[str] = []
+
+    # if global service is ready, use it
+    if ollama_service.client is not None:
         prompts = ollama_service.get_available_prompts()
-    except RuntimeError:
-        # fallback (docs generation case)
-        config.reload_settings()
+    else:
+        # fallback for docs generation
         prompts = OllamaService.list_prompts_without_client(config.get_settings())
 
     for prompt in prompts:
