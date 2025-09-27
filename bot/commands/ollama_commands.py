@@ -11,7 +11,7 @@ def create_ollama_command(prompt_name: str):
 
         @property
         def description(self) -> str:
-            return f"Replies as '{prompt_name} using an AI."
+            return f"Replies as '{prompt_name}' using an AI."
 
         @property
         def usage(self) -> str:
