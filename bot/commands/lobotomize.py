@@ -21,7 +21,7 @@ class LobotomizeCommand(BaseCommand):
     def permissions(self) -> list[PermissionLevel]:
         return [
             PermissionLevel.STREAMER,
-            PermissionLevel.MODERATOR,
+            # PermissionLevel.MODERATOR, TODO: Fix all permissions
             PermissionLevel.BOT_MODERATOR,
         ]
 

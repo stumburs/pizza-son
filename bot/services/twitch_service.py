@@ -57,6 +57,30 @@ async def has_permissions(username: str, permissions: list[PermissionLevel]) -> 
     ):
         return True
 
+    # Bot moderators
+    if PermissionLevel.BOT_MODERATOR in permissions:
+        bot_mods = config.get_settings().twitch.moderators
+        if username.lower() in [m.lower() for m in bot_mods]:
+            return True
+
+
+# TODO: Figure out how to check permissions on other channels
+async def _full_permission_check(
+    username: str, permissions: list[PermissionLevel]
+) -> bool:
+    target_channel: str = config.get_settings().twitch.target_channel
+
+    # All
+    if PermissionLevel.ALL in permissions:
+        return True
+
+    # Streamer
+    if (
+        PermissionLevel.STREAMER in permissions
+        and username.lower() == target_channel.lower()
+    ):
+        return True
+
     # Moderators
     if PermissionLevel.MODERATOR in permissions:
         moderators = await get_channel_moderators(target_channel)

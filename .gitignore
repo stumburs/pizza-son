@@ -1,4 +1,4 @@
 __pycache__/
 tokens.json
 *.pkl
-bot/services/ollama_prompts/*.txt
+# bot/services/ollama_prompts/*.txt

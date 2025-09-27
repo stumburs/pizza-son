@@ -4,6 +4,8 @@ from collections import deque
 from typing import Dict, Optional
 import os
 from bot.config import config
+from bot.services import twitch_service
+import re
 
 
 class OllamaService:
@@ -37,12 +39,32 @@ class OllamaService:
 
         return prompts
 
-    def get_system_prompt(self, prompt: str) -> dict[str, str]:
+    async def fill_placeholders(text: str) -> str:
+        target_channel = config.get_settings().twitch.target_channel
+        channel_info = await twitch_service.get_channel_info(target_channel)
+
+        replacements = {
+            "game_name": channel_info.game_name,
+            "stream_title": channel_info.title,
+            "channel_name": target_channel,
+        }
+
+        def replacer(match):
+            key = match.group(1)
+            return replacements.get(key, f"{{{{{key}}}}}")
+
+        return re.sub(r"\{\{(\w+)\}\}", replacer, text)
+
+    async def get_system_prompt(self, prompt: str) -> dict[str, str]:
+        base_prompt = self.system_prompts.get(
+            prompt, f"Respond with 'Failed to load prompt: {prompt}' only."
+        )
+
+        content = await self.fill_placeholders(base_prompt)
+
         return {
             "role": "system",
-            "content": self.system_prompts.get(
-                prompt, f"Respond with 'Failed to load prompt: {prompt}' only."
-            ),
+            "content": content,
         }
 
     async def on_message(self, msg: ChatMessage) -> None:
@@ -67,7 +89,7 @@ class OllamaService:
         self.message_history.append(question)
         print(f"[OllamaService] Question: {question}")
 
-        messages = [self.get_system_prompt(cmd.name.lower())] + list(
+        messages = [await self.get_system_prompt(cmd.name.lower())] + list(
             self.message_history
         )
 
