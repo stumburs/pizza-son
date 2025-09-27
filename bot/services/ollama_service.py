@@ -39,6 +39,11 @@ class OllamaService:
 
         return prompts
 
+    def list_prompts_without_client(settings) -> list[str]:
+        temp_client = OllamaService()
+        temp_client.init_client(settings=settings)
+        return temp_client.get_available_prompts()
+
     async def fill_placeholders(text: str) -> str:
         target_channel = config.get_settings().twitch.target_channel
         channel_info = await twitch_service.get_channel_info(target_channel)

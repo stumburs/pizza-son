@@ -28,10 +28,15 @@ def load_commands() -> List[BaseCommand]:
     from bot.services.ollama_service import ollama_service, OllamaService
     from bot.commands.ollama_commands import create_ollama_command
 
-    temp_client = OllamaService()
-    temp_client.init_client(config.get_settings())
+    # use the running service if it's initialized
+    try:
+        prompts = ollama_service.get_available_prompts()
+    except RuntimeError:
+        # fallback (docs generation case)
+        config.reload_settings()
+        prompts = OllamaService.list_prompts_without_client(config.get_settings())
 
-    for prompt in temp_client.get_available_prompts():
+    for prompt in prompts:
         commands.append(create_ollama_command(prompt_name=prompt))
 
     return commands
