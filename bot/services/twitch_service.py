@@ -1,4 +1,10 @@
-from twitchAPI.object.api import ChannelInformation, TwitchUser, Moderator, ChannelVIP
+from twitchAPI.object.api import (
+    ChannelInformation,
+    TwitchUser,
+    Moderator,
+    ChannelVIP,
+    Stream,
+)
 from bot.services import twitch_client
 from twitchAPI.helper import first
 from typing import AsyncGenerator
@@ -21,6 +27,18 @@ async def get_channel_info(username: str) -> ChannelInformation:
     if not channels:
         raise ValueError(f"No channel info found for user: {username}")
     return channels[0]
+
+
+async def get_stream_info(username: str) -> Stream:
+    twitch = twitch_client.get_twitch()
+    user = await get_user_by_name(username=username)
+
+    stream: Stream = await first(twitch.get_streams(user_login=[user.login]))
+
+    if not stream:
+        raise ValueError(f"No stream found with login: {username}")
+
+    return stream
 
 
 async def get_channel_moderators(username: str) -> list[Moderator]:

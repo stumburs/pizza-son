@@ -6,6 +6,8 @@ import os
 from bot.config import config
 from bot.services import twitch_service
 import re
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 
 class OllamaService:
@@ -49,11 +51,18 @@ class OllamaService:
     async def fill_placeholders(self, text: str) -> str:
         target_channel = config.get_settings().twitch.target_channel
         channel_info = await twitch_service.get_channel_info(target_channel)
+        stream_info = await twitch_service.get_stream_info(target_channel)
 
         replacements = {
             "game_name": channel_info.game_name,
             "stream_title": channel_info.title,
             "channel_name": target_channel,
+            "time_cest": datetime.now(ZoneInfo("Europe/Berlin")).strftime(
+                "%Y-%m-%d %H:%M:%S %Z"
+            ),
+            "channel_tags": channel_info.tags,
+            "viewer_count": stream_info.viewer_count,
+            "thumbnail_url": stream_info.thumbnail_url,
         }
 
         def replacer(match):
