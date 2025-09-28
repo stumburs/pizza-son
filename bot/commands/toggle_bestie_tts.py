@@ -30,5 +30,5 @@ class BestieToggleCommand(BaseCommand):
         )
 
         await cmd.reply(
-            f"Bestie has been {"enabled" if ollama_service.ollama_service.bestie_enabled else "disabled"}!"
+            f"Bestie has been {'enabled' if ollama_service.ollama_service.bestie_enabled else 'disabled'}!"
         )
