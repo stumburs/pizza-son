@@ -29,14 +29,15 @@ async def get_channel_info(username: str) -> ChannelInformation:
     return channels[0]
 
 
-async def get_stream_info(username: str) -> Stream:
+async def get_stream_info(username: str) -> Stream | None:
     twitch = twitch_client.get_twitch()
     user = await get_user_by_name(username=username)
 
     stream: Stream = await first(twitch.get_streams(user_login=[user.login]))
 
     if not stream:
-        raise ValueError(f"No stream found with login: {username}")
+        print(f"No stream found with login: {username}")
+        return None
 
     return stream
 

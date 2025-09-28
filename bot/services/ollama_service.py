@@ -51,6 +51,7 @@ class OllamaService:
     async def fill_placeholders(self, text: str) -> str:
         target_channel = config.get_settings().twitch.target_channel
         channel_info = await twitch_service.get_channel_info(target_channel)
+
         stream_info = await twitch_service.get_stream_info(target_channel)
 
         replacements = {
@@ -61,8 +62,12 @@ class OllamaService:
                 "%Y-%m-%d %H:%M:%S %Z"
             ),
             "channel_tags": channel_info.tags,
-            "viewer_count": stream_info.viewer_count,
-            "thumbnail_url": stream_info.thumbnail_url,
+            "viewer_count": (
+                stream_info.viewer_count if stream_info else "Failed to fetch stream."
+            ),
+            "thumbnail_url": (
+                stream_info.thumbnail_url if stream_info else "Failed to fetch stream."
+            ),
         }
 
         def replacer(match):
