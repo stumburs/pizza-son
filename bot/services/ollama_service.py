@@ -15,6 +15,8 @@ class OllamaService:
         self.system_prompts: dict[str, str] = {}
         self.model: str = ""
         self.num_predict: int = 80
+        self.bestie_enabled: bool = False
+        self.bestie_voice: str = "bestie"
 
     def init_client(self, settings: config.Settings) -> None:
         self.client = AsyncClient(host=settings.ollama.host)

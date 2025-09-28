@@ -23,6 +23,12 @@ def create_ollama_command(prompt_name: str):
 
         async def execute(self, cmd: ChatCommand) -> None:
             response = await ollama_service.ollama_service.get_llm_response(cmd)
-            await cmd.reply(response)
+
+            if ollama_service.ollama_service.bestie_enabled:
+                await cmd.send(
+                    ollama_service.ollama_service.bestie_voice + ": " + response
+                )
+            else:
+                await cmd.reply(response)
 
     return OllamaPromptCommand()
