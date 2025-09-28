@@ -62,7 +62,7 @@ class OllamaService:
             "stream_title": channel_info.title,
             "channel_name": target_channel,
             "time_cest": time_cest,
-            "channel_tags": channel_info.tags,
+            "channel_tags": ", ".join(channel_info.tags),
             "viewer_count": (
                 stream_info.viewer_count if stream_info else "Failed to fetch stream."
             ),
