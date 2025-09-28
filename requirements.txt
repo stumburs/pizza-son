@@ -3,6 +3,5 @@
 aiofiles==24.1.0
 ollama==0.5.4
 pydantic==2.11.9
-twitchAPI==4.5.0
-# Manually added because pigar doesn't find it
 pytz==2025.2
+twitchAPI==4.5.0
