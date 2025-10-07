@@ -63,10 +63,10 @@ class OllamaService:
             "channel_name": target_channel,
             "time_cest": time_cest,
             "channel_tags": ", ".join(channel_info.tags),
-            "viewer_count": (
+            "viewer_count": str(
                 stream_info.viewer_count if stream_info else "Failed to fetch stream."
             ),
-            "thumbnail_url": (
+            "thumbnail_url": str(
                 stream_info.thumbnail_url if stream_info else "Failed to fetch stream."
             ),
         }
