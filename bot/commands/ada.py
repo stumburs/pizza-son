@@ -1,20 +1,20 @@
 from .base_command import BaseCommand, PermissionLevel
 from twitchAPI.chat import ChatCommand
-import random
+from bot.ada import ada
 
 
-class HugCommand(BaseCommand):
+class AdaCommand(BaseCommand):
     @property
     def name(self) -> str:
-        return "hug"
+        return "ada"
 
     @property
     def description(self) -> str:
-        return "Hugs the target user."
+        return "Responds based off previous interactions. Functions similarly to the chatbot - [Cleverbot](https://www.cleverbot.com/)."
 
     @property
     def usage(self) -> str:
-        return f"!{self.name} <user>"
+        return f"!{self.name} <text>"
 
     @property
     def permissions(self) -> list[PermissionLevel]:
@@ -25,7 +25,6 @@ class HugCommand(BaseCommand):
             await cmd.reply(f"Usage: {self.usage}")
             return
 
-        target = cmd.parameter.removeprefix("@").strip()
-        love = random.randint(0, 100)
+        response = await ada.get_ada_response(user_input=cmd.parameter)
 
-        await cmd.reply(f"{cmd.user.display_name} hugs {target} with {love}% love :3")
+        await cmd.reply(response)

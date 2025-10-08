@@ -42,6 +42,11 @@ class OllamaConfig(BaseModel):
     max_history: int = 80
 
 
+class AdaConfig(BaseModel):
+    enabled: bool = False
+    top_n: int = 3
+
+
 class Settings(BaseModel):
     twitch: TwitchConfig
     features: FeaturesConfig

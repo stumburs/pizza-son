@@ -3,7 +3,7 @@ from twitchAPI.chat import ChatCommand
 import random
 
 
-class PingCommand(BaseCommand):
+class IQCommand(BaseCommand):
     @property
     def name(self) -> str:
         return "iq"

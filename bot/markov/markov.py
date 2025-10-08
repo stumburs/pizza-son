@@ -11,20 +11,20 @@ async def load_ngrams_from_binary(path: str) -> None:
     if not os.path.exists(path):
         with open(path, "wb") as f:
             pickle.dump({}, f)
-        print(f"Ngrams file {path} did not exist, created empty file.")
+        print(f"[Markov] Ngrams file {path} did not exist, created empty file.")
         return
 
     with open(path, "rb") as f:
         ngrams = pickle.load(f)
 
-    print(f"Ngrams successfully loaded from {path}!")
+    print(f"[Markov] Ngrams successfully loaded from {path}!")
 
 
 async def save_ngrams_to_binary(path: str) -> None:
     with open(path, "wb") as f:
         pickle.dump(ngrams, f)
 
-    print(f"Ngrams successfully saved to {path}!")
+    print(f"[Markov] Ngrams successfully saved to {path}!")
 
 
 async def get_random_key() -> str:
@@ -64,7 +64,7 @@ async def build_ngrams(
         words = split_by_n_characters(text_to_use, character_count)
         print(words)
     else:
-        raise ValueError("Unknown split strategy to build Ngrams.")
+        raise ValueError("[Markov] Unknown split strategy to build Ngrams.")
 
     if len(words) == 1:
         word = words[0]
@@ -82,7 +82,7 @@ async def build_ngrams(
 
         ngrams[current_word].append(next_word)
 
-    print(f"Ngrams built by {character_count} characters.")
+    print(f"[Markov] Ngrams built by {character_count} characters.")
 
 
 # Helper function to split text by words (while keeping spaces)

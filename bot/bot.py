@@ -13,6 +13,7 @@ from bot.on_ready import on_ready
 from bot.markov import markov
 from bot.services import ollama_service, twitch_service
 from bot.config import config
+from bot.ada import ada
 
 
 async def run_bot() -> None:
@@ -69,6 +70,7 @@ async def run_bot() -> None:
     try:
         input("Press ENTER to stop! \n")
     finally:
+        await ada.save_database()
         await markov.save_ngrams_to_binary(path=settings.markov.ngram_path)
         chat.stop()
         await bot.close()
