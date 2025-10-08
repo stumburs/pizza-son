@@ -15,6 +15,11 @@ class TwitchConfig(BaseModel):
     moderators: List[str] = []
 
 
+class DiscordConfig(BaseModel):
+    token: str
+    enabled: bool
+
+
 class FeaturesConfig(BaseModel):
     tts: bool = False
 
@@ -49,6 +54,7 @@ class AdaConfig(BaseModel):
 
 class Settings(BaseModel):
     twitch: TwitchConfig
+    discord: DiscordConfig
     features: FeaturesConfig
     markov: MarkovConfig
     moderation: ModerationConfig

@@ -4,6 +4,10 @@ client_secret = ""
 target_channel = ""
 moderators = []
 
+[discord]
+enabled = false
+token = ""
+
 [features]
 tts = false
 

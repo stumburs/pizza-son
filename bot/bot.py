@@ -14,6 +14,7 @@ from bot.markov import markov
 from bot.services import ollama_service, twitch_service
 from bot.config import config
 from bot.ada import ada
+from bot.discord import discord
 
 
 async def run_bot() -> None:
@@ -67,13 +68,28 @@ async def run_bot() -> None:
 
     chat.start()
 
+    # Discord bot
+    discord_task = None
+    if settings.discord.enabled:
+        discord_bot = discord.DiscordBot()
+        discord_task = asyncio.create_task(discord_bot.start_bot())
+
     try:
-        input("Press ENTER to stop! \n")
+        await asyncio.Event().wait()
+    except (KeyboardInterrupt, SystemExit):
+        print("Shutting down pizza_son...")
     finally:
-        await ada.save_database()
-        await markov.save_ngrams_to_binary(path=settings.markov.ngram_path)
         chat.stop()
         await bot.close()
+
+        # Only close Discord bot if it was started
+        if discord_task is not None:
+            await discord_bot.close()
+            discord_task.cancel()
+
+        await ada.save_database()
+        await markov.save_ngrams_to_binary(path=settings.markov.ngram_path)
+        print("Cleanup complete!")
 
 
 if __name__ == "__main__":
