@@ -15,7 +15,7 @@ async def on_message(msg: ChatMessage) -> None:
 
     # Log all messages
     if _config.logging.log_all_messages:
-        logging.log_message(msg=msg)
+        await logging.log_message(msg=msg)
 
     # filter out commands
     if msg.text.startswith("!"):
