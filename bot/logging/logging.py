@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 from twitchAPI.chat import ChatMessage
 from bot.config import config
+from bot.services import twitch_service
 
 LOG_FILE = Path("logs/chat_logs.jsonl")
 LOG_FILE.parent.mkdir(exist_ok=True)
@@ -10,6 +11,7 @@ LOG_FILE.parent.mkdir(exist_ok=True)
 async def log_message(msg: ChatMessage) -> None:
     try:
         target_channel = config.get_settings().twitch.target_channel
+        channel_info = await twitch_service.get_cached_channel_info(target_channel)
 
         log_data = {
             "username": msg.user.name,
@@ -20,6 +22,8 @@ async def log_message(msg: ChatMessage) -> None:
             "subscriber": msg.user.subscriber,
             "vip": msg.user.vip,
             "mod": msg.user.mod,
+            "game": channel_info.game_name,
+            "title": channel_info.title,
         }
 
         with LOG_FILE.open("a", encoding="utf-8") as f:

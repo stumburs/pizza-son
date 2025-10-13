@@ -10,6 +10,31 @@ from twitchAPI.helper import first
 from typing import AsyncGenerator
 from bot.commands.base_command import PermissionLevel
 from bot.config import config
+from datetime import datetime, timedelta
+import asyncio
+
+_channel_info_cache = None
+_channel_info_last_update = datetime.min
+_channel_info_lock = asyncio.Lock()
+
+
+async def get_cached_channel_info(channel_name: str) -> ChannelInformation:
+    global _channel_info_cache, _channel_info_last_update
+
+    if (
+        _channel_info_cache is None
+        or datetime.now() - _channel_info_last_update > timedelta(minutes=5)
+    ):
+        async with _channel_info_lock:
+            # check twice because of async shenanigans
+            if (
+                _channel_info_cache is None
+                or datetime.now() - _channel_info_last_update > timedelta(minutes=5)
+            ):
+                _channel_info_cache = await get_channel_info(username=channel_name)
+                _channel_info_last_update = datetime.now()
+
+    return _channel_info_cache
 
 
 async def get_user_by_name(username: str) -> TwitchUser:
