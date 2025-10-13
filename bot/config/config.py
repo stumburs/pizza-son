@@ -52,6 +52,10 @@ class AdaConfig(BaseModel):
     top_n: int = 3
 
 
+class LoggingConfig(BaseModel):
+    log_all_messages: bool = False
+
+
 class Settings(BaseModel):
     twitch: TwitchConfig
     discord: DiscordConfig
@@ -59,6 +63,7 @@ class Settings(BaseModel):
     markov: MarkovConfig
     moderation: ModerationConfig
     ollama: OllamaConfig
+    logging: LoggingConfig
 
 
 _settings: Settings | None = None

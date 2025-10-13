@@ -3,7 +3,7 @@ from .config import config
 from .markov import markov
 from bot.filter import filter
 from bot.services import ollama_service
-
+from bot.logging import logging
 
 message_counter: int = 0
 
@@ -12,6 +12,10 @@ async def on_message(msg: ChatMessage) -> None:
     global message_counter
 
     _config: config.Settings = config.get_settings()
+
+    # Log all messages
+    if _config.logging.log_all_messages:
+        logging.log_message(msg=msg)
 
     # filter out commands
     if msg.text.startswith("!"):
