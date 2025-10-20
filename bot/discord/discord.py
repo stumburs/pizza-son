@@ -94,11 +94,16 @@ class DiscordBot(commands.Bot):
         print(f"[Discord] Logged in as {self.user.name} (ID: {self.user.id})")
 
     async def on_message(self, message: discord.Message):
+        _config: config.Settings = config.get_settings()
+
+        # Only listen to specific channels
+        if message.channel.id not in _config.discord.target_channel:
+            return
+
         # Ignore bot's own messages
         if message.author == self.user:
             return
 
-        _config: config.Settings = config.get_settings()
         text = message.content
         if not text:
             return

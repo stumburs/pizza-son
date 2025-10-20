@@ -40,6 +40,8 @@ async def load_commands() -> List[BaseCommand]:
         prompts = OllamaService.list_prompts_without_client(config.get_settings())
 
     for prompt in prompts:
+        if prompt in ["lark", "jark"]:
+            continue
         commands.append(create_ollama_command(prompt_name=prompt))
 
     return commands

@@ -3,3 +3,4 @@ tokens.json
 *.pkl
 # bot/services/ollama_prompts/*.txt
 conversations.json
+_config.toml

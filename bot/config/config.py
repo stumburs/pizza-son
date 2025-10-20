@@ -18,6 +18,7 @@ class TwitchConfig(BaseModel):
 class DiscordConfig(BaseModel):
     token: str
     enabled: bool
+    target_channel: List[int] = []
 
 
 class FeaturesConfig(BaseModel):

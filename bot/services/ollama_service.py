@@ -1,7 +1,7 @@
 from ollama import AsyncClient, ResponseError
 from twitchAPI.chat import ChatMessage, ChatCommand
 from collections import deque
-from typing import Dict, Optional
+from typing import Dict, Optional, List
 import os
 from bot.config import config
 from bot.services import twitch_service
@@ -124,6 +124,36 @@ class OllamaService:
 
             self.message_history.append(
                 {"role": "assistant", "content": response.message.content}
+            )
+
+            print(f"[OllamaService] Response: {response.message.content}")
+
+            return response.message.content[:400]
+        except ResponseError as e:
+            return f"Something went wrong while generating response: {e.error}"
+
+    async def get_llm_response_without_memory(self, cmd: ChatCommand) -> str:
+        if self.client is None:
+            return "Ollama client not initialized."
+
+        non_ollama_prompts = ["lark", "jark"]
+
+        question = {
+            "role": "user",
+            "content": f"{cmd.user.display_name + " asked assistant" if cmd.name not in non_ollama_prompts else "System"}: {cmd.parameter}",
+        }
+
+        messages: List[dict[str, str]] = []
+
+        messages = [await self.get_system_prompt(cmd.name.lower())] + [question]
+
+        print(f"[OllamaService] Question: {question}")
+
+        try:
+            response = await self.client.chat(
+                model=self.model,
+                messages=messages,
+                options={"num_predict": self.num_predict},
             )
 
             print(f"[OllamaService] Response: {response.message.content}")
