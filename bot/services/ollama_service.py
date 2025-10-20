@@ -140,7 +140,7 @@ class OllamaService:
 
         question = {
             "role": "user",
-            "content": f"{cmd.user.display_name + " asked assistant" if cmd.name not in non_ollama_prompts else "System"}: {cmd.parameter}",
+            "content": f"{cmd.user.display_name + ' asked assistant' if cmd.name not in non_ollama_prompts else 'System'}: {cmd.parameter}",
         }
 
         messages: List[dict[str, str]] = []
