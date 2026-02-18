@@ -1,0 +1,7 @@
+[twitch]
+user = "your_bot_username"
+oauth = "oauth:your_token_here"
+
+[bot]
+prefix = "!"
+channels = ["your_channel_here"]
