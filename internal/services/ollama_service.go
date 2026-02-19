@@ -41,19 +41,9 @@ func (s *OllamaService) GenerateResponse(prompt string) string {
 
 func (s *OllamaService) OnPrivateMessage(msg twitch.PrivateMessage) {
 	chat := s.Client.GetChat(msg.Channel)
+	// Create a new chat instance if it doesn't exist yet on this channel
 	if chat == nil {
-		newChat := ollama.Chat{
-			ID:       msg.Channel,
-			Messages: []ollama.Message{},
-		}
-		role := "system"
-		content := "You are a Twitch chat bot."
-		systemPrompt := ollama.Message{
-			Role:    &role,
-			Content: &content,
-			Images:  nil,
-		}
-		newChat.Messages = append(newChat.Messages, systemPrompt)
+		newChat := newChat(msg.Channel)
 		s.Client.PreloadChat(newChat)
 		chat = s.Client.GetChat(msg.Channel)
 		log.Println("Preloaded chat in", msg.Channel)
@@ -95,9 +85,49 @@ func (s *OllamaService) GenerateChatResponse(msg twitch.PrivateMessage, prompt s
 		return &ollama.ChatResponse{}, err
 	}
 
+	// Remove prompt and re-append to end
+	chat := s.Client.GetChat(chatID)
+	if chat == nil {
+		log.Println("Failed to get current chat to re-append system prompt")
+	} else {
+		readdSystemPrompt(chat, "TODO")
+	}
+
+	fmt.Println(chat)
+
 	return res, nil
 }
 
 func (s *OllamaService) Lobotomize(channel string) {
 	s.Client.DeleteChat(channel)
+}
+
+func newChat(channel string) ollama.Chat {
+	newChat := ollama.Chat{
+		ID:       channel,
+		Messages: []ollama.Message{},
+	}
+	role := "system"
+	content := "You are a Twitch chat bot."
+	systemPrompt := ollama.Message{
+		Role:    &role,
+		Content: &content,
+		Images:  nil,
+	}
+	newChat.Messages = append(newChat.Messages, systemPrompt)
+
+	return newChat
+}
+
+// Clears and adds new system prompt to the end of the chat
+func readdSystemPrompt(chat *ollama.Chat, prompt string) {
+	chat.DeleteMessage(0)
+	role := "system"
+	prompt = FillPlaceholders(prompt)
+	promptMessage := &ollama.Message{
+		Role:    &role,
+		Content: &prompt,
+		Images:  nil,
+	}
+	chat.AddMessageTo(0, *promptMessage)
 }
