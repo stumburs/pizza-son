@@ -5,3 +5,9 @@ oauth = "oauth:your_token_here"
 [bot]
 prefix = "!"
 channels = ["your_channel_here"]
+
+[ollama]
+host = "192.168.0.101:11434"
+model = "mistral:latest"
+num_predict = 80
+max_history = 80

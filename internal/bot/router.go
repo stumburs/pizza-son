@@ -3,6 +3,7 @@ package bot
 import (
 	"pizza-son/internal/commands"
 	"strings"
+	"time"
 
 	"github.com/gempir/go-twitch-irc/v4"
 )
@@ -13,12 +14,14 @@ type Router struct {
 
 	// Runs on every message before commands
 	MessageHooks []func(msg twitch.PrivateMessage)
+	Cooldowns    map[string]time.Time
 }
 
 func NewRouter(ctx *commands.Context) *Router {
 	return &Router{
-		Commands: make(map[string]commands.Command),
-		Ctx:      ctx,
+		Commands:  make(map[string]commands.Command),
+		Ctx:       ctx,
+		Cooldowns: make(map[string]time.Time),
 	}
 }
 
@@ -54,10 +57,18 @@ func (r *Router) HandleMessage(msg twitch.PrivateMessage) {
 		return
 	}
 
+	// Permissions
 	if !r.hasPermission(cmd.Permission(), msg) {
 		r.Ctx.Reply(msg.Channel, msg.ID, "You don't have permission to use this command.")
 		return
 	}
+
+	// Cooldown per command per user
+	key := msg.User.Name + ":" + cmd.Name()
+	if t, exists := r.Cooldowns[key]; exists && time.Since(t) < 5*time.Second {
+		return
+	}
+	r.Cooldowns[key] = time.Now()
 
 	go cmd.Execute(r.Ctx, msg, args)
 }

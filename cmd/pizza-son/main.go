@@ -18,13 +18,10 @@ func main() {
 	generator.ReadNgrams("data.bin")
 
 	log.Println("Loading config...")
-	cfg, err := config.Load("config.toml")
-	if err != nil {
-		panic(err)
-	}
+	config.Load("config.toml")
 
 	log.Println("Creating client...")
-	client := twitch.NewClient(cfg.Twitch.User, cfg.Twitch.OAuth)
+	client := twitch.NewClient(config.Get().Twitch.User, config.Get().Twitch.OAuth)
 
 	ctx := &commands.Context{
 		Reply: func(channel, replyToID, message string) {
@@ -34,9 +31,12 @@ func main() {
 
 	router := bot.NewRouter(ctx)
 
+	// !mark
 	router.Register(&commands.MarkCommand{
 		Generator: generator,
 	})
+	// !llm
+	router.Register(commands.NewAIPromptCommand("llm", commands.All))
 
 	// fricc hook
 	router.AddHook(func(msg twitch.PrivateMessage) {
@@ -50,8 +50,8 @@ func main() {
 		log.Println("Connected!")
 	})
 
-	log.Println("Joining channel(s):", cfg.Bot.Channels)
-	client.Join(cfg.Bot.Channels...)
+	log.Println("Joining channel(s):", config.Get().Bot.Channels)
+	client.Join(config.Get().Bot.Channels...)
 
 	log.Println("Connecting...")
 	if err := client.Connect(); err != nil {
