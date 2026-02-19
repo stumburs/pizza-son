@@ -7,3 +7,5 @@ require (
 	github.com/pelletier/go-toml/v2 v2.2.4
 	github.com/stumburs/mgo v1.0.0
 )
+
+require github.com/JexSrs/go-ollama v1.1.1

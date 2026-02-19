@@ -26,9 +26,11 @@ func (c *AIPromptCommand) Execute(ctx *Context, msg twitch.PrivateMessage, args 
 		return
 	}
 
-	response, err := services.OllamaService.GetLLMResponse(args)
+	services.Ollama.AddMessage(msg.Channel, msg.User.DisplayName, args)
+
+	response, err := services.Ollama.GenerateResponse(msg.Channel, args)
 	if err != nil {
-		ctx.Reply(msg.Channel, msg.ID, "AI service error")
+		ctx.Reply(msg.Channel, msg.ID, "AI service error"+err.Error())
 		return
 	}
 
