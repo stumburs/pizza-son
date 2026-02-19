@@ -15,15 +15,15 @@ func (c *MarkCommand) Name() string {
 	return "mark"
 }
 
-func (c *MarkCommand) Permission() Permission {
-	return All
+func (c *MarkCommand) Permissions() []Permission {
+	return []Permission{All}
 }
 
 func (c *MarkCommand) Execute(ctx *Context, msg twitch.PrivateMessage, args string) {
 	text := strings.TrimSpace(args)
 	c.Generator.SourceText = text
 
-	output := c.Generator.BuildNgrams(mgo.SplitByNCharacters, 3).GenerateText(100)
+	output := c.Generator.BuildNgrams(mgo.SplitByNCharacters, 4).GenerateText(100)
 
 	ctx.Reply(msg.Channel, msg.ID, output)
 }

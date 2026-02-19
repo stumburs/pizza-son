@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"net/url"
 	"pizza-son/internal/bot"
 	"pizza-son/internal/commands"
 	"pizza-son/internal/config"
@@ -14,20 +13,15 @@ import (
 )
 
 func main() {
+	log.Println("Loading config...")
+	config.Load("config.toml")
 
 	log.Println("Initializing Markov...")
 	generator := mgo.NewMarkovGenerator()
 	generator.ReadNgrams("data.bin")
 
-	log.Println("Loading config...")
-	config.Load("config.toml")
-
 	log.Println("Initializing Ollama...")
-	url, err := url.Parse("http://192.168.0.101:11434")
-	if err != nil {
-		panic(err)
-	}
-	services.InitOllamaService(*url, "mistral:latest", 80)
+	services.NewOllamaService()
 
 	log.Println("Creating client...")
 	client := twitch.NewClient(config.Get().Twitch.User, config.Get().Twitch.OAuth)
@@ -44,14 +38,33 @@ func main() {
 	router.Register(&commands.MarkCommand{
 		Generator: generator,
 	})
+	// !iq
+	router.Register(&commands.IQCommand{})
 	// !llm
-	router.Register(commands.NewAIPromptCommand("llm", commands.All))
+	router.Register(&commands.LLMCommand{})
+	// !lobotomize
+	router.Register(&commands.LobotomizeCommand{})
 
 	// fricc hook
 	router.AddHook(func(msg twitch.PrivateMessage) {
 		if strings.Contains(strings.ToLower(msg.Message), "fricc") {
 			router.Ctx.Reply(msg.Channel, msg.ID, "fricc u too")
 		}
+	})
+
+	// meow hook
+	router.AddHook(func(msg twitch.PrivateMessage) {
+		if msg.Message == "meow" {
+			router.Ctx.Reply(msg.Channel, msg.ID, "meow")
+		}
+	})
+
+	// ollama on message
+	router.AddHook(func(msg twitch.PrivateMessage) {
+		if strings.HasPrefix(msg.Message, "!") {
+			return
+		}
+		services.OllamaServiceInstance.OnPrivateMessage(msg)
 	})
 
 	client.OnPrivateMessage(router.HandleMessage)

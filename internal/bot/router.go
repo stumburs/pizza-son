@@ -2,6 +2,7 @@ package bot
 
 import (
 	"pizza-son/internal/commands"
+	"pizza-son/internal/utils"
 	"strings"
 	"time"
 
@@ -44,21 +45,16 @@ func (r *Router) HandleMessage(msg twitch.PrivateMessage) {
 		return
 	}
 
-	parts := strings.SplitN(msg.Message[1:], " ", 2)
-	name := parts[0]
+	commandName := utils.GetMessageCommandName(msg)
+	args := utils.GetMessageArgs(msg)
 
-	args := ""
-	if len(parts) > 1 {
-		args = parts[1]
-	}
-
-	cmd, ok := r.Commands[name]
+	cmd, ok := r.Commands[commandName]
 	if !ok {
 		return
 	}
 
 	// Permissions
-	if !r.hasPermission(cmd.Permission(), msg) {
+	if !r.hasPermission(cmd.Permissions(), msg) {
 		r.Ctx.Reply(msg.Channel, msg.ID, "You don't have permission to use this command.")
 		return
 	}
@@ -73,19 +69,28 @@ func (r *Router) HandleMessage(msg twitch.PrivateMessage) {
 	go cmd.Execute(r.Ctx, msg, args)
 }
 
-func (r *Router) hasPermission(level commands.Permission, msg twitch.PrivateMessage) bool {
-	switch level {
-	case commands.All:
-		return true
-	case commands.Subscriber:
-		return msg.User.Badges["subscriber"] == 1
-	case commands.VIP:
-		return msg.User.IsVip
-	case commands.Moderator:
-		return msg.User.IsMod
-	case commands.Streamer:
-		return msg.User.IsBroadcaster
-	default:
-		return false
+func (r *Router) hasPermission(levels []commands.Permission, msg twitch.PrivateMessage) bool {
+	for _, level := range levels {
+		switch level {
+		case commands.All:
+			return true
+		case commands.Subscriber:
+			if msg.User.Badges["subscriber"] == 1 {
+				return true
+			}
+		case commands.VIP:
+			if msg.User.IsVip {
+				return true
+			}
+		case commands.Moderator:
+			if msg.User.IsMod {
+				return true
+			}
+		case commands.Streamer:
+			if msg.User.IsBroadcaster {
+				return true
+			}
+		}
 	}
+	return false
 }

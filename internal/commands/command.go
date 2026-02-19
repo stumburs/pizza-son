@@ -4,7 +4,7 @@ import "github.com/gempir/go-twitch-irc/v4"
 
 type Command interface {
 	Name() string
-	Permission() Permission
+	Permissions() []Permission
 	Execute(ctx *Context, msg twitch.PrivateMessage, args string)
 }
 

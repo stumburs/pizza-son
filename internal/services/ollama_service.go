@@ -2,90 +2,102 @@ package services
 
 import (
 	"fmt"
+	"log"
 	"net/url"
-	"sync"
+	"pizza-son/internal/config"
 
 	"github.com/JexSrs/go-ollama"
+	"github.com/gempir/go-twitch-irc/v4"
 )
 
 type OllamaService struct {
-	client     *ollama.Ollama
-	model      string
-	numPredict int
-	mutex      sync.RWMutex
+	Client *ollama.Ollama
 }
 
-var Ollama *OllamaService
+var OllamaServiceInstance *OllamaService
 
-func InitOllamaService(host url.URL, model string, numPredict int) {
-	Ollama = &OllamaService{
-		client:     ollama.New(host),
-		model:      model,
-		numPredict: numPredict,
+func NewOllamaService() {
+	url, err := url.Parse("http://192.168.0.101:11434")
+	if err != nil {
+		panic(err)
+	}
+
+	OllamaServiceInstance = &OllamaService{
+		Client: ollama.New(*url),
 	}
 }
 
-// helper to get pointer of a string
-func strPtr(s string) *string {
-	return &s
-}
-
-func (s *OllamaService) AddMessage(channel, user, message string) {
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
-
-	chat := s.client.GetChat(channel)
-	if chat == nil {
-		chat = &ollama.Chat{
-			ID:       channel,
-			Messages: []ollama.Message{},
-		}
-		s.client.PreloadChat(*chat)
-		chat = s.client.GetChat(channel)
-	}
-
-	content := fmt.Sprintf("%s: %s", user, message)
-	chat.AddMessage(ollama.Message{
-		Role:    strPtr("user"),
-		Content: strPtr(content),
-		Images:  nil,
-	})
-}
-
-func (s *OllamaService) GenerateResponse(channel, userPrompt string) (string, error) {
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
-
-	chat := s.client.GetChat(channel)
-	if chat == nil {
-		newChat := ollama.Chat{
-			ID:       channel,
-			Messages: []ollama.Message{},
-		}
-		s.client.PreloadChat(newChat)
-		chat = s.client.GetChat(channel)
-	}
-
-	chat.AddMessage(ollama.Message{
-		Role:    strPtr("user"),
-		Content: strPtr(userPrompt),
-		Images:  nil,
-	})
-
-	chatId := channel
-	res, err := s.client.Chat(strPtr(chatId),
-		s.client.Chat.WithModel(s.model),
+func (s *OllamaService) GenerateResponse(prompt string) string {
+	res, err := s.Client.Generate(
+		s.Client.Generate.WithModel("mistral:latest"),
+		s.Client.Generate.WithPrompt(prompt),
 	)
 	if err != nil {
-		return "", fmt.Errorf("Ollama error: %w", err)
+		panic(err)
 	}
 
-	return *res.Message.Content, nil
+	return res.Response
 }
 
-func (s *OllamaService) ClearChannelHistory(channel string) {
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
+func (s *OllamaService) OnPrivateMessage(msg twitch.PrivateMessage) {
+	chat := s.Client.GetChat(msg.Channel)
+	if chat == nil {
+		newChat := ollama.Chat{
+			ID:       msg.Channel,
+			Messages: []ollama.Message{},
+		}
+		role := "system"
+		content := "You are a Twitch chat bot."
+		systemPrompt := ollama.Message{
+			Role:    &role,
+			Content: &content,
+			Images:  nil,
+		}
+		newChat.Messages = append(newChat.Messages, systemPrompt)
+		s.Client.PreloadChat(newChat)
+		chat = s.Client.GetChat(msg.Channel)
+		log.Println("Preloaded chat in", msg.Channel)
+	}
 
-	s.client.DeleteChat(channel)
+	role := "user"
+	content := fmt.Sprintf("%s chatted: %s", msg.User.DisplayName, msg.Message)
+	log.Println(content)
+
+	message := ollama.Message{
+		Role:    &role,
+		Content: &content,
+		Images:  nil,
+	}
+	chat.AddMessage(message)
+	log.Println("Added message '", content, "' to channel", msg.Channel)
+}
+
+func (s *OllamaService) GenerateChatResponse(msg twitch.PrivateMessage, prompt string) (*ollama.ChatResponse, error) {
+	chatID := msg.Channel
+	role := "user"
+	prompt = fmt.Sprintf("%s asked: %s", msg.User.DisplayName, prompt)
+
+	message := ollama.Message{
+		Role:    &role,
+		Content: &prompt,
+		Images:  nil,
+	}
+
+	res, err := s.Client.Chat(
+		&chatID,
+		s.Client.Chat.WithModel("mistral:latest"),
+		s.Client.Chat.WithMessage(message),
+		s.Client.Chat.WithOptions(ollama.Options{
+			NumPredict: &config.Get().Ollama.NumPredict,
+		}),
+	)
+	if err != nil {
+		return &ollama.ChatResponse{}, err
+	}
+
+	return res, nil
+}
+
+func (s *OllamaService) Lobotomize(channel string) {
+	s.Client.DeleteChat(channel)
 }
