@@ -42,6 +42,18 @@ func main() {
 	router.Register(&commands.IQCommand{})
 	// !llm
 	router.Register(&commands.LLMCommand{})
+	// !cat
+	router.Register(&commands.CatCommand{})
+	// !nsfw
+	router.Register(&commands.NSFWCommand{})
+	// !lark
+	router.Register(&commands.LarkCommand{})
+	// !joni
+	router.Register(&commands.JoniCommand{})
+	// !jark
+	router.Register(&commands.JarkCommand{})
+	// !math
+	router.Register(&commands.MathCommand{})
 	// !lobotomize
 	router.Register(&commands.LobotomizeCommand{})
 
