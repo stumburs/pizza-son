@@ -15,6 +15,10 @@ func (c *MarkCommand) Name() string {
 	return "mark"
 }
 
+func (c *MarkCommand) Permission() Permission {
+	return All
+}
+
 func (c *MarkCommand) Execute(ctx *Context, msg twitch.PrivateMessage, args string) {
 	text := strings.TrimSpace(args)
 	c.Generator.SourceText = text
