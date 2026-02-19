@@ -10,6 +10,9 @@ import (
 type Router struct {
 	Commands map[string]commands.Command
 	Ctx      *commands.Context
+
+	// Runs on every message before commands
+	MessageHooks []func(msg twitch.PrivateMessage)
 }
 
 func NewRouter(ctx *commands.Context) *Router {
@@ -23,7 +26,17 @@ func (r *Router) Register(cmd commands.Command) {
 	r.Commands[cmd.Name()] = cmd
 }
 
+func (r *Router) AddHook(hook func(msg twitch.PrivateMessage)) {
+	r.MessageHooks = append(r.MessageHooks, hook)
+}
+
 func (r *Router) HandleMessage(msg twitch.PrivateMessage) {
+	// Hooks
+	for _, hook := range r.MessageHooks {
+		go hook(msg)
+	}
+
+	// Commands
 	if !strings.HasPrefix(msg.Message, "!") {
 		return
 	}

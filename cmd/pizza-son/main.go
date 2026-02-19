@@ -5,6 +5,7 @@ import (
 	"pizza-son/internal/bot"
 	"pizza-son/internal/commands"
 	"pizza-son/internal/config"
+	"strings"
 
 	"github.com/gempir/go-twitch-irc/v4"
 	"github.com/stumburs/mgo"
@@ -35,6 +36,13 @@ func main() {
 
 	router.Register(&commands.MarkCommand{
 		Generator: generator,
+	})
+
+	// fricc hook
+	router.AddHook(func(msg twitch.PrivateMessage) {
+		if strings.Contains(strings.ToLower(msg.Message), "fricc") {
+			router.Ctx.Reply(msg.Channel, msg.ID, "fricc u too")
+		}
 	})
 
 	client.OnPrivateMessage(router.HandleMessage)
