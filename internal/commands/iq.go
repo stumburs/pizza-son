@@ -3,31 +3,20 @@ package commands
 import (
 	"fmt"
 	"math/rand/v2"
-	"strings"
-
-	"github.com/gempir/go-twitch-irc/v4"
+	"pizza-son/internal/bot"
 )
 
-type IQCommand struct {
-}
-
-func (c *IQCommand) Name() string {
-	return "iq"
-}
-
-func (c *IQCommand) Permissions() []Permission {
-	return []Permission{All}
-}
-
-func (c *IQCommand) Execute(ctx *Context, msg twitch.PrivateMessage, args string) {
-	iq_amount := rand.IntN(300)
-
-	text := strings.TrimSpace(args)
-	if text == "" {
-		ctx.Reply(msg.Channel, msg.ID, fmt.Sprintf("%s has %d IQ xddNerd", msg.User.DisplayName, iq_amount))
-		return
-	} else {
-		ctx.Reply(msg.Channel, msg.ID, fmt.Sprintf("%s has %d IQ xddNerd", text, iq_amount))
-		return
-	}
+func init() {
+	Register(bot.Command{
+		Name:        "iq",
+		Description: "Shows the IQ of target user.",
+		Handler: func(ctx bot.CommandContext) {
+			target := ctx.Message.User.DisplayName
+			if len(ctx.Args) > 0 {
+				target = ctx.Args[0]
+			}
+			iqAmount := rand.IntN(300)
+			ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, fmt.Sprintf("%s has %d IQ xddNerd", target, iqAmount))
+		},
+	})
 }
