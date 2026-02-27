@@ -33,6 +33,20 @@ func main() {
 		},
 	})
 
+	// Markov
+	services.NewMarkovService()
+	registry.RegisterListener(bot.ListenerEntry{
+		Name:        "markov-learn",
+		Description: "Feeds chat messages into Markov generator to train",
+		Handler: func(ctx bot.CommandContext) bool {
+			if strings.HasPrefix(ctx.Message.Message, config.Get().Bot.Prefix) {
+				return false
+			}
+			go services.MarkovServiceInstance.Learn(ctx.Message.Channel, ctx.Message.Message)
+			return true
+		},
+	})
+
 	b := bot.New(
 		config.Get().Twitch.User,
 		config.Get().Twitch.OAuth,
