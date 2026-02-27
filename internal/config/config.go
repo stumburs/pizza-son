@@ -14,8 +14,9 @@ type Config struct {
 	} `toml:"twitch"`
 
 	Bot struct {
-		Prefix   string   `toml:"prefix"`
-		Channels []string `toml:"channels"`
+		Prefix       string   `toml:"prefix"`
+		Channels     []string `toml:"channels"`
+		IgnoredUsers []string `toml:"ignored_users"`
 	} `toml:"bot"`
 
 	Ollama struct {

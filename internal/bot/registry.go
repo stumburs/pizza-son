@@ -1,6 +1,7 @@
 package bot
 
 import (
+	"pizza-son/internal/config"
 	"strings"
 	"sync"
 
@@ -58,6 +59,14 @@ func (r *Registry) RegisterListener(l ListenerEntry) {
 }
 
 func (r *Registry) Dispatch(client *twitch.Client, msg twitch.PrivateMessage) {
+
+	// Ignored users
+	for _, ignored := range config.Get().Bot.IgnoredUsers {
+		if strings.EqualFold(msg.User.Name, ignored) {
+			return
+		}
+	}
+
 	r.mu.Lock()
 	defer r.mu.Unlock()
 

@@ -1,6 +1,10 @@
 package bot
 
-import "github.com/gempir/go-twitch-irc/v4"
+import (
+	"slices"
+
+	"github.com/gempir/go-twitch-irc/v4"
+)
 
 type Permission int
 
@@ -32,11 +36,8 @@ func HasPermission(msg twitch.PrivateMessage, required Permission) bool {
 	if msg.User.IsMod {
 		userLevel = Moderator
 	}
-	for _, mod := range botModerators {
-		if msg.User.Name == mod {
-			userLevel = BotModerator
-			break
-		}
+	if slices.Contains(botModerators, msg.User.Name) {
+		userLevel = BotModerator
 	}
 	if msg.User.IsBroadcaster {
 		userLevel = Streamer

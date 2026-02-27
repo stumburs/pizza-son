@@ -5,6 +5,7 @@ oauth = "oauth:your_token_here"
 [bot]
 prefix = "!"
 channels = ["your_channel_here"]
+ignored_users = ["streamelements", "creatisbot", "nightbot", "fossabot"]
 
 [ollama]
 host = "192.168.0.101:11434"
