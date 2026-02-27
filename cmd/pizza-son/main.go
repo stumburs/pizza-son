@@ -17,6 +17,9 @@ func main() {
 	registry := bot.NewRegistry(config.Get().Bot.Prefix)
 	commands.SetRegistry(registry)
 
+	// Twitch API
+	services.NewTwitchService()
+
 	// Ollama
 	services.NewOllamaService()
 	// Register on message listener
@@ -46,6 +49,9 @@ func main() {
 			return true
 		},
 	})
+
+	// Ada
+	services.NewAdaService()
 
 	b := bot.New(
 		config.Get().Twitch.User,

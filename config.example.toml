@@ -1,6 +1,9 @@
 [twitch]
 user = "your_bot_username"
 oauth = "oauth:your_token_here"
+client_id = "bot_client_id"
+# https://dev.twitch.tv/console
+client_secret = "secret_from_developer_console" 
 
 [bot]
 prefix = "!"
@@ -12,3 +15,7 @@ host = "192.168.0.101:11434"
 model = "mistral:latest"
 num_predict = 80
 max_history = 80
+
+[markov]
+autosave_interval = 50
+length_to_generate = 200

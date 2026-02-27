@@ -1,2 +1,4 @@
 config.toml
 data.bin
+ada_data/
+markov_data/

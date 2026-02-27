@@ -155,7 +155,7 @@ func newChat(channel string) ollama.Chat {
 func readdSystemPrompt(chat *ollama.Chat, prompt string) {
 	chat.DeleteMessage(0)
 	role := "system"
-	prompt = FillPlaceholders(prompt)
+	prompt = FillPlaceholders(prompt, chat.ID)
 	promptMessage := &ollama.Message{
 		Role:    &role,
 		Content: &prompt,

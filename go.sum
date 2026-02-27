@@ -2,6 +2,10 @@ github.com/JexSrs/go-ollama v1.1.1 h1:+dggIeIxkVUgLq2k6l3bJ+5dtHr2+NTacYIz/bjshz
 github.com/JexSrs/go-ollama v1.1.1/go.mod h1:OjK/woUpcpAszwEABTcjwOOy2Sf/q+BYLvU7oAPKVVs=
 github.com/gempir/go-twitch-irc/v4 v4.3.1 h1:aWLyxnTD7rga1CPow9ALPWNTUH/HsS3G5d3uXzVBG6s=
 github.com/gempir/go-twitch-irc/v4 v4.3.1/go.mod h1:QsOMMAk470uxQ7EYD9GJBGAVqM/jDrXBNbuePfTauzg=
+github.com/golang-jwt/jwt/v4 v4.5.2 h1:YtQM7lnr8iZ+j5q71MGKkNw9Mn7AjHM68uc9g5fXeUI=
+github.com/golang-jwt/jwt/v4 v4.5.2/go.mod h1:m21LjoU+eqJr34lmDMbreY2eSTRJ1cv77w39/MY0Ch0=
+github.com/nicklaw5/helix/v2 v2.32.0 h1:ZRPt+wRUMQqpny6yZKVY9rUGNwv+ZmIh75fSiopMXuY=
+github.com/nicklaw5/helix/v2 v2.32.0/go.mod h1:KaXa2mb2kBzsDana9RbXevTgnfU95DMoSORWo2hqlWA=
 github.com/pelletier/go-toml/v2 v2.2.4 h1:mye9XuhQ6gvn5h28+VilKrrPoQVanw5PMw/TB0t5Ec4=
 github.com/pelletier/go-toml/v2 v2.2.4/go.mod h1:2gIqNv+qfxSVS7cM2xJQKtLSTLUE9V8t9Stt+h56mCY=
 github.com/stumburs/mgo v1.0.0 h1:c6r4AP1nS5f5WnuBM12N5R7VIAkJjpfJ7Pu2+io+vlA=

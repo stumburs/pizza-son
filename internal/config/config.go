@@ -9,8 +9,10 @@ import (
 
 type Config struct {
 	Twitch struct {
-		User  string `toml:"user"`
-		OAuth string `toml:"oauth"`
+		User         string `toml:"user"`
+		OAuth        string `toml:"oauth"`
+		ClientID     string `toml:"client_id"`
+		ClientSecret string `toml:"client_secret"`
 	} `toml:"twitch"`
 
 	Bot struct {
@@ -25,6 +27,11 @@ type Config struct {
 		NumPredict int    `toml:"num_predict"`
 		MaxHistory int    `toml:"max_history"`
 	} `toml:"ollama"`
+
+	Markov struct {
+		AutosaveInterval int `toml:"autosave_interval"`
+		LengthToGenerate int `toml:"length_to_generate"`
+	} `toml:"markov"`
 }
 
 var cfg *Config
@@ -48,4 +55,9 @@ func Get() *Config {
 		log.Fatal("Config not loaded. Call config.Load() first.")
 	}
 	return cfg
+}
+
+func Reload(path string) {
+	log.Println("[Config] Reloaded config from", path)
+	Load(path)
 }

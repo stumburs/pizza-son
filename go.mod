@@ -8,4 +8,9 @@ require (
 	github.com/stumburs/mgo v1.0.0
 )
 
-require github.com/JexSrs/go-ollama v1.1.1
+require (
+	github.com/JexSrs/go-ollama v1.1.1
+	github.com/nicklaw5/helix/v2 v2.32.0
+)
+
+require github.com/golang-jwt/jwt/v4 v4.5.2 // indirect

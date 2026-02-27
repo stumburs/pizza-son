@@ -21,27 +21,41 @@ const (
 var botModerators = []string{"pizza_tm"}
 
 func HasPermission(msg twitch.PrivateMessage, required Permission) bool {
-	if required == All {
-		return true
-	}
+	return GetPermissionLevel(msg) >= required
+}
 
-	userLevel := All
-
-	if msg.User.Badges["subscriber"] > 0 {
-		userLevel = Subscriber
-	}
-	if msg.User.IsVip {
-		userLevel = VIP
-	}
-	if msg.User.IsMod {
-		userLevel = Moderator
+func GetPermissionLevel(msg twitch.PrivateMessage) Permission {
+	if msg.User.IsBroadcaster {
+		return Streamer
 	}
 	if slices.Contains(botModerators, msg.User.Name) {
-		userLevel = BotModerator
+		return BotModerator
 	}
-	if msg.User.IsBroadcaster {
-		userLevel = Streamer
+	if msg.User.IsMod {
+		return Moderator
 	}
+	if msg.User.IsVip {
+		return VIP
+	}
+	if msg.User.Badges["subscriber"] > 0 {
+		return Subscriber
+	}
+	return All
+}
 
-	return userLevel >= required
+func PermissionName(p Permission) string {
+	switch p {
+	case Subscriber:
+		return "Subscriber"
+	case VIP:
+		return "VIP"
+	case Moderator:
+		return "Moderator"
+	case BotModerator:
+		return "Bot Moderator"
+	case Streamer:
+		return "Streamer"
+	default:
+		return "Everyone"
+	}
 }
