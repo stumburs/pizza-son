@@ -3,6 +3,7 @@ package services
 import (
 	"log"
 	"pizza-son/internal/config"
+	"time"
 
 	"github.com/nicklaw5/helix/v2"
 )
@@ -32,15 +33,34 @@ func NewTwitchService() {
 	}
 
 	token, err := client.RequestAppAccessToken([]string{})
-	if err != nil {
-		log.Fatal("[Twitch] Failed to get app access token:", err)
+	if err != nil || token.Data.AccessToken == "" {
+		log.Fatal("[Twitch] Failed to get app access token:", err, token.ErrorMessage)
 	}
 
 	log.Printf("[Twitch] Got access token, expires in %d seconds", token.Data.ExpiresIn)
 	client.SetAppAccessToken(token.Data.AccessToken)
 
 	TwitchServiceInstance = &TwitchService{client: client}
+	TwitchServiceInstance.startTokenRefresh(client, token.Data.ExpiresIn)
 	log.Println("[Twitch] Service initialized")
+}
+
+func (s *TwitchService) startTokenRefresh(client *helix.Client, expiresIn int) {
+	go func() {
+		for {
+			time.Sleep(time.Duration(expiresIn-300) * time.Second)
+
+			token, err := client.RequestAppAccessToken([]string{})
+			if err != nil || token.Data.AccessToken == "" {
+				log.Println("[Twitch] Failed to refresh app token:", err)
+				time.Sleep(30 * time.Second)
+				continue
+			}
+			client.SetAppAccessToken(token.Data.AccessToken)
+			expiresIn = token.Data.ExpiresIn
+			log.Printf("[Twitch] App token refreshed, expires in %d seconds", expiresIn)
+		}
+	}()
 }
 
 func (s *TwitchService) GetStreamInfo(channel string) StreamInfo {

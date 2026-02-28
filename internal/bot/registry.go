@@ -81,7 +81,8 @@ func (r *Registry) Dispatch(client *twitch.Client, msg twitch.PrivateMessage) {
 		if !HasPermission(msg, l.Permission) {
 			continue
 		}
-		l.Handler(ctx)
+		l := l
+		go l.Handler(ctx)
 	}
 
 	// Run commands if starts with prefix
@@ -107,7 +108,7 @@ func (r *Registry) Dispatch(client *twitch.Client, msg twitch.PrivateMessage) {
 
 	ctx.Args = parts[1:]
 
-	cmd.Handler(ctx)
+	go cmd.Handler(ctx)
 }
 
 func (r *Registry) Commands() map[string]Command {
