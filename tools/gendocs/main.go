@@ -34,7 +34,7 @@ Use the search bar above to find a specific command.
 ---
 {{ end }}
 
-## Permission Levels
+# Permission Levels
 
 | Level | Description |
 |-------|-------------|
