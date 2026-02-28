@@ -9,6 +9,7 @@ on:
       - "mkdocs.yml"
       - "tools/gendocs/**"
       - "internal/commands/**"
+      - ".github/workflows/docs.yml"
 
 permissions:
   contents: write
