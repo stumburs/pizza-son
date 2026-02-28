@@ -25,7 +25,7 @@ Use the search bar above to find a specific command.
 
 {{ .Description }}
 
-{{ if. Usage -}}
+{{ if .Usage -}}
 **Usage:** {{ $.Tick }}{{ .Usage }}{{ $.Tick }}
 {{- end }}
 
