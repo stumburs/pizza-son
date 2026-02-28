@@ -7,8 +7,8 @@ import (
 
 func init() {
 	Register(bot.Command{
-		Name:        "pee",
-		Description: "Pees on the target user.",
+		Name:        "lobotomize",
+		Description: "Clears the LLM's memory in this channel.",
 		Permission:  bot.Moderator,
 		Handler: func(ctx bot.CommandContext) {
 			services.OllamaServiceInstance.Lobotomize(ctx.Message.Channel)
