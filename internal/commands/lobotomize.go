@@ -13,6 +13,7 @@ func init() {
 		Permission:  bot.Moderator,
 		Handler: func(ctx bot.CommandContext) {
 			services.OllamaServiceInstance.Lobotomize(ctx.Message.Channel)
+			ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "meow")
 		},
 	})
 }

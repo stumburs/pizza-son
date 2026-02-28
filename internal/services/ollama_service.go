@@ -130,6 +130,7 @@ func (s *OllamaService) GenerateChatResponse(msg twitch.PrivateMessage, prompt s
 
 func (s *OllamaService) Lobotomize(channel string) {
 	s.Client.DeleteChat(channel)
+	log.Println("[Ollama] Bot Lobotomized in", channel)
 }
 
 func newChat(channel string) ollama.Chat {
