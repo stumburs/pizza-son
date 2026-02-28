@@ -9,6 +9,7 @@ func init() {
 	Register(bot.Command{
 		Name:        "reloadconfig",
 		Description: "Reloads the config file.",
+		Usage:       "!reloadconfig",
 		Permission:  bot.BotModerator,
 		Handler: func(ctx bot.CommandContext) {
 			config.Reload("config.toml")

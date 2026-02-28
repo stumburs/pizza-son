@@ -10,6 +10,7 @@ func init() {
 	Register(bot.Command{
 		Name:        "pee",
 		Description: "Pees on the target user.",
+		Usage:       "!pee [user]",
 		Handler: func(ctx bot.CommandContext) {
 			target := ctx.Message.User.DisplayName
 			flavor := rand.IntN(100)

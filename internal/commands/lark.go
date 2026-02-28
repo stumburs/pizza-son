@@ -10,6 +10,7 @@ func init() {
 	Register(bot.Command{
 		Name:        "lark",
 		Description: "Reinterprets a message from !mark using an LLM.",
+		Usage:       "!lark [text]",
 		Handler: func(ctx bot.CommandContext) {
 			markMsg := services.MarkovServiceInstance.Generate(ctx.Message.Channel)
 			res, err := services.OllamaServiceInstance.GenerateChatResponse(ctx.Message, markMsg)

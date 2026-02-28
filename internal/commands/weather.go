@@ -10,7 +10,8 @@ import (
 func init() {
 	Register(bot.Command{
 		Name:        "weather",
-		Description: "Gets the temperature for a location. Usage: !weather <location>",
+		Description: "Gets the temperature for a location.",
+		Usage:       "!weather <location>",
 		Handler: func(ctx bot.CommandContext) {
 			if len(ctx.Args) == 0 {
 				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "Usage: !weather <location>")

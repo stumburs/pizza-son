@@ -10,6 +10,7 @@ func init() {
 	Register(bot.Command{
 		Name:        "ada",
 		Description: "Chat with Ada, the learning chatbot.",
+		Usage:       "!ada <text>",
 		Handler: func(ctx bot.CommandContext) {
 			if len(ctx.Args) == 0 {
 				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "Say something to Ada!")

@@ -20,6 +20,7 @@ type Listener func(ctx CommandContext) bool
 type Command struct {
 	Name        string
 	Description string
+	Usage       string
 	Permission  Permission
 	Handler     CommandHandler
 }

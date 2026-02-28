@@ -11,6 +11,7 @@ func init() {
 	Register(bot.Command{
 		Name:        "llm",
 		Description: "Responds as a basic LLM.",
+		Usage:       "!llm <text>",
 		Handler: func(ctx bot.CommandContext) {
 			res, err := services.OllamaServiceInstance.GenerateChatResponse(ctx.Message, strings.Join(ctx.Args, " "))
 			if err != nil {

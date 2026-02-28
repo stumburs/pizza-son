@@ -11,6 +11,7 @@ func init() {
 	Register(bot.Command{
 		Name:        "nsfw",
 		Description: "Responds as a spicy LLM ;)",
+		Usage:       "!nsfw <text>",
 		Handler: func(ctx bot.CommandContext) {
 			res, err := services.OllamaServiceInstance.GenerateChatResponse(ctx.Message, strings.Join(ctx.Args, " "))
 			if err != nil {

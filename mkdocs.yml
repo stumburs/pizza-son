@@ -12,6 +12,10 @@ theme:
     - navigation.instant
     - navigation.top
     - search.suggest
+    - search.highlight
+
+plugins:
+  - search
 
 nav:
   - Home: index.md
@@ -19,3 +23,6 @@ nav:
 
 repo_url: https://github.com/stumburs/pizza-son
 repo_name: pizza-son
+
+markdown_extensions:
+  - admonition

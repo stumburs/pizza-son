@@ -10,6 +10,7 @@ func init() {
 	Register(bot.Command{
 		Name:        "iq",
 		Description: "Shows the IQ of target user.",
+		Usage:       "!iq [user]",
 		Handler: func(ctx bot.CommandContext) {
 			target := ctx.Message.User.DisplayName
 			if len(ctx.Args) > 0 {

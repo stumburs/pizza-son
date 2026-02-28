@@ -6,6 +6,7 @@ func init() {
 	Register(bot.Command{
 		Name:        "ping",
 		Description: "Responds with Pong!",
+		Usage:       "!ping",
 		Handler: func(ctx bot.CommandContext) {
 			ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "Pong!")
 		},

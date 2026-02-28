@@ -10,6 +10,7 @@ func init() {
 	Register(bot.Command{
 		Name:        "hug",
 		Description: "Hugs the target user.",
+		Usage:       "!hug [user]",
 		Handler: func(ctx bot.CommandContext) {
 			target := ctx.Message.User.DisplayName
 			loveAmount := rand.IntN(100)

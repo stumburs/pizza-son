@@ -12,12 +12,26 @@ import (
 
 var docTemplate = `# Commands
 
-All commands use the {{ .Tick }}!help{{ .Tick }} command to see available commands.
+Use the search bar above to find a specific command.
 
-| Command | Description | Permission |
-|---------|-------------|------------|
-{{ range .Commands -}}
-| {{ $.Tick }}!{{ .Name }}{{ $.Tick }} | {{ .Description }} | {{ .Permission }} |
+!!! info "Usage notation"
+    - {{ $.Tick }}<argument>{{ $.Tick }} — required
+    - {{ $.Tick }}[argument]{{ $.Tick }} — optional
+
+---
+
+{{ range .Commands }}
+ ## {{ $.Tick }}!{{ .Name }}{{ $.Tick }}
+
+{{ .Description }}
+
+{{ if. Usage -}}
+**Usage:** {{ $.Tick }}{{ .Usage }}{{ $.Tick }}
+{{- end }}
+
+**Permission:** {{ .Permission }}
+
+---
 {{ end }}
 
 ## Permission Levels
@@ -35,6 +49,7 @@ All commands use the {{ .Tick }}!help{{ .Tick }} command to see available comman
 type CommandDoc struct {
 	Name        string
 	Description string
+	Usage       string
 	Permission  string
 }
 
@@ -54,6 +69,7 @@ func main() {
 		docs = append(docs, CommandDoc{
 			Name:        cmd.Name,
 			Description: cmd.Description,
+			Usage:       cmd.Usage,
 			Permission:  bot.PermissionName(cmd.Permission),
 		})
 	}

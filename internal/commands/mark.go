@@ -9,6 +9,7 @@ func init() {
 	Register(bot.Command{
 		Name:        "mark",
 		Description: "Responds using a markov chain algorithm trained on this chat.",
+		Usage:       "!mark [text]",
 		Handler: func(ctx bot.CommandContext) {
 			text := services.MarkovServiceInstance.Generate(ctx.Message.Channel)
 			if text == "" {

@@ -10,6 +10,7 @@ func init() {
 	Register(bot.Command{
 		Name:        "pp",
 		Description: "Shows the pp size of target user.",
+		Usage:       "!pp [user]",
 		Handler: func(ctx bot.CommandContext) {
 			target := ctx.Message.User.DisplayName
 			if len(ctx.Args) > 0 {

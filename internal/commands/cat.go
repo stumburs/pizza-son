@@ -11,6 +11,7 @@ func init() {
 	Register(bot.Command{
 		Name:        "cat",
 		Description: "Responds as a cat.",
+		Usage:       "!cat <text>",
 		Handler: func(ctx bot.CommandContext) {
 			res, err := services.OllamaServiceInstance.GenerateChatResponse(ctx.Message, strings.Join(ctx.Args, " "))
 			if err != nil {
