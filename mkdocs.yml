@@ -14,9 +14,13 @@ theme:
     - search.suggest
     - search.highlight
     - search.share
+  hide:
+    - toc
 
 plugins:
-  - search
+  - search:
+      separator: '[\s\-\!]+'
+
 nav:
   - Home: index.md
   - Commands: commands.md
@@ -26,3 +30,5 @@ repo_name: pizza-son
 
 markdown_extensions:
   - admonition
+  - toc:
+      permalink: true
