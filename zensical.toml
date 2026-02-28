@@ -19,7 +19,6 @@ features = [
   "search.suggest",
   "search.highlight",
   "search.share",
-  "toc.integrate",
 ]
 
 [[project.theme.palette]]
