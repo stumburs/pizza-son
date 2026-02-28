@@ -1,0 +1,21 @@
+site_name: pizza_son
+site_description: Documentation for the pizza_son Twitch bot
+site_url: https://stumburs.github.io/pizza-son
+
+theme:
+  name: material
+  palette:
+    scheme: slate
+    primary: deep purple
+    accent: purple
+  features:
+    - navigation.instant
+    - navigation.top
+    - search.suggest
+
+nav:
+  - Home: index.md
+  - Commands: commands.md
+
+repo_url: https://github.com/stumburs/pizza-son
+repo_name: pizza-son
