@@ -30,6 +30,6 @@ func (b *Bot) Start() error {
 		b.client.Join(ch)
 	}
 
-	log.Println("Bot connecting...")
+	log.Println("[Bot] Bot connecting to:", b.channels)
 	return b.client.Connect()
 }

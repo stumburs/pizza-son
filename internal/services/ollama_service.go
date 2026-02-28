@@ -37,7 +37,7 @@ func (s *OllamaService) GetPromptByCommand(command string) string {
 
 	content, err := os.ReadFile(promptFile)
 	if err != nil {
-		log.Printf("Failed to load prompt for command %s: %v", command, err)
+		log.Printf("[Ollama] Failed to load prompt for command %s: %v", command, err)
 		// Fallback to default prompt
 		content, _ = os.ReadFile("prompts/llm.txt")
 	}
@@ -72,12 +72,11 @@ func (s *OllamaService) OnPrivateMessage(msg twitch.PrivateMessage) {
 		newChat := newChat(msg.Channel)
 		s.Client.PreloadChat(newChat)
 		chat = s.Client.GetChat(msg.Channel)
-		log.Println("Preloaded chat in", msg.Channel)
+		log.Println("[Ollama] Preloaded chat in", msg.Channel)
 	}
 
 	role := "user"
 	content := fmt.Sprintf("%s chatted: %s", msg.User.DisplayName, msg.Message)
-	log.Println(content)
 
 	message := ollama.Message{
 		Role:    &role,
@@ -85,7 +84,6 @@ func (s *OllamaService) OnPrivateMessage(msg twitch.PrivateMessage) {
 		Images:  nil,
 	}
 	chat.AddMessage(message)
-	log.Println("Added message '", content, "' to channel", msg.Channel)
 }
 
 func (s *OllamaService) GenerateChatResponse(msg twitch.PrivateMessage, prompt string) (*ollama.ChatResponse, error) {
