@@ -44,6 +44,13 @@ Use the search bar above to find a specific command.
 | Moderator | Channel moderators |
 | Bot Moderator | Bot-specific moderators |
 | Streamer | The broadcaster |
+
+*[Everyone]: All viewers can use this command
+*[Subscriber]: Channel subscribers and above
+*[VIP]: Channel VIPs and above
+*[Moderator]: Channel moderators and above
+*[Bot Moderator]: Bot-specific moderators and above
+*[Streamer]: The broadcaster only
 `
 
 type CommandDoc struct {

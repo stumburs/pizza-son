@@ -27,6 +27,7 @@ primary = "deep-purple"
 accent = "purple"
 
 [project.markdown_extensions.admonition]
+[project.markdown_extensions.abbr]
 
 [project.markdown_extensions.toc]
 permalink = true
