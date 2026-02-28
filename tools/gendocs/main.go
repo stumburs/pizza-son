@@ -2,12 +2,12 @@ package main
 
 import (
 	"fmt"
-	"html/template"
 	"os"
 	"pizza-son/internal/bot"
 	"pizza-son/internal/commands"
 	"sort"
 	"strings"
+	"text/template"
 )
 
 var docTemplate = `# Commands
@@ -21,7 +21,7 @@ Use the search bar above to find a specific command.
 ---
 
 {{ range .Commands }}
- ## {{ $.Tick }}!{{ .Name }}{{ $.Tick }}
+## {{ $.Tick }}!{{ .Name }}{{ $.Tick }}
 
 {{ .Description }}
 

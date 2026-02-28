@@ -13,9 +13,12 @@ theme:
     - navigation.top
     - search.suggest
     - search.highlight
+    - navigation.indexes
 
 plugins:
-  - search
+  - search:
+      separator: '[\s\-]+'
+      indexing: full
 
 nav:
   - Home: index.md
