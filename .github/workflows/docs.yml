@@ -6,7 +6,7 @@ on:
       - main
     paths:
       - "docs/**"
-      - "mkdocs.yml"
+      - "zensical.toml"
       - "tools/gendocs/**"
       - "internal/commands/**"
       - ".github/workflows/docs.yml"

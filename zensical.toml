@@ -1,0 +1,33 @@
+[project]
+site_name = "pizza_son"
+site_description = "Documentation for the pizza_son Twitch bot"
+site_url = "https://stumburs.github.io/pizza-son"
+repo_url = "https://github.com/stumburs/pizza-son"
+repo_name = "pizza-son"
+
+[project.theme]
+name = "material"
+
+[[project.theme.palette]]
+scheme = "slate"
+primary = "deep-purple"
+accent = "purple"
+
+[project.theme.features]
+navigation = ["instant", "top"]
+search = ["suggest", "highlight", "share"]
+toc = { hide = true }
+
+[project.nav]
+pages = [
+  { title = "Home", path = "index.md" },
+  { title = "Commands", path = "commands.md" },
+]
+
+[project.markdown_extensions.admonition]
+
+[project.markdown_extensions.toc]
+permalink = true
+
+[project.search]
+separator = '[\s\-\!]+'

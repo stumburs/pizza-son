@@ -4,3 +4,5 @@ ada_data/
 markov_data/
 pizza-son
 pizza-son.exe
+.cache/
+site/
