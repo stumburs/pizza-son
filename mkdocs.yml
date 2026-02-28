@@ -16,10 +16,7 @@ theme:
     - search.share
 
 plugins:
-  - search:
-      separator: '[\s\-\!]+'
-      indexing: full
-
+  - search
 nav:
   - Home: index.md
   - Commands: commands.md
