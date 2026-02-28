@@ -21,7 +21,7 @@ Use the search bar above to find a specific command.
 ---
 
 {{ range .Commands }}
-## {{ $.Tick }}!{{ .Name }}{{ $.Tick }}
+## !{{ .Name }}
 
 {{ .Description }}
 

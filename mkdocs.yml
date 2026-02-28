@@ -13,11 +13,11 @@ theme:
     - navigation.top
     - search.suggest
     - search.highlight
-    - navigation.indexes
+    - search.share
 
 plugins:
   - search:
-      separator: '[\s\-]+'
+      separator: '[\s\-\!]+'
       indexing: full
 
 nav:
