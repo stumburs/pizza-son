@@ -5,24 +5,27 @@ site_url = "https://stumburs.github.io/pizza-son"
 repo_url = "https://github.com/stumburs/pizza-son"
 repo_name = "pizza-son"
 
+nav = [
+  { "Home" = "index.md" },
+  { "Commands" = "commands.md" },
+]
+
 [project.theme]
 name = "material"
+language = "en"
+features = [
+  "navigation.instant",
+  "navigation.top",
+  "search.suggest",
+  "search.highlight",
+  "search.share",
+  "toc.integrate",
+]
 
 [[project.theme.palette]]
 scheme = "slate"
 primary = "deep-purple"
 accent = "purple"
-
-[project.theme.features]
-navigation = ["instant", "top"]
-search = ["suggest", "highlight", "share"]
-toc = { hide = true }
-
-[project.nav]
-pages = [
-  { title = "Home", path = "index.md" },
-  { title = "Commands", path = "commands.md" },
-]
 
 [project.markdown_extensions.admonition]
 
