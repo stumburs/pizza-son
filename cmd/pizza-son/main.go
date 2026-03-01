@@ -19,6 +19,9 @@ func main() {
 	// Quotes
 	services.NewQuoteService()
 
+	// RNN Model
+	services.NewRNNService()
+
 	// Command registry
 	registry := bot.NewRegistry(config.Get().Bot.Prefix)
 	commands.SetRegistry(registry)
