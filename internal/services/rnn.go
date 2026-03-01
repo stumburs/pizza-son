@@ -194,6 +194,11 @@ func (s *RNNService) Generate(seed string, length int, temperature float32) stri
 	return string(result)
 }
 
+func (s *RNNService) RandomSeed() string {
+	idx := rand.IntN(s.vocabSize)
+	return s.idx2char[idx]
+}
+
 func sampleLogits(logits []float32, temperature float32) int {
 	max := logits[0]
 	for _, v := range logits {
