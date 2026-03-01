@@ -50,7 +50,10 @@ func NewTwitchService() {
 	log.Printf("[Twitch] Got access token, expires in %d seconds", token.Data.ExpiresIn)
 	client.SetAppAccessToken(token.Data.AccessToken)
 
-	TwitchServiceInstance = &TwitchService{client: client}
+	TwitchServiceInstance = &TwitchService{
+		client: client,
+		cache:  map[string]cachedStreamInfo{},
+	}
 	TwitchServiceInstance.startTokenRefresh(client, token.Data.ExpiresIn)
 	log.Println("[Twitch] Service initialized")
 }
@@ -75,10 +78,6 @@ func (s *TwitchService) startTokenRefresh(client *helix.Client, expiresIn int) {
 
 func (s *TwitchService) GetStreamInfo(channel string) StreamInfo {
 	s.mu.Lock()
-
-	if s.cache == nil {
-		s.cache = make(map[string]cachedStreamInfo)
-	}
 
 	if cached, ok := s.cache[channel]; ok {
 		if time.Since(cached.fetchedAt) < cacheDuration {
