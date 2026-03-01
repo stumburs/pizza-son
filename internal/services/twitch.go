@@ -3,6 +3,7 @@ package services
 import (
 	"log"
 	"pizza-son/internal/config"
+	"sync"
 	"time"
 
 	"github.com/nicklaw5/helix/v2"
@@ -10,6 +11,13 @@ import (
 
 type TwitchService struct {
 	client *helix.Client
+	cache  map[string]cachedStreamInfo
+	mu     sync.Mutex
+}
+
+type cachedStreamInfo struct {
+	info      StreamInfo
+	fetchedAt time.Time
 }
 
 type StreamInfo struct {
@@ -20,6 +28,8 @@ type StreamInfo struct {
 	ChannelTags  []string
 	ThumbnailURL string
 }
+
+const cacheDuration = 10 * time.Minute
 
 var TwitchServiceInstance *TwitchService
 
@@ -64,6 +74,21 @@ func (s *TwitchService) startTokenRefresh(client *helix.Client, expiresIn int) {
 }
 
 func (s *TwitchService) GetStreamInfo(channel string) StreamInfo {
+	s.mu.Lock()
+
+	if s.cache == nil {
+		s.cache = make(map[string]cachedStreamInfo)
+	}
+
+	if cached, ok := s.cache[channel]; ok {
+		if time.Since(cached.fetchedAt) < cacheDuration {
+			s.mu.Unlock()
+			log.Printf("[Twitch] Cache hit for %s", channel)
+			return cached.info
+		}
+	}
+	s.mu.Unlock()
+
 	usersResp, err := s.client.GetUsers(&helix.UsersParams{
 		Logins: []string{channel},
 	})
@@ -99,6 +124,12 @@ func (s *TwitchService) GetStreamInfo(channel string) StreamInfo {
 		info.ViewerCount = streamResp.Data.Streams[0].ViewerCount
 		info.ThumbnailURL = streamResp.Data.Streams[0].ThumbnailURL
 	}
+
+	s.mu.Lock()
+	s.cache[channel] = cachedStreamInfo{info: info, fetchedAt: time.Now()}
+	s.mu.Unlock()
+
+	log.Printf("[Twitch] Cached stream info for %s", channel)
 
 	return info
 }
