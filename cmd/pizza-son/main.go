@@ -16,6 +16,9 @@ func main() {
 	// Twitch API
 	services.NewTwitchService()
 
+	// Quotes
+	services.NewQuoteService()
+
 	// Command registry
 	registry := bot.NewRegistry(config.Get().Bot.Prefix)
 	commands.SetRegistry(registry)
