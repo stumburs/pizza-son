@@ -11,7 +11,7 @@ import (
 func init() {
 	Register(bot.Command{
 		Name:        "quote",
-		Description: "Manage and retrieve quotes.",
+		Description: "Manage and retrieve quotes. Only VIP's can add new quotes.",
 		Usage:       "!quote | !quote <number> | !quote add <text>",
 		Handler: func(ctx bot.CommandContext) {
 			if len(ctx.Args) == 0 {
@@ -27,9 +27,9 @@ func init() {
 
 			switch ctx.Args[0] {
 			case "add":
-				// Only mods can add new quotes
-				if !bot.HasPermission(ctx.Message, bot.Moderator) {
-					ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "Only moderators can add quotes.")
+				// Only VIP's can add new quotes
+				if !bot.HasPermission(ctx.Message, bot.VIP) {
+					ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "Only VIP's can add quotes.")
 					return
 				}
 				if len(ctx.Args) < 2 {
