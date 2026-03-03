@@ -46,7 +46,7 @@ func init() {
 
 func handleChallenge(ctx bot.CommandContext) {
 	if len(ctx.Args) < 2 {
-		ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "Usage: !duel <user> <amount>")
+		ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "Usage: !mudwrestle <user> <amount>")
 		return
 	}
 
