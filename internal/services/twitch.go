@@ -1,6 +1,7 @@
 package services
 
 import (
+	"fmt"
 	"log"
 	"pizza-son/internal/config"
 	"sync"
@@ -131,4 +132,14 @@ func (s *TwitchService) GetStreamInfo(channel string) StreamInfo {
 	log.Printf("[Twitch] Cached stream info for %s", channel)
 
 	return info
+}
+
+func (s *TwitchService) GetUserID(username string) (string, error) {
+	resp, err := s.client.GetUsers(&helix.UsersParams{
+		Logins: []string{username},
+	})
+	if err != nil || len(resp.Data.Users) == 0 {
+		return "", fmt.Errorf("user not found: %s", username)
+	}
+	return resp.Data.Users[0].ID, nil
 }

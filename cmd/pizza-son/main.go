@@ -28,6 +28,9 @@ func main() {
 	// Logger
 	services.NewLoggerService()
 
+	// Currency
+	services.NewCurrencyService()
+
 	// Command registry
 	registry := bot.NewRegistry(config.Get().Bot.Prefix)
 	commands.SetRegistry(registry)
