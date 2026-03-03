@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-const quotesDir = "quotes"
+const quotesDir = "data/quotes"
 
 type Quote struct {
 	Text      string `json:"text"`

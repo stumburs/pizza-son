@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	rnnWeightsPath = "tools/lm/weights.json"
-	rnnVocabPath   = "tools/lm/vocab.json"
+	rnnWeightsPath = "data/rnn/weights.json"
+	rnnVocabPath   = "data/rnn/vocab.json"
 )
 
 type RNNService struct {

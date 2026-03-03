@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	ngramsDir = "markov_data"
+	ngramsDir = "data/markov"
 )
 
 type MarkovService struct {

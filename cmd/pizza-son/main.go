@@ -2,11 +2,14 @@ package main
 
 import (
 	"log"
+	"os"
+	"os/signal"
 	"pizza-son/internal/bot"
 	"pizza-son/internal/commands"
 	"pizza-son/internal/config"
 	"pizza-son/internal/services"
 	"strings"
+	"syscall"
 )
 
 func main() {
@@ -21,6 +24,9 @@ func main() {
 
 	// RNN Model
 	services.NewRNNService()
+
+	// Logger
+	services.NewLoggerService()
 
 	// Command registry
 	registry := bot.NewRegistry(config.Get().Bot.Prefix)
@@ -66,7 +72,17 @@ func main() {
 		registry,
 	)
 
-	if err := b.Start(); err != nil {
-		log.Fatal(err)
-	}
+	// Graceful shutdown
+	sc := make(chan os.Signal, 1)
+	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM)
+
+	go func() {
+		if err := b.Start(); err != nil {
+			log.Fatal(err)
+		}
+	}()
+
+	<-sc
+	log.Println("Shutting down...")
+	services.LoggerServiceInstance.Close()
 }

@@ -11,7 +11,7 @@ import (
 	"sync"
 )
 
-const adaDataDir = "ada_data"
+const adaDataDir = "data/ada"
 
 var defaultDatabase = []ConversationPair{
 	{"Hi!", "Hello! How are you?"},
