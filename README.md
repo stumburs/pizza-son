@@ -86,7 +86,7 @@ $env:GOOS="linux"; $env:GOARCH="amd64"; go build -o pizza-son ./cmd/pizza-son
 
 ## Commands
 
-These are just a few examples, the bot is designed to be easily extensible, so you can add your own commands by following the instructions below [see "Adding Commands"](README.md#adding-commands).
+These are just a few examples, the bot is designed to be easily extensible, so you can add your own commands by following the instructions below about [adding commands](README.md#adding-commands).
 
 | Command                        | Description                                | Permission   |
 | ------------------------------ | ------------------------------------------ | ------------ |
