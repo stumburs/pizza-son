@@ -66,7 +66,8 @@ This produces `data/rnn/weights.json` and `data/rnn/vocab.json`. Training requir
 { "username": "user", "message": "hello", "timestamp": 1234567890 }
 ```
 
-[!NOTE] You can disable this service by removing `services.NewRNNService()` from `main.go`.
+> [!NOTE]
+> You can disable this service by removing `services.NewRNNService()` from `main.go`.
 
 ### 5. Build and run
 
