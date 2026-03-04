@@ -191,3 +191,7 @@ func init() {
 The listener registers itself automatically via `init()` — no other files need to be changed.
 
 ## License is licensed under the MIT License. See [LICENSE](LICENSE) for details.
+
+## Support the project
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/R6R11VC7ZJ)
