@@ -48,6 +48,7 @@ func Load(path string) {
 	}
 
 	cfg = &c
+	log.Println("[Config] Config loaded")
 }
 
 func Get() *Config {

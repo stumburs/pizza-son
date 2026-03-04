@@ -9,14 +9,14 @@ import (
 
 func init() {
 	RegisterListener(bot.ListenerEntry{
-		Name:        "log-listener",
-		Description: "Logs all messages",
+		Name:        "markov-learn",
+		Description: "Feeds chat messages into Markov generator",
 		Handler: func(ctx bot.CommandContext) bool {
 			if strings.HasPrefix(ctx.Message.Message, config.Get().Bot.Prefix) {
 				return false
 			}
-			services.LoggerServiceInstance.Log(ctx.Message)
-			return false
+			go services.MarkovServiceInstance.Learn(ctx.Message.Channel, ctx.Message.Message)
+			return true
 		},
 	})
 }

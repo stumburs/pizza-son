@@ -9,14 +9,14 @@ import (
 
 func init() {
 	RegisterListener(bot.ListenerEntry{
-		Name:        "log-listener",
-		Description: "Logs all messages",
+		Name:        "ollama-context",
+		Description: "Feeds chat messages to LLM context",
 		Handler: func(ctx bot.CommandContext) bool {
 			if strings.HasPrefix(ctx.Message.Message, config.Get().Bot.Prefix) {
 				return false
 			}
-			services.LoggerServiceInstance.Log(ctx.Message)
-			return false
+			go services.OllamaServiceInstance.OnPrivateMessage(ctx.Message)
+			return true
 		},
 	})
 }
