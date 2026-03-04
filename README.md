@@ -86,14 +86,15 @@ $env:GOOS="linux"; $env:GOARCH="amd64"; go build -o pizza-son ./cmd/pizza-son
 
 ## Commands
 
+These are just a few examples, the bot is designed to be easily extensible, so you can add your own commands by following the instructions below [see "Adding Commands"](README.md#adding-commands).
+
 | Command                        | Description                                | Permission   |
 | ------------------------------ | ------------------------------------------ | ------------ |
 | `!ping`                        | Simple response test                       | Everyone     |
-| `!hello [name]`                | Greets a user                              | Everyone     |
 | `!8ball <question>`            | Ask the magic 8ball                        | Everyone     |
 | `!quote`                       | Get a random quote                         | Everyone     |
 | `!quote <number>`              | Get a specific quote                       | Everyone     |
-| `!quote add <text>`            | Add a new quote                            | Moderator    |
+| `!quote add <text>`            | Add a new quote                            | VIP          |
 | `!llm <prompt>`                | Chat with the LLM                          | Everyone     |
 | `!mark`                        | Generate Markov chain text                 | Everyone     |
 | `!rnn [seed]`                  | Generate text using the RNN model          | Everyone     |
