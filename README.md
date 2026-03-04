@@ -67,7 +67,7 @@ This produces `data/rnn/weights.json` and `data/rnn/vocab.json`. Training requir
 ```
 
 > [!NOTE]
-> You can disable this service by removing `services.NewRNNService()` from `main.go`.
+> You can disable this service by removing `services.NewRNNService()` from `main.go` and removing the `!rnn` command from `internal/commands/rnn.go`.
 
 ### 5. Build and run
 
