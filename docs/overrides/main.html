@@ -1,25 +1,11 @@
 {% extends "base.html" %} {% block scripts %} {{ super() }}
 <script src="https://storage.ko-fi.com/cdn/scripts/overlay-widget.js"></script>
 <script>
-  function initKofi() {
-    // Remove any existing Ko-fi elements first
-    document
-      .querySelectorAll(
-        ".floatingchat-container-wrap, .floatingchat-container-wrap-mobi",
-      )
-      .forEach((el) => el.remove());
-
-    kofiWidgetOverlay.draw("stumburs", {
-      type: "floating-chat",
-      "floating-chat.donateButton.text": "Support me",
-      "floating-chat.donateButton.background-color": "#ffffff",
-      "floating-chat.donateButton.text-color": "#323842",
-    });
-  }
-
-  document.addEventListener("DOMContentLoaded", initKofi);
-
-  // Reinitialize on Material theme instant navigation
-  document.addEventListener("content.action.animate", initKofi);
+  kofiWidgetOverlay.draw("stumburs", {
+    type: "floating-chat",
+    "floating-chat.donateButton.text": "Support me",
+    "floating-chat.donateButton.background-color": "#ffffff",
+    "floating-chat.donateButton.text-color": "#323842",
+  });
 </script>
 {% endblock %}

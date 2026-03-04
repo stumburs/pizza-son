@@ -15,7 +15,6 @@ name = "material"
 custom_dir = "docs/overrides"
 language = "en"
 features = [
-  "navigation.instant",
   "navigation.top",
   "search.suggest",
   "search.highlight",
