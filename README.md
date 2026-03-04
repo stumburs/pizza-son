@@ -111,7 +111,7 @@ These are just a few examples, the bot is designed to be easily extensible, so y
 | `!reloadconfig`                | Reload config.toml                         | BotModerator |
 | `!repeat <text>`               | Repeats what you say                       | Everyone     |
 
----
+## See the full list of commands and their implementations in the `internal/commands/` directory or visit the [online documentation](https://stumburs.github.io/pizza-son/commands).
 
 ## Data
 
@@ -135,6 +135,8 @@ data/
 
 ## Adding Commands
 
+Commands listen for messages starting with the prefix (default `!`) and execute a handler function when triggered. They're ideal for user-invoked actions like `!quote`, `!weather`, or `!slices`.
+
 Create a new file in `internal/commands/`:
 
 ```go
@@ -155,6 +157,37 @@ func init() {
 }
 ```
 
-The command registers itself automatically via `init()` — no other files need to be changed.
+The listener registers itself automatically via `init()` — no other files need to be changed.
+
+## Adding listeners
+
+Listeners are similar to commands but trigger on every message instead of just messages starting with the prefix. They're useful for features like auto-moderation, passive learning, or fun easter eggs.
+
+Create a new file in `internal/commands/`:
+
+```go
+package commands
+
+import (
+	"pizza-son/internal/bot"
+	"strings"
+)
+
+func init() {
+	RegisterListener(bot.ListenerEntry{
+		Name:        "hello",
+		Description: "Responds to hello messages",
+		Handler: func(ctx bot.CommandContext) bool {
+			if !strings.Contains(strings.ToLower(ctx.Message.Message), "hello") {
+				return false
+			}
+			ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "Hello!")
+			return true
+		},
+	})
+}
+```
+
+The listener registers itself automatically via `init()` — no other files need to be changed.
 
 ## License is licensed under the MIT License. See [LICENSE](LICENSE) for details.
