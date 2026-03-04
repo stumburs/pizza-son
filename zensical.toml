@@ -12,6 +12,7 @@ nav = [
 
 [project.theme]
 name = "material"
+custom_dir = "docs/overrides"
 language = "en"
 features = [
   "navigation.instant",
