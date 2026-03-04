@@ -28,6 +28,7 @@ accent = "purple"
 
 [project.markdown_extensions.admonition]
 [project.markdown_extensions.abbr]
+[project.markdown_extensions.md_in_html]
 
 [project.markdown_extensions.toc]
 permalink = true

@@ -12,6 +12,9 @@ func init() {
 		Name:        "slicerboard",
 		Description: "Shows the top 5 slice holders.",
 		Usage:       "!slicerboard",
+		Examples: []bot.CommandExample{
+			{Input: "!slicerboard", Output: "Top slicers: #1 pizza_tm (123574 🍕) | #2 your_mom (99 🍕) | #3 pineapplesonpizza (0 🍕)"},
+		},
 		Handler: func(ctx bot.CommandContext) {
 			top := services.CurrencyServiceInstance.TopBalances(5)
 			if len(top) == 0 {

@@ -11,6 +11,10 @@ func init() {
 		Name:        "hug",
 		Description: "Hugs the target user.",
 		Usage:       "!hug [user]",
+		Examples: []bot.CommandExample{
+			{Input: "!hug", Output: "pizza_tm hugs themselves with 23% love... what a loser smh"},
+			{Input: "!hug @creamyperson", Output: "pizza_tm hugs creamyperson with 23% love :3"},
+		},
 		Handler: func(ctx bot.CommandContext) {
 			target := ctx.Message.User.DisplayName
 			loveAmount := rand.IntN(100)

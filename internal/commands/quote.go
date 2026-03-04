@@ -13,6 +13,11 @@ func init() {
 		Name:        "quote",
 		Description: "Manage and retrieve quotes. Only VIP's can add new quotes.",
 		Usage:       "!quote | !quote <number> | !quote add <text>",
+		Examples: []bot.CommandExample{
+			{Input: "!quote", Output: "#4: \" I love cats \" - added by pizza_tm on 2026-03-05"},
+			{Input: "!quote 2", Output: "#2: \" Dogs are alright too \" - added by meowercat on 2026-03-02"},
+			{Input: "!quote add this is a quote", Output: "Quote #5 added!"},
+		},
 		Handler: func(ctx bot.CommandContext) {
 			if len(ctx.Args) == 0 {
 				// Random quote

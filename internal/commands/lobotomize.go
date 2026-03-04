@@ -11,6 +11,9 @@ func init() {
 		Description: "Clears the LLM's memory in this channel.",
 		Usage:       "!lobotomize",
 		Permission:  bot.Moderator,
+		Examples: []bot.CommandExample{
+			{Input: "!lobotomize", Output: "meow"},
+		},
 		Handler: func(ctx bot.CommandContext) {
 			services.OllamaServiceInstance.Lobotomize(ctx.Message.Channel)
 			ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "meow")

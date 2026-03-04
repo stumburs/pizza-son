@@ -13,6 +13,12 @@ func init() {
 		Name:        "slices",
 		Description: "Check your or another user's pizza slice balance, or give slices to another user. Only Moderators can set amounts.",
 		Usage:       "!slices | !slices <user> | !slices give <user> <amount> | !slices set <user> <amount>",
+		Examples: []bot.CommandExample{
+			{Input: "!slices", Output: "You have 69 pizza slices."},
+			{Input: "!slices @big_bob", Output: "big_bob has 420 pizza slices."},
+			{Input: "!slices give @cat_enjoyer123 500", Output: "Gave 500 pizza slices to cat_enjoyer123."},
+			{Input: "!slices set @naughty_person 0", Output: "Set naughty_person slices to 0."},
+		},
 		Handler: func(ctx bot.CommandContext) {
 			if len(ctx.Args) == 0 {
 				balance := services.CurrencyServiceInstance.Balance(ctx.Message.User.ID)

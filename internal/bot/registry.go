@@ -23,7 +23,13 @@ type Command struct {
 	Description string
 	Usage       string
 	Permission  Permission
+	Examples    []CommandExample
 	Handler     CommandHandler
+}
+
+type CommandExample struct {
+	Input  string
+	Output string
 }
 
 type ListenerEntry struct {

@@ -31,6 +31,19 @@ Use the search bar above to find a specific command.
 
 **Permission:** {{ .Permission }}
 
+{{ if .Examples -}}
+<details markdown>
+<summary>Examples</summary>
+
+| Input | Output |
+|-------|--------|
+{{ range .Examples -}}
+| {{ $.Tick }}{{ .Input }}{{ $.Tick }} | {{ $.Tick }}{{ .Output }}{{ $.Tick }} |
+{{ end }}
+
+</details>
+{{- end }}
+
 ---
 {{ end }}
 
@@ -53,11 +66,17 @@ Use the search bar above to find a specific command.
 *[Streamer]: The broadcaster only
 `
 
+type ExampleDoc struct {
+	Input  string
+	Output string
+}
+
 type CommandDoc struct {
 	Name        string
 	Description string
 	Usage       string
 	Permission  string
+	Examples    []ExampleDoc
 }
 
 type TemplateData struct {
@@ -73,11 +92,19 @@ func main() {
 
 	docs := make([]CommandDoc, 0, len(cmds))
 	for _, cmd := range cmds {
+		examples := make([]ExampleDoc, 0, len(cmd.Examples))
+		for _, ex := range cmd.Examples {
+			examples = append(examples, ExampleDoc{
+				Input:  ex.Input,
+				Output: ex.Output,
+			})
+		}
 		docs = append(docs, CommandDoc{
 			Name:        cmd.Name,
 			Description: cmd.Description,
 			Usage:       cmd.Usage,
 			Permission:  bot.PermissionName(cmd.Permission),
+			Examples:    examples,
 		})
 	}
 

@@ -11,6 +11,10 @@ func init() {
 		Name:        "ada",
 		Description: "Chat with Ada, the learning chatbot.",
 		Usage:       "!ada <text>",
+		Examples: []bot.CommandExample{
+			{Input: "!ada hello", Output: "Hi there!"},
+			{Input: "!ada how are you doing?", Output: "I'm doing great, what about you?"},
+		},
 		Handler: func(ctx bot.CommandContext) {
 			if len(ctx.Args) == 0 {
 				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "Say something to Ada!")

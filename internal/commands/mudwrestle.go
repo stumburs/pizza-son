@@ -28,6 +28,10 @@ func init() {
 		Name:        "mudwrestle",
 		Description: "Challenge another user to a mud wrestling match for pizza slices. The winner takes all.",
 		Usage:       "!mudwrestle <user> <amount> | !mudwrestle accept",
+		Examples: []bot.CommandExample{
+			{Input: "!mudwrestle @sweaty_man67 100", Output: "pizza_tm has challenged @sweaty_man67 to a mud wrestling match for 100 pizza slices! Type !mudwrestle accept within 60 seconds to accept."},
+			{Input: "!mudwrestle accept", Output: "sweaty_man67 has won the wrestling duel against pizza_tm and takes 100 slices."},
+		},
 		Handler: func(ctx bot.CommandContext) {
 			if len(ctx.Args) == 0 {
 				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "Usage: !mudwrestle <user> <amount> | !mudwrestle accept")

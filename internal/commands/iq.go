@@ -11,6 +11,10 @@ func init() {
 		Name:        "iq",
 		Description: "Shows the IQ of target user.",
 		Usage:       "!iq [user]",
+		Examples: []bot.CommandExample{
+			{Input: "!iq", Output: "pizza_tm has 100 IQ xddNerd"},
+			{Input: "!iq @jeff_einstein", Output: "jeff_einstein has 69 IQ xddNerd"},
+		},
 		Handler: func(ctx bot.CommandContext) {
 			target := ctx.Message.User.DisplayName
 			if len(ctx.Args) > 0 {

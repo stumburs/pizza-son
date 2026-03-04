@@ -112,6 +112,10 @@ func init() {
 		Name:        "8ball",
 		Description: "Get an accurate answer for any question you desire.",
 		Usage:       "!8ball <text>",
+		Examples: []bot.CommandExample{
+			{Input: "!8ball will i win today?", Output: "🎱 Only you can decide."},
+			{Input: "!8ball should i sleep?", Output: "Perform a coin toss."},
+		},
 		Handler: func(ctx bot.CommandContext) {
 			if len(ctx.Args) == 0 {
 				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "Ask a question!")

@@ -11,6 +11,10 @@ func init() {
 		Name:        "rnn",
 		Description: "Generates text using a pre-trained RNN model based off over 97k messages across few channels the bot has lurked in over a few months.",
 		Usage:       "!rnn [text-to-continue]",
+		Examples: []bot.CommandExample{
+			{Input: "!rnn", Output: "ing the plastic. still waiting"},
+			{Input: "!rnn i think cats", Output: "i think cats in 2025 is the best"},
+		},
 		Handler: func(ctx bot.CommandContext) {
 			seed := "i"
 			if len(ctx.Args) > 0 {

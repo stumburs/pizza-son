@@ -10,6 +10,9 @@ func init() {
 		Name:        "perm",
 		Description: "Returns the lowest permission level for calling user.",
 		Usage:       "!perm",
+		Examples: []bot.CommandExample{
+			{Input: "!perm", Output: "Your permission level is VIP"},
+		},
 		Handler: func(ctx bot.CommandContext) {
 			level := bot.GetPermissionLevel(ctx.Message)
 			name := bot.PermissionName(level)

@@ -18,7 +18,12 @@ func init() {
 		Name:        "command",
 		Description: "Enable or disable commands in this channel.",
 		Usage:       "!command <enable|disable|list> [command]",
-		Permission:  bot.Moderator,
+		Examples: []bot.CommandExample{
+			{Input: "!command enable hug", Output: "Command !hug enabled."},
+			{Input: "!command disable mark", Output: "Command !mark disabled."},
+			{Input: "!command list", Output: "Disabled commands: !mark, !nsfw, !quote"},
+		},
+		Permission: bot.Moderator,
 		Handler: func(ctx bot.CommandContext) {
 			if len(ctx.Args) == 0 {
 				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "Usage: !command <enable|disable|list> [command]")

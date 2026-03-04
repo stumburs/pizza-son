@@ -10,6 +10,9 @@ func init() {
 		Description: "Returns site to all commands.",
 		Usage:       "!commands",
 		Permission:  bot.All,
+		Examples: []bot.CommandExample{
+			{Input: "!commands", Output: "Use and abuse me with these commands: https://stumburs.github.io/pizza-son/commands"},
+		},
 		Handler: func(ctx bot.CommandContext) {
 			ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "Use and abuse me with these commands: https://stumburs.github.io/pizza-son/commands")
 		},
