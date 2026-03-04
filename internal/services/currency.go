@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"os"
+	"sort"
 	"sync"
 )
 
@@ -12,6 +13,11 @@ const currencyFile = "data/currency/balances.json"
 type CurrencyService struct {
 	mu       sync.Mutex
 	balances map[string]int // key - user ID
+}
+
+type UserBalance struct {
+	UserID  string
+	Balance int
 }
 
 var CurrencyServiceInstance *CurrencyService
@@ -101,4 +107,24 @@ func (s *CurrencyService) Give(fromID, toID string, amount int) (int, bool) {
 	s.balances[toID] += amount
 	s.save()
 	return s.balances[fromID], true
+}
+
+func (s *CurrencyService) TopBalances(n int) []UserBalance {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	all := make([]UserBalance, 0, len(s.balances))
+	for id, bal := range s.balances {
+		all = append(all, UserBalance{UserID: id, Balance: bal})
+	}
+
+	sort.Slice(all, func(i, j int) bool {
+		return all[i].Balance > all[j].Balance
+	})
+
+	if n > len(all) {
+		n = len(all)
+	}
+
+	return all[:n]
 }

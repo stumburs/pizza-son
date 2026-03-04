@@ -2,6 +2,7 @@ package bot
 
 import (
 	"pizza-son/internal/config"
+	"pizza-son/internal/services"
 	"strings"
 	"sync"
 
@@ -98,6 +99,10 @@ func (r *Registry) Dispatch(client *twitch.Client, msg twitch.PrivateMessage) {
 	name := strings.ToLower(parts[0])
 	cmd, ok := r.commands[name]
 	if !ok {
+		return
+	}
+
+	if !services.ChannelSettingsInstance.IsCommandEnabled(msg.Channel, name) {
 		return
 	}
 

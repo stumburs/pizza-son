@@ -143,3 +143,13 @@ func (s *TwitchService) GetUserID(username string) (string, error) {
 	}
 	return resp.Data.Users[0].ID, nil
 }
+
+func (s *TwitchService) GetUsername(userID string) (string, error) {
+	resp, err := s.client.GetUsers(&helix.UsersParams{
+		IDs: []string{userID},
+	})
+	if err != nil || len(resp.Data.Users) == 0 {
+		return "", fmt.Errorf("user not found: %s", userID)
+	}
+	return resp.Data.Users[0].DisplayName, nil
+}

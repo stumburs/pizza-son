@@ -23,6 +23,7 @@ func main() {
 	services.NewCurrencyService()
 	services.NewRNNService()
 	services.NewLoggerService()
+	services.NewChannelSettingsService()
 
 	// Command registry
 	registry := bot.NewRegistry(config.Get().Bot.Prefix)
