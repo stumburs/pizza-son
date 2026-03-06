@@ -9,10 +9,10 @@ import (
 
 type Config struct {
 	Twitch struct {
-		User         string `toml:"user"`
-		OAuth        string `toml:"oauth"`
-		ClientID     string `toml:"client_id"`
-		ClientSecret string `toml:"client_secret"`
+		User            string `toml:"user"`
+		UserAccessToken string `toml:"user_access_token"`
+		ClientID        string `toml:"client_id"`
+		ClientSecret    string `toml:"client_secret"`
 	} `toml:"twitch"`
 
 	Bot struct {

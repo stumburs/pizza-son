@@ -27,7 +27,7 @@ cp config.example.toml config.toml
 ```toml
 [twitch]
 user = "your_bot_username"
-oauth = "your_oauth_token"       # https://twitchtokengenerator.com/
+user_access_token = "your_user_access_token"       # https://twitchtokengenerator.com/
 client_id = "your_client_id"     # https://dev.twitch.tv/console
 client_secret = "your_client_secret"
 
@@ -52,7 +52,7 @@ length_to_generate = 200
 1. Go to [dev.twitch.tv/console](https://dev.twitch.tv/console) and create a new application, ideally using your bot account.
 2. Set the OAuth redirect URL to `http://localhost:3000`
 3. Copy the **Client ID** and **Client Secret** into your config
-4. Generate an OAuth token using [twitchtokengenerator.com](https://twitchtokengenerator.com/) and add it to your config **including `oauth:`**.
+4. Generate a UserAccessToken using [twitchtokengenerator.com](https://twitchtokengenerator.com/) and add it to your config.
 
 ### 4. Set up the RNN model (semi-optional)
 

@@ -1,9 +1,9 @@
 [twitch]
 user = "your_bot_username"
-oauth = "oauth:your_token_here"
-client_id = "bot_client_id"
+user_access_token = "your_token_here"
 # https://dev.twitch.tv/console
-client_secret = "secret_from_developer_console" 
+client_id = "bot_client_id"
+client_secret = "client_secret"
 
 [bot]
 prefix = "!"

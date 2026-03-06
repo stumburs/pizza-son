@@ -51,6 +51,8 @@ func NewTwitchService() {
 	log.Printf("[Twitch] Got access token, expires in %d seconds", token.Data.ExpiresIn)
 	client.SetAppAccessToken(token.Data.AccessToken)
 
+	client.SetUserAccessToken(config.Get().Twitch.UserAccessToken)
+
 	TwitchServiceInstance = &TwitchService{
 		client: client,
 		cache:  map[string]cachedStreamInfo{},
@@ -152,4 +154,31 @@ func (s *TwitchService) GetUsername(userID string) (string, error) {
 		return "", fmt.Errorf("user not found: %s", userID)
 	}
 	return resp.Data.Users[0].DisplayName, nil
+}
+
+func (s *TwitchService) Timeout(channel, userID string, duration int, reason string) {
+	broadcasterID, err := s.GetUserID(channel)
+	if err != nil {
+		log.Printf("[Twitch] Failed to resolve broadcaster ID for %s: %v", channel, err)
+		return
+	}
+
+	botID, err := s.GetUserID(config.Get().Twitch.User)
+	if err != nil {
+		log.Printf("[Twitch] Failed to resolve bot user ID: %v", err)
+		return
+	}
+
+	resp, err := s.client.BanUser(&helix.BanUserParams{
+		BroadcasterID: broadcasterID,
+		ModeratorId:   botID,
+		Body: helix.BanUserRequestBody{
+			UserId:   userID,
+			Duration: duration,
+			Reason:   reason,
+		},
+	})
+	if err != nil || resp.ErrorMessage != "" {
+		log.Printf("[Twitch] Failed to timeout %s: %v %s", userID, err, resp.ErrorMessage)
+	}
 }

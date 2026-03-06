@@ -13,7 +13,8 @@ type Bot struct {
 }
 
 func New(username, oauth string, channels []string, registry *Registry) *Bot {
-	client := twitch.NewClient(username, oauth)
+	token := "oauth:" + oauth
+	client := twitch.NewClient(username, token)
 	return &Bot{
 		client:   client,
 		registry: registry,
