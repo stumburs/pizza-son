@@ -73,6 +73,18 @@ func handleChallenge(ctx bot.CommandContext) {
 		return
 	}
 
+	targetID, err := services.TwitchServiceInstance.GetUserID(target)
+	if err != nil {
+		ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, fmt.Sprintf("Something went wrong when checking %ss balance.", target))
+		return
+	}
+
+	targetBalance := services.CurrencyServiceInstance.Balance(targetID)
+	if targetBalance < amount {
+		ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, fmt.Sprintf("%s doesn't have enough pizza slices to accept the duel.", target))
+		return
+	}
+
 	pendingDuelsMu.Lock()
 	pendingDuels[target] = &duelChallenge{
 		challengerID:   ctx.Message.User.ID,

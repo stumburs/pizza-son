@@ -75,7 +75,7 @@ func (s *CurrencyService) Add(userID string, amount int) int {
 	return s.balances[userID]
 }
 
-// Returns false if failed to deduct
+// Returns new balance, and false if failed to deduct
 func (s *CurrencyService) Deduct(userID string, amount int) (int, bool) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
