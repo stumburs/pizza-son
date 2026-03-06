@@ -10,6 +10,7 @@ func init() {
 		Name:        "reloadconfig",
 		Description: "Reloads the config file.",
 		Usage:       "!reloadconfig",
+		Category:    bot.CategoryModeration,
 		Permission:  bot.BotModerator,
 		Examples: []bot.CommandExample{
 			{Input: "!reloadconfig", Output: "Config reloaded! meow"},

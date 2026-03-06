@@ -7,6 +7,7 @@ func init() {
 		Name:        "ping",
 		Description: "Responds with Pong!",
 		Usage:       "!ping",
+		Category:    bot.CategoryUtility,
 		Examples: []bot.CommandExample{
 			{Input: "!ping", Output: "Pong!"},
 		},

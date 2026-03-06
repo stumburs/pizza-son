@@ -11,6 +11,7 @@ func init() {
 		Name:        "pee",
 		Description: "Pees on the target user. Note, for optimal enjoyment, you should add certain 7TV emotes.",
 		Usage:       "!pee [user]",
+		Category:    bot.CategoryFun,
 		Examples: []bot.CommandExample{
 			{Input: "!pee", Output: "pizza_tm PEE s all over themselves with 84% flavor smh"},
 			{Input: "!pee @water_enjoyer", Output: "pizza_tm PEE s on borpaLick water_enjoyer borpaLickL with 100% flavor LICKA"},

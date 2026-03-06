@@ -11,6 +11,7 @@ func init() {
 		Name:        "ada",
 		Description: "Chat with Ada, the learning chatbot.",
 		Usage:       "!ada <text>",
+		Category:    bot.CategoryAI,
 		Examples: []bot.CommandExample{
 			{Input: "!ada hello", Output: "Hi there!"},
 			{Input: "!ada how are you doing?", Output: "I'm doing great, what about you?"},

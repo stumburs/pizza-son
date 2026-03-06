@@ -10,6 +10,7 @@ func init() {
 		Name:        "perm",
 		Description: "Returns the lowest permission level for calling user.",
 		Usage:       "!perm",
+		Category:    bot.CategoryUtility,
 		Examples: []bot.CommandExample{
 			{Input: "!perm", Output: "Your permission level is VIP"},
 		},

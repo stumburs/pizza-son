@@ -18,6 +18,7 @@ func init() {
 		Name:        "command",
 		Description: "Enable or disable commands in this channel.",
 		Usage:       "!command <enable|disable|list> [command]",
+		Category:    bot.CategoryModeration,
 		Examples: []bot.CommandExample{
 			{Input: "!command enable hug", Output: "Command !hug enabled."},
 			{Input: "!command disable mark", Output: "Command !mark disabled."},

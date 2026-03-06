@@ -11,6 +11,7 @@ func init() {
 		Name:        "hug",
 		Description: "Hugs the target user.",
 		Usage:       "!hug [user]",
+		Category:    bot.CategoryFun,
 		Examples: []bot.CommandExample{
 			{Input: "!hug", Output: "pizza_tm hugs themselves with 23% love... what a loser smh"},
 			{Input: "!hug @creamyperson", Output: "pizza_tm hugs creamyperson with 23% love :3"},

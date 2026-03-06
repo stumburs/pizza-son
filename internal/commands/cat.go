@@ -12,6 +12,7 @@ func init() {
 		Name:        "cat",
 		Description: "Responds as a cat.",
 		Usage:       "!cat <text>",
+		Category:    bot.CategoryAI,
 		Examples: []bot.CommandExample{
 			{Input: "!meow hello", Output: "Meow meow meow!"},
 			{Input: "!meow should I become a cat?", Output: "MEOW!"},

@@ -10,6 +10,7 @@ func init() {
 		Name:        "repeat",
 		Description: "Repeats what you tell it to. Pretty self explanatory.",
 		Usage:       "!repeat <text>",
+		Category:    bot.CategoryUtility,
 		Permission:  bot.BotModerator,
 		Examples: []bot.CommandExample{
 			{Input: "!repeat meowdy", Output: "meowdy"},

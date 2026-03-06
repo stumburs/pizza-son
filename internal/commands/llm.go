@@ -12,6 +12,7 @@ func init() {
 		Name:        "llm",
 		Description: "Responds as a basic LLM.",
 		Usage:       "!llm <text>",
+		Category:    bot.CategoryAI,
 		Examples: []bot.CommandExample{
 			{Input: "!llm hello!", Output: "Hello, there, pizza_tm."},
 			{Input: "!llm what's the current stream title?", Output: "The current stream title is: 'Playing with kitties'"},

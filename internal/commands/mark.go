@@ -10,6 +10,7 @@ func init() {
 		Name:        "mark",
 		Description: "Responds using a markov chain algorithm trained on this chat.",
 		Usage:       "!mark [text]",
+		Category:    bot.CategoryAI,
 		Examples: []bot.CommandExample{
 			{Input: "!mark", Output: "t kept calling and I can time , makes serious it ok if i can mean Kappa"},
 		},

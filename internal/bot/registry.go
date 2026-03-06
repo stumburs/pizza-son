@@ -18,11 +18,26 @@ type CommandContext struct {
 type CommandHandler func(ctx CommandContext)
 type Listener func(ctx CommandContext) bool
 
+// Command categories
+type Category int
+
+const (
+	CategoryUncategorized Category = iota
+	CategoryAI
+	CategoryCurrency
+	CategoryFun
+	CategoryGames
+	CategoryModeration
+	CategoryQuotes
+	CategoryUtility
+)
+
 type Command struct {
 	Name        string
 	Description string
 	Usage       string
 	Permission  Permission
+	Category    Category
 	Examples    []CommandExample
 	Handler     CommandHandler
 }
@@ -124,4 +139,25 @@ func (r *Registry) Dispatch(client *twitch.Client, msg twitch.PrivateMessage) {
 
 func (r *Registry) Commands() map[string]Command {
 	return r.commands
+}
+
+func (c Category) String() string {
+	switch c {
+	case CategoryAI:
+		return "AI"
+	case CategoryCurrency:
+		return "Currency"
+	case CategoryFun:
+		return "Fun"
+	case CategoryGames:
+		return "Games"
+	case CategoryModeration:
+		return "Moderation"
+	case CategoryQuotes:
+		return "Quotes"
+	case CategoryUtility:
+		return "Utility"
+	default:
+		return "Uncategorized"
+	}
 }

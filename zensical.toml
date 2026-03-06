@@ -3,7 +3,7 @@ site_name = "pizza_son"
 site_description = "Documentation for the pizza_son Twitch bot"
 site_url = "https://stumburs.github.io/pizza-son"
 repo_url = "https://github.com/stumburs/pizza-son"
-repo_name = "pizza-son"
+repo_name = "stumburs/pizza-son"
 
 nav = [
   { "Home" = "index.md" },
@@ -15,23 +15,49 @@ name = "material"
 custom_dir = "docs/overrides"
 language = "en"
 features = [
+  "navigation.tabs",
+  "navigation.tabs.sticky",
+  "navigation.path",
+  "toc.follow",
+  "toc.integrate",
   "navigation.top",
   "search.suggest",
   "search.highlight",
   "search.share",
 ]
 
+
+# Palette toggle for dark mode
 [[project.theme.palette]]
+media = "(prefers-color-scheme: dark)"
 scheme = "slate"
 primary = "deep-purple"
 accent = "purple"
+toggle.icon = "lucide/moon"
+toggle.name = "Switch to light mode"
+
+# Palette toggle for light mode
+[[project.theme.palette]]
+media = "(prefers-color-scheme: light)"
+scheme = "default"
+primary = "deep-purple"
+accent = "deep-purple"
+toggle.icon = "lucide/sun"
+toggle.name = "Switch to dark mode"
+
+[project.theme.icon]
+repo = "fontawesome/brands/github"
+
+# [[project.theme.palette]]
+# scheme = "slate"
+
 
 [project.markdown_extensions.admonition]
 [project.markdown_extensions.abbr]
 [project.markdown_extensions.md_in_html]
-
-[project.markdown_extensions.toc]
-permalink = true
+[project.markdown_extensions.pymdownx.emoji]
+emoji_index = "zensical.extensions.emoji.twemoji" 
+emoji_generator = "zensical.extensions.emoji.to_svg"
 
 [project.search]
 separator = '[\s\-\!]+'

@@ -11,6 +11,7 @@ func init() {
 		Name:        "lark",
 		Description: "Reinterprets a message from !mark using an LLM.",
 		Usage:       "!lark [text]",
+		Category:    bot.CategoryAI,
 		Examples: []bot.CommandExample{
 			{Input: "!lark", Output: "the cats will have keys of backwards maps"},
 			{Input: "!lark should I get a cat?", Output: "laugh out loud. my friend just did the unthinkable."},

@@ -12,6 +12,7 @@ func init() {
 		Name:        "math",
 		Description: "Responds as a math assistant.",
 		Usage:       "!math <text>",
+		Category:    bot.CategoryAI,
 		Examples: []bot.CommandExample{
 			{Input: "!math what's 9+10?", Output: "The result of 9+10 is 19."},
 			{Input: "!math what's pi?", Output: "The value of Pi is approximately 3.14."},

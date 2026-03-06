@@ -10,6 +10,7 @@ func init() {
 		Name:        "lobotomize",
 		Description: "Clears the LLM's memory in this channel.",
 		Usage:       "!lobotomize",
+		Category:    bot.CategoryAI,
 		Permission:  bot.Moderator,
 		Examples: []bot.CommandExample{
 			{Input: "!lobotomize", Output: "meow"},

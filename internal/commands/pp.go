@@ -11,6 +11,7 @@ func init() {
 		Name:        "pp",
 		Description: "Shows the pp size of target user.",
 		Usage:       "!pp [user]",
+		Category:    bot.CategoryFun,
 		Examples: []bot.CommandExample{
 			{Input: "!pp", Output: "pizza_tm has 34cm kok SpringlesLong"},
 			{Input: "!pp @big_daddy69", Output: "big_daddy69 has 1cm kok SpringlesLong"},

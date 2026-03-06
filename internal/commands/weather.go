@@ -12,6 +12,7 @@ func init() {
 		Name:        "weather",
 		Description: "Gets the temperature for a location.",
 		Usage:       "!weather <location>",
+		Category:    bot.CategoryUtility,
 		Examples: []bot.CommandExample{
 			{Input: "!weather London", Output: "London: +16°C"},
 		},

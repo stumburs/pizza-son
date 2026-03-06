@@ -52,6 +52,7 @@ func init() {
 		Name:        "signup",
 		Description: "Sign up to have the bot added to your channel. Your channel will be manually reviewed to determine whether it meets certain criteria. Having pizza_son added to your channel might take a day or two after passing the criteria.",
 		Usage:       "!signup",
+		Category:    bot.CategoryUtility,
 		Examples: []bot.CommandExample{
 			{Input: "!signup", Output: "You have been added to the signup list, fantastic_streamer4235! Please wait for manual review."},
 		},

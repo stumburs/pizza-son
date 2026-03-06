@@ -10,6 +10,19 @@ import (
 	"text/template"
 )
 
+var categoryOrder = []string{"AI", "Currency", "Fun", "Games", "Moderation", "Quotes", "Utility", "Uncategorized"}
+
+var categoryIcons = map[string]string{
+	"AI":            ":material-robot:",
+	"Currency":      ":material-pizza:",
+	"Fun":           ":material-emoticon:",
+	"Games":         ":material-gamepad-variant:",
+	"Moderation":    ":material-shield:",
+	"Quotes":        ":material-format-quote-close:",
+	"Utility":       ":material-wrench:",
+	"Uncategorized": ":material-help:",
+}
+
 var docTemplate = `# Commands
 
 Use the search bar above to find a specific command.
@@ -18,10 +31,28 @@ Use the search bar above to find a specific command.
     - {{ $.Tick }}<argument>{{ $.Tick }} — required
     - {{ $.Tick }}[argument]{{ $.Tick }} — optional
 
+
+<div class="grid cards" markdown>
+
+{{ range .Categories -}}
+-   {{ .Icon }} __{{ .Name }}__
+
+    ---
+
+	{{ len .Commands }} commands
+
+	[:octicons-arrow-right-24: {{ .Name }}](#{{ .Name | lower }})
+
+{{ end }}
+</div>
+
 ---
 
+{{ range .Categories }}
+## {{ .Name }}
+
 {{ range .Commands }}
-## !{{ .Name }}
+### !{{ .Name }}
 
 {{ .Description }}
 
@@ -45,6 +76,7 @@ Use the search bar above to find a specific command.
 {{- end }}
 
 ---
+{{ end }}
 {{ end }}
 
 ## Permission Levels
@@ -79,9 +111,15 @@ type CommandDoc struct {
 	Examples    []ExampleDoc
 }
 
-type TemplateData struct {
+type CategoryDoc struct {
+	Name     string
+	Icon     string
 	Commands []CommandDoc
-	Tick     string
+}
+
+type TemplateData struct {
+	Categories []CategoryDoc
+	Tick       string
 }
 
 func main() {
@@ -90,8 +128,13 @@ func main() {
 
 	cmds := registry.Commands()
 
-	docs := make([]CommandDoc, 0, len(cmds))
+	// Group by category
+	categoryMap := make(map[string][]CommandDoc)
 	for _, cmd := range cmds {
+		category := cmd.Category.String()
+		if category == "" {
+			category = "Uncategorized"
+		}
 		examples := make([]ExampleDoc, 0, len(cmd.Examples))
 		for _, ex := range cmd.Examples {
 			examples = append(examples, ExampleDoc{
@@ -99,7 +142,7 @@ func main() {
 				Output: ex.Output,
 			})
 		}
-		docs = append(docs, CommandDoc{
+		categoryMap[category] = append(categoryMap[category], CommandDoc{
 			Name:        cmd.Name,
 			Description: cmd.Description,
 			Usage:       cmd.Usage,
@@ -108,15 +151,69 @@ func main() {
 		})
 	}
 
-	sort.Slice(docs, func(i, j int) bool {
-		return docs[i].Name < docs[j].Name
-	})
+	// Build ordered categories
+	categories := make([]CategoryDoc, 0)
+	seen := make(map[string]bool)
+	for _, name := range categoryOrder {
+		if cmds, ok := categoryMap[name]; ok {
+			sort.Slice(cmds, func(i, j int) bool {
+				return cmds[i].Name < cmds[j].Name
+			})
+			categories = append(categories, CategoryDoc{
+				Name:     name,
+				Icon:     categoryIcons[name],
+				Commands: cmds,
+			})
+			seen[name] = true
+		}
+	}
 
-	tmpl, err := template.New("docs").Parse(docTemplate)
+	// Uncategorized
+	for name, cmds := range categoryMap {
+		if seen[name] {
+			continue
+		}
+		sort.Slice(cmds, func(i, j int) bool {
+			return cmds[i].Name < cmds[j].Name
+		})
+		categories = append(categories, CategoryDoc{Name: name, Commands: cmds})
+	}
+
+	// docs := make([]CommandDoc, 0, len(cmds))
+	// for _, cmd := range cmds {
+	// 	examples := make([]ExampleDoc, 0, len(cmd.Examples))
+	// 	for _, ex := range cmd.Examples {
+	// 		examples = append(examples, ExampleDoc{
+	// 			Input:  ex.Input,
+	// 			Output: ex.Output,
+	// 		})
+	// 	}
+	// 	docs = append(docs, CommandDoc{
+	// 		Name:        cmd.Name,
+	// 		Description: cmd.Description,
+	// 		Usage:       cmd.Usage,
+	// 		Permission:  bot.PermissionName(cmd.Permission),
+	// 		Examples:    examples,
+	// 	})
+	// }
+
+	// sort.Slice(docs, func(i, j int) bool {
+	// 	return docs[i].Name < docs[j].Name
+	// })
+
+	tmpl, err := template.New("docs").Funcs(template.FuncMap{
+		"lower": strings.ToLower,
+	}).Parse(docTemplate)
 	if err != nil {
 		fmt.Println("Template error:", err)
 		os.Exit(1)
 	}
+
+	// tmpl, err := template.New("docs").fun(docTemplate)
+	// if err != nil {
+	// 	fmt.Println("Template error:", err)
+	// 	os.Exit(1)
+	// }
 
 	// Write to docs/commands.md
 	if err := os.MkdirAll("docs", os.ModePerm); err != nil {
@@ -132,13 +229,13 @@ func main() {
 	defer f.Close()
 
 	if err := tmpl.Execute(f, TemplateData{
-		Commands: docs,
-		Tick:     "`",
+		Categories: categories,
+		Tick:       "`",
 	}); err != nil {
 		fmt.Println("Failed to execute template:", err)
 		os.Exit(1)
 	}
 
-	fmt.Printf("Generated docs/commands.md with %d commands\n", len(docs))
+	fmt.Printf("Generated docs/commands.md with %d categories\n", len(categories))
 	_ = strings.TrimSpace
 }

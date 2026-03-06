@@ -11,6 +11,7 @@ func init() {
 		Name:        "iq",
 		Description: "Shows the IQ of target user.",
 		Usage:       "!iq [user]",
+		Category:    bot.CategoryFun,
 		Examples: []bot.CommandExample{
 			{Input: "!iq", Output: "pizza_tm has 100 IQ xddNerd"},
 			{Input: "!iq @jeff_einstein", Output: "jeff_einstein has 69 IQ xddNerd"},

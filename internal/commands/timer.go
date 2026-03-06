@@ -13,6 +13,7 @@ func init() {
 		Name:        "timer",
 		Description: "Start a timer that sends an optional message after it expires. Duration can be formatted using {x}s, {x}m|min, {x}/h.",
 		Usage:       "!timer <duration> [message]",
+		Category:    bot.CategoryUtility,
 		Examples: []bot.CommandExample{
 			{Input: "!timer 5m pizza is ready", Output: "Timer set for 5m. | (after 5 minutes) | pizza_tm dinkDonk pizza is ready dinkDonk"},
 			{Input: "!timer 2.5h", Output: "Timer set for 2.5h. | (after 2.5 hours) | dinkDonk Your end is nigh (timer is up) dinkDonk"},

@@ -9,6 +9,7 @@ func init() {
 		Name:        "commands",
 		Description: "Returns site to all commands.",
 		Usage:       "!commands",
+		Category:    bot.CategoryUtility,
 		Permission:  bot.All,
 		Examples: []bot.CommandExample{
 			{Input: "!commands", Output: "Use and abuse me with these commands: https://stumburs.github.io/pizza-son/commands"},

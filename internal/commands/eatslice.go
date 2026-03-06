@@ -64,6 +64,7 @@ func init() {
 		Name:        "eat",
 		Description: "Eat a slice of pizza.",
 		Usage:       "!eat",
+		Category:    bot.CategoryFun,
 		Examples: []bot.CommandExample{
 			{Input: "!eat", Output: ""},
 		},

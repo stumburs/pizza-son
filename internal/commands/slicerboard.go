@@ -12,6 +12,7 @@ func init() {
 		Name:        "slicerboard",
 		Description: "Shows the top 5 slice holders.",
 		Usage:       "!slicerboard",
+		Category:    bot.CategoryCurrency,
 		Examples: []bot.CommandExample{
 			{Input: "!slicerboard", Output: "Top slicers: #1 pizza_tm (123574 🍕) | #2 your_mom (99 🍕) | #3 pineapplesonpizza (0 🍕)"},
 		},

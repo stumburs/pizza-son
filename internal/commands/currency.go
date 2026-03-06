@@ -13,6 +13,7 @@ func init() {
 		Name:        "slices",
 		Description: "Check your or another user's pizza slice balance, or give slices to another user. Only Moderators can set amounts.",
 		Usage:       "!slices | !slices <user> | !slices give <user> <amount> | !slices set <user> <amount>",
+		Category:    bot.CategoryCurrency,
 		Examples: []bot.CommandExample{
 			{Input: "!slices", Output: "You have 69 pizza slices."},
 			{Input: "!slices @big_bob", Output: "big_bob has 420 pizza slices."},
