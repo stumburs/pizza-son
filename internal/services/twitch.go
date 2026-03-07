@@ -38,45 +38,52 @@ func NewTwitchService() {
 	client, err := helix.NewClient(&helix.Options{
 		ClientID:     config.Get().Twitch.ClientID,
 		ClientSecret: config.Get().Twitch.ClientSecret,
+		RedirectURI:  "https://twitchtokengenerator.com",
 	})
 	if err != nil {
 		log.Fatal("[Twitch] Failed to create Helix client:", err)
 	}
 
-	token, err := client.RequestAppAccessToken([]string{})
-	if err != nil || token.Data.AccessToken == "" {
-		log.Fatal("[Twitch] Failed to get app access token:", err, token.ErrorMessage)
+	resp, err := client.RefreshUserAccessToken(config.Get().Twitch.RefreshToken)
+	if err != nil || resp.Data.AccessToken == "" {
+		log.Fatal("[Twitch] Failed to refresh user token:", err, resp.ErrorMessage)
 	}
-
-	log.Printf("[Twitch] Got access token, expires in %d seconds", token.Data.ExpiresIn)
-	client.SetAppAccessToken(token.Data.AccessToken)
+	log.Println("[Twitch] User token refreshed")
 
 	client.SetUserAccessToken(config.Get().Twitch.UserAccessToken)
+	config.Get().Twitch.UserAccessToken = resp.Data.AccessToken
+	config.Get().Twitch.RefreshToken = resp.Data.RefreshToken
+	log.Print("[Twitch] User token refreshed")
 
 	TwitchServiceInstance = &TwitchService{
 		client: client,
 		cache:  map[string]cachedStreamInfo{},
 	}
-	TwitchServiceInstance.startTokenRefresh(client, token.Data.ExpiresIn)
+	TwitchServiceInstance.startTokenRefresh()
 	log.Println("[Twitch] Service initialized")
 }
 
-func (s *TwitchService) startTokenRefresh(client *helix.Client, expiresIn int) {
+func (s *TwitchService) startTokenRefresh() {
 	go func() {
 		for {
-			time.Sleep(time.Duration(expiresIn-300) * time.Second)
+			time.Sleep(3 * time.Hour)
 
-			token, err := client.RequestAppAccessToken([]string{})
-			if err != nil || token.Data.AccessToken == "" {
+			resp, err := s.client.RefreshUserAccessToken(config.Get().Twitch.RefreshToken)
+			if err != nil || resp.Data.AccessToken == "" {
 				log.Println("[Twitch] Failed to refresh app token:", err)
-				time.Sleep(30 * time.Second)
 				continue
 			}
-			client.SetAppAccessToken(token.Data.AccessToken)
-			expiresIn = token.Data.ExpiresIn
+			s.client.SetUserAccessToken(resp.Data.AccessToken)
+			config.Get().Twitch.UserAccessToken = resp.Data.AccessToken
+			config.Get().Twitch.RefreshToken = resp.Data.RefreshToken
+			expiresIn := resp.Data.ExpiresIn
 			log.Printf("[Twitch] App token refreshed, expires in %d seconds", expiresIn)
 		}
 	}()
+}
+
+func (s *TwitchService) GetAccessToken() string {
+	return s.client.GetUserAccessToken()
 }
 
 func (s *TwitchService) GetStreamInfo(channel string) StreamInfo {

@@ -1,9 +1,12 @@
 [twitch]
-user = "your_bot_username"
-user_access_token = "your_token_here"
+user = ""
 # https://dev.twitch.tv/console
-client_id = "bot_client_id"
-client_secret = "client_secret"
+# https://twitchtokengenerator.com
+client_id = ""
+client_secret = ""
+user_access_token = ""
+refresh_token = ""
+
 
 [bot]
 prefix = "!"

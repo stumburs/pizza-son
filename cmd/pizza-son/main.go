@@ -32,7 +32,6 @@ func main() {
 	// Bot
 	b := bot.New(
 		config.Get().Twitch.User,
-		config.Get().Twitch.UserAccessToken,
 		config.Get().Bot.Channels,
 		registry,
 	)

@@ -2,6 +2,7 @@ package bot
 
 import (
 	"log"
+	"pizza-son/internal/services"
 
 	"github.com/gempir/go-twitch-irc/v4"
 )
@@ -12,8 +13,8 @@ type Bot struct {
 	channels []string
 }
 
-func New(username, oauth string, channels []string, registry *Registry) *Bot {
-	token := "oauth:" + oauth
+func New(username string, channels []string, registry *Registry) *Bot {
+	token := "oauth:" + services.TwitchServiceInstance.GetAccessToken()
 	client := twitch.NewClient(username, token)
 	return &Bot{
 		client:   client,

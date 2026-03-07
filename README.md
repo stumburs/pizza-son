@@ -18,6 +18,9 @@ cd pizza-son
 
 ### 2. Create your config file
 
+> [!WARNING]
+> This section is outdated and will get updated in the future.
+
 Copy the example config and fill in your values:
 
 ```bash
@@ -48,6 +51,9 @@ length_to_generate = 200
 ```
 
 ### 3. Set up Twitch credentials
+
+> [!WARNING]
+> This section is outdated and will get updated in the future.
 
 1. Go to [dev.twitch.tv/console](https://dev.twitch.tv/console) and create a new application, ideally using your bot account.
 2. Set the OAuth redirect URL to `http://localhost:3000`
