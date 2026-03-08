@@ -63,3 +63,11 @@ func Reload(path string) {
 	log.Println("[Config] Reloaded config from", path)
 	Load(path)
 }
+
+func Save() error {
+	data, err := toml.Marshal(cfg)
+	if err != nil {
+		return err
+	}
+	return os.WriteFile("config.toml", data, 0644)
+}

@@ -48,12 +48,17 @@ func NewTwitchService() {
 	if err != nil || resp.Data.AccessToken == "" {
 		log.Fatal("[Twitch] Failed to refresh user token:", err, resp.ErrorMessage)
 	}
-	log.Println("[Twitch] User token refreshed")
 
-	client.SetUserAccessToken(config.Get().Twitch.UserAccessToken)
+	client.SetUserAccessToken(resp.Data.AccessToken)
 	config.Get().Twitch.UserAccessToken = resp.Data.AccessToken
 	config.Get().Twitch.RefreshToken = resp.Data.RefreshToken
-	log.Print("[Twitch] User token refreshed")
+
+	// Save to disk
+	if err := config.Save(); err != nil {
+		log.Println("[Twitch] Failed to save tokens:", err)
+	} else {
+		log.Println("[Twitch] User token refreshed and saved")
+	}
 
 	TwitchServiceInstance = &TwitchService{
 		client: client,
@@ -76,8 +81,15 @@ func (s *TwitchService) startTokenRefresh() {
 			s.client.SetUserAccessToken(resp.Data.AccessToken)
 			config.Get().Twitch.UserAccessToken = resp.Data.AccessToken
 			config.Get().Twitch.RefreshToken = resp.Data.RefreshToken
-			expiresIn := resp.Data.ExpiresIn
-			log.Printf("[Twitch] App token refreshed, expires in %d seconds", expiresIn)
+
+			// Save to disk
+			if err := config.Save(); err != nil {
+				log.Println("[Twitch] Failed to save tokens:", err)
+			} else {
+				log.Println("[Twitch] User token refreshed and saved")
+			}
+
+			log.Printf("[Twitch] App token refreshed, expires in %d seconds", resp.Data.ExpiresIn)
 		}
 	}()
 }
