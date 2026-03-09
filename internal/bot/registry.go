@@ -9,10 +9,28 @@ import (
 	"github.com/gempir/go-twitch-irc/v4"
 )
 
+type Sender interface {
+	Say(channel, message string)
+	Reply(channel, msgID, message string)
+}
+
+type TwitchSender struct {
+	client *twitch.Client
+}
+
+func (t *TwitchSender) Say(channel, message string) {
+	t.client.Say(channel, message)
+}
+
+func (t *TwitchSender) Reply(channel, msgID, message string) {
+	t.client.Reply(channel, msgID, message)
+}
+
 type CommandContext struct {
-	Client  *twitch.Client
-	Message twitch.PrivateMessage
-	Args    []string // command args
+	Client   Sender
+	Message  twitch.PrivateMessage
+	Args     []string // command args
+	Registry *Registry
 }
 
 type CommandHandler func(ctx CommandContext)
@@ -94,8 +112,9 @@ func (r *Registry) Dispatch(client *twitch.Client, msg twitch.PrivateMessage) {
 	defer r.mu.Unlock()
 
 	ctx := CommandContext{
-		Client:  client,
-		Message: msg,
+		Client:   &TwitchSender{client: client},
+		Message:  msg,
+		Registry: r,
 	}
 
 	// Run listeners on every message
@@ -160,4 +179,18 @@ func (c Category) String() string {
 	default:
 		return "Uncategorized"
 	}
+}
+
+func (r *Registry) DispatchCommand(ctx CommandContext) {
+	if len(ctx.Args) == 0 {
+		return
+	}
+
+	name := strings.ToLower(ctx.Args[0])
+	cmd, ok := r.commands[name]
+	if !ok {
+		return
+	}
+	ctx.Args = ctx.Args[1:]
+	go cmd.Handler(ctx)
 }
