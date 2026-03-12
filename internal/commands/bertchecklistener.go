@@ -46,7 +46,7 @@ func init() {
 				return false
 			}
 			response := berts[rand.IntN(len(berts))]
-			if rand.Float64() < 0.15 {
+			if rand.Float64() < 0.05 {
 				response += " zaza"
 			}
 			ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, response)
