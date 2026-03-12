@@ -53,4 +53,21 @@ func init() {
 			return true
 		},
 	})
+	RegisterListener(bot.ListenerEntry{
+		Name:        "firsttimebert",
+		Description: "Detects first time bert'ers",
+		Handler: func(ctx bot.CommandContext) bool {
+			if !ctx.Message.FirstMessage {
+				return false
+			}
+			msg := strings.ToLower(ctx.Message.Message)
+			for _, bert := range berts {
+				if strings.Contains(msg, strings.ToLower(bert)) {
+					ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "firsttimeberter")
+					return true
+				}
+			}
+			return false
+		},
+	})
 }
