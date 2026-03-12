@@ -25,6 +25,15 @@ var berts = []string{
 	"tylenolbert",
 	"weinerbert",
 	"zazabert",
+	"fishbert",
+	"Error404bert",
+	"bertsittingverycomfortablearoundacampfirewithitsfriends",
+	"sorbert",
+	"berttosis",
+	"Bertnard",
+	"robbert",
+	"bertsimpson",
+	"Bort",
 }
 
 func init() {
