@@ -35,6 +35,8 @@ var berts = []string{
 	"bertsimpson",
 	"Bort",
 	"numbert",
+	"strawberty",
+	"cyBERTerrorist",
 }
 
 func init() {
