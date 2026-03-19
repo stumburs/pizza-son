@@ -1,0 +1,1795 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Documentation for the pizza_son Twitch bot">
+      
+      
+      
+        <link rel="canonical" href="https://stumburs.github.io/pizza-son/commands/">
+      
+      
+        <link rel="prev" href="./..">
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="zensical-0.0.28">
+    
+    
+      
+        <title>Commands - pizza_son</title>
+      
+    
+    
+      
+        
+      
+      <link rel="stylesheet" href="../assets/stylesheets/modern/main.6f2fbb28.min.css">
+      
+        
+          
+        
+        <link rel="stylesheet" href="../assets/stylesheets/modern/palette.dfe2e883.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,500,500i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,t)=>(e<<5)-e+t.charCodeAt(0)),0),__md_get=(e,t=localStorage,a=__md_scope)=>JSON.parse(t.getItem(a.pathname+"."+e)),__md_set=(e,t,a=localStorage,_=__md_scope)=>{try{a.setItem(_.pathname+"."+e,JSON.stringify(t))}catch(e){}},document.documentElement.setAttribute("data-platform",navigator.platform)</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="purple">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer" aria-label="Navigation"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#commands" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="./.." title="pizza_son" class="md-header__button md-logo" aria-label="pizza_son" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-book-open" viewBox="0 0 24 24"><path d="M12 7v14M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer" aria-label="Navigation">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-menu" viewBox="0 0 24 24"><path d="M4 5h16M4 12h16M4 19h16"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            pizza_son
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Commands
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="purple"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-moon" viewBox="0 0 24 24"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="deep-purple"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search" aria-label="Search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-search" viewBox="0 0 24 24"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog" aria-label="Search">
+  <button type="button" class="md-search__button">
+    Search
+  </button>
+</div>
+      
+    
+    <div class="md-header__source">
+      
+        <a href="https://github.com/stumburs/pizza-son" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path fill="currentColor" d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    stumburs/pizza-son
+  </div>
+</a>
+      
+    </div>
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="./.." class="md-tabs__link">
+        
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="././" class="md-tabs__link">
+        
+  
+  Commands
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="./.." title="pizza_son" class="md-nav__button md-logo" aria-label="pizza_son" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-book-open" viewBox="0 0 24 24"><path d="M12 7v14M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg>
+
+    </a>
+    pizza_son
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/stumburs/pizza-son" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path fill="currentColor" d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    stumburs/pizza-son
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="./.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Commands
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="././" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Commands
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#ai" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AI
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="AI">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ada" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        !ada
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cat" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        !cat
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#lark" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        !lark
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#llm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        !llm
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#lobotomize" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        !lobotomize
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mark" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        !mark
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#math" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        !math
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nsfw" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        !nsfw
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rnn" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        !rnn
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#currency" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Currency
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Currency">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#slicerboard" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        !slicerboard
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#slices" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        !slices
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fun" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fun
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Fun">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#8ball" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        !8ball
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#eat" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        !eat
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hug" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        !hug
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#iq" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        !iq
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pee" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        !pee
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        !pp
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setvoice" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        !setvoice
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        !tts
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#games" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Games
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Games">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#mudwrestle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        !mudwrestle
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#moderation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Moderation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Moderation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#command" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        !command
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reloadconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        !reloadconfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quotes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quotes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Quotes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#quote" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        !quote
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#utility" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Utility
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Utility">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#commands_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        !commands
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#perm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        !perm
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        !ping
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#repeat" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        !repeat
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#signup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        !signup
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#timer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        !timer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#weather" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        !weather
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#permission-levels" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Permission Levels
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+                
+
+
+
+  
+
+
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+  
+  
+
+
+<h1 id="commands">Commands</h1>
+<p>Use the search bar above to find a specific command.</p>
+<div class="admonition info">
+<p class="admonition-title">Usage notation</p>
+<ul>
+<li><code>&lt;argument&gt;</code> — required</li>
+<li><code>[argument]</code> — optional</li>
+</ul>
+</div>
+<div class="grid cards">
+<ul>
+<li>
+<p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2M7.5 13A2.5 2.5 0 0 0 5 15.5 2.5 2.5 0 0 0 7.5 18a2.5 2.5 0 0 0 2.5-2.5A2.5 2.5 0 0 0 7.5 13m9 0a2.5 2.5 0 0 0-2.5 2.5 2.5 2.5 0 0 0 2.5 2.5 2.5 2.5 0 0 0 2.5-2.5 2.5 2.5 0 0 0-2.5-2.5"/></svg></span> <strong>AI</strong></p>
+<hr />
+<p>9 commands</p>
+<p><a href="#ai"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> AI</a></p>
+</li>
+<li>
+<p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 15a2 2 0 0 1-2-2 2 2 0 0 1 2-2 2 2 0 0 1 2 2 2 2 0 0 1-2 2M7 7c0-1.11.89-2 2-2a2 2 0 0 1 2 2 2 2 0 0 1-2 2 2 2 0 0 1-2-2m5-5C8.43 2 5.23 3.54 3 6l9 16 9-16c-2.22-2.46-5.43-4-9-4"/></svg></span> <strong>Currency</strong></p>
+<hr />
+<p>2 commands</p>
+<p><a href="#currency"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> Currency</a></p>
+</li>
+<li>
+<p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.47 2 2 6.5 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2m3.5 6A1.5 1.5 0 0 1 17 9.5a1.5 1.5 0 0 1-1.5 1.5A1.5 1.5 0 0 1 14 9.5 1.5 1.5 0 0 1 15.5 8m-7 0A1.5 1.5 0 0 1 10 9.5 1.5 1.5 0 0 1 8.5 11 1.5 1.5 0 0 1 7 9.5 1.5 1.5 0 0 1 8.5 8m3.5 9.5c-2.33 0-4.31-1.46-5.11-3.5h10.22c-.81 2.04-2.78 3.5-5.11 3.5"/></svg></span> <strong>Fun</strong></p>
+<hr />
+<p>8 commands</p>
+<p><a href="#fun"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> Fun</a></p>
+</li>
+<li>
+<p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7 6h10a6 6 0 0 1 6 6 6 6 0 0 1-6 6c-1.78 0-3.37-.77-4.47-2h-1.06c-1.1 1.23-2.69 2-4.47 2a6 6 0 0 1-6-6 6 6 0 0 1 6-6M6 9v2H4v2h2v2h2v-2h2v-2H8V9zm9.5 3a1.5 1.5 0 0 0-1.5 1.5 1.5 1.5 0 0 0 1.5 1.5 1.5 1.5 0 0 0 1.5-1.5 1.5 1.5 0 0 0-1.5-1.5m3-3a1.5 1.5 0 0 0-1.5 1.5 1.5 1.5 0 0 0 1.5 1.5 1.5 1.5 0 0 0 1.5-1.5A1.5 1.5 0 0 0 18.5 9"/></svg></span> <strong>Games</strong></p>
+<hr />
+<p>1 commands</p>
+<p><a href="#games"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> Games</a></p>
+</li>
+<li>
+<p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5z"/></svg></span> <strong>Moderation</strong></p>
+<hr />
+<p>2 commands</p>
+<p><a href="#moderation"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> Moderation</a></p>
+</li>
+<li>
+<p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14 17h3l2-4V7h-6v6h3M6 17h3l2-4V7H5v6h3z"/></svg></span> <strong>Quotes</strong></p>
+<hr />
+<p>1 commands</p>
+<p><a href="#quotes"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> Quotes</a></p>
+</li>
+<li>
+<p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m22.7 19-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4"/></svg></span> <strong>Utility</strong></p>
+<hr />
+<p>7 commands</p>
+<p><a href="#utility"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> Utility</a></p>
+</li>
+</ul>
+</div>
+<hr />
+<h2 id="ai">AI</h2>
+<h3 id="ada">!ada</h3>
+<p>Chat with Ada, the learning chatbot.</p>
+<p><strong>Usage:</strong> <code>!ada &lt;text&gt;</code></p>
+<p><strong>Permission:</strong> <abbr title="All viewers can use this command">Everyone</abbr></p>
+<details>
+<summary>Examples</summary>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>!ada hello</code></td>
+<td><code>Hi there!</code></td>
+</tr>
+<tr>
+<td><code>!ada how are you doing?</code></td>
+<td><code>I'm doing great, what about you?</code></td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h3 id="cat">!cat</h3>
+<p>Responds as a cat.</p>
+<p><strong>Usage:</strong> <code>!cat &lt;text&gt;</code></p>
+<p><strong>Permission:</strong> <abbr title="All viewers can use this command">Everyone</abbr></p>
+<details>
+<summary>Examples</summary>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>!meow hello</code></td>
+<td><code>Meow meow meow!</code></td>
+</tr>
+<tr>
+<td><code>!meow should I become a cat?</code></td>
+<td><code>MEOW!</code></td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h3 id="lark">!lark</h3>
+<p>Reinterprets a message from !mark using an LLM.</p>
+<p><strong>Usage:</strong> <code>!lark [text]</code></p>
+<p><strong>Permission:</strong> <abbr title="All viewers can use this command">Everyone</abbr></p>
+<details>
+<summary>Examples</summary>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>!lark</code></td>
+<td><code>the cats will have keys of backwards maps</code></td>
+</tr>
+<tr>
+<td><code>!lark should I get a cat?</code></td>
+<td><code>laugh out loud. my friend just did the unthinkable.</code></td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h3 id="llm">!llm</h3>
+<p>Responds as a basic LLM.</p>
+<p><strong>Usage:</strong> <code>!llm &lt;text&gt;</code></p>
+<p><strong>Permission:</strong> <abbr title="All viewers can use this command">Everyone</abbr></p>
+<details>
+<summary>Examples</summary>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>!llm hello!</code></td>
+<td><code>Hello, there, pizza_tm.</code></td>
+</tr>
+<tr>
+<td><code>!llm what's the current stream title?</code></td>
+<td><code>The current stream title is: 'Playing with kitties'</code></td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h3 id="lobotomize">!lobotomize</h3>
+<p>Clears the LLM's memory in this channel.</p>
+<p><strong>Usage:</strong> <code>!lobotomize</code></p>
+<p><strong>Permission:</strong> <abbr title="Channel moderators and above">Moderator</abbr></p>
+<details>
+<summary>Examples</summary>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>!lobotomize</code></td>
+<td><code>meow</code></td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h3 id="mark">!mark</h3>
+<p>Responds using a markov chain algorithm trained on this chat.</p>
+<p><strong>Usage:</strong> <code>!mark [text]</code></p>
+<p><strong>Permission:</strong> <abbr title="All viewers can use this command">Everyone</abbr></p>
+<details>
+<summary>Examples</summary>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>!mark</code></td>
+<td><code>t kept calling and I can time , makes serious it ok if i can mean Kappa</code></td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h3 id="math">!math</h3>
+<p>Responds as a math assistant.</p>
+<p><strong>Usage:</strong> <code>!math &lt;text&gt;</code></p>
+<p><strong>Permission:</strong> <abbr title="All viewers can use this command">Everyone</abbr></p>
+<details>
+<summary>Examples</summary>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>!math what's 9+10?</code></td>
+<td><code>The result of 9+10 is 19.</code></td>
+</tr>
+<tr>
+<td><code>!math what's pi?</code></td>
+<td><code>The value of Pi is approximately 3.14.</code></td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h3 id="nsfw">!nsfw</h3>
+<p>Responds as a spicy LLM ;)</p>
+<p><strong>Usage:</strong> <code>!nsfw &lt;text&gt;</code></p>
+<p><strong>Permission:</strong> <abbr title="All viewers can use this command">Everyone</abbr></p>
+<details>
+<summary>Examples</summary>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>!nsfw hey there</code></td>
+<td><code>Damn, that beautiful ass of yours is making me sweat. Always here for your every desire. 💦 🔥</code></td>
+</tr>
+<tr>
+<td><code>!nsfw can you tell me a joke?</code></td>
+<td><code>Of course! Here's one for you, sweetie. Why did the cocky jock bring a ladder to bed? Because he wanted to reach that sexy ass of yours from every angle! 🍆 💦 🔥</code></td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h3 id="rnn">!rnn</h3>
+<p>Generates text using a pre-trained RNN model based off over 97k messages across few channels the bot has lurked in over a few months.</p>
+<p><strong>Usage:</strong> <code>!rnn [text-to-continue]</code></p>
+<p><strong>Permission:</strong> <abbr title="All viewers can use this command">Everyone</abbr></p>
+<details>
+<summary>Examples</summary>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>!rnn</code></td>
+<td><code>ing the plastic. still waiting</code></td>
+</tr>
+<tr>
+<td><code>!rnn i think cats</code></td>
+<td><code>i think cats in 2025 is the best</code></td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="currency">Currency</h2>
+<h3 id="slicerboard">!slicerboard</h3>
+<p>Shows the top 5 slice holders.</p>
+<p><strong>Usage:</strong> <code>!slicerboard</code></p>
+<p><strong>Permission:</strong> <abbr title="All viewers can use this command">Everyone</abbr></p>
+<details>
+<summary>Examples</summary>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>!slicerboard</code></td>
+<td><code>Top slicers: #1 pizza_tm (123574 🍕) | #2 your_mom (99 🍕) | #3 pineapplesonpizza (0 🍕)</code></td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h3 id="slices">!slices</h3>
+<p>Check your or another user's pizza slice balance, or give slices to another user. Only Moderators can set amounts.</p>
+<p><strong>Usage:</strong> <code>!slices | !slices &lt;user&gt; | !slices give &lt;user&gt; &lt;amount&gt; | !slices set &lt;user&gt; &lt;amount&gt;</code></p>
+<p><strong>Permission:</strong> <abbr title="All viewers can use this command">Everyone</abbr></p>
+<details>
+<summary>Examples</summary>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>!slices</code></td>
+<td><code>You have 69 pizza slices.</code></td>
+</tr>
+<tr>
+<td><code>!slices @big_bob</code></td>
+<td><code>big_bob has 420 pizza slices.</code></td>
+</tr>
+<tr>
+<td><code>!slices give @cat_enjoyer123 500</code></td>
+<td><code>Gave 500 pizza slices to cat_enjoyer123.</code></td>
+</tr>
+<tr>
+<td><code>!slices set @naughty_person 0</code></td>
+<td><code>Set naughty_person slices to 0.</code></td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="fun">Fun</h2>
+<h3 id="8ball">!8ball</h3>
+<p>Get an accurate answer for any question you desire.</p>
+<p><strong>Usage:</strong> <code>!8ball &lt;text&gt;</code></p>
+<p><strong>Permission:</strong> <abbr title="All viewers can use this command">Everyone</abbr></p>
+<details>
+<summary>Examples</summary>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>!8ball will i win today?</code></td>
+<td><code>🎱 Only you can decide.</code></td>
+</tr>
+<tr>
+<td><code>!8ball should i sleep?</code></td>
+<td><code>Perform a coin toss.</code></td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h3 id="eat">!eat</h3>
+<p>Eat a slice of pizza.</p>
+<p><strong>Usage:</strong> <code>!eat</code></p>
+<p><strong>Permission:</strong> <abbr title="All viewers can use this command">Everyone</abbr></p>
+<details>
+<summary>Examples</summary>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>!eat</code></td>
+<td>``</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h3 id="hug">!hug</h3>
+<p>Hugs the target user.</p>
+<p><strong>Usage:</strong> <code>!hug [user]</code></p>
+<p><strong>Permission:</strong> <abbr title="All viewers can use this command">Everyone</abbr></p>
+<details>
+<summary>Examples</summary>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>!hug</code></td>
+<td><code>pizza_tm hugs themselves with 23% love... what a loser smh</code></td>
+</tr>
+<tr>
+<td><code>!hug @creamyperson</code></td>
+<td><code>pizza_tm hugs creamyperson with 23% love :3</code></td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h3 id="iq">!iq</h3>
+<p>Shows the IQ of target user.</p>
+<p><strong>Usage:</strong> <code>!iq [user]</code></p>
+<p><strong>Permission:</strong> <abbr title="All viewers can use this command">Everyone</abbr></p>
+<details>
+<summary>Examples</summary>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>!iq</code></td>
+<td><code>pizza_tm has 100 IQ xddNerd</code></td>
+</tr>
+<tr>
+<td><code>!iq @jeff_einstein</code></td>
+<td><code>jeff_einstein has 69 IQ xddNerd</code></td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h3 id="pee">!pee</h3>
+<p>Pees on the target user. Note, for optimal enjoyment, you should add certain 7TV emotes.</p>
+<p><strong>Usage:</strong> <code>!pee [user]</code></p>
+<p><strong>Permission:</strong> <abbr title="All viewers can use this command">Everyone</abbr></p>
+<details>
+<summary>Examples</summary>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>!pee</code></td>
+<td><code>pizza_tm PEE s all over themselves with 84% flavor smh</code></td>
+</tr>
+<tr>
+<td><code>!pee @water_enjoyer</code></td>
+<td><code>pizza_tm PEE s on borpaLick water_enjoyer borpaLickL with 100% flavor LICKA</code></td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h3 id="pp">!pp</h3>
+<p>Shows the pp size of target user.</p>
+<p><strong>Usage:</strong> <code>!pp [user]</code></p>
+<p><strong>Permission:</strong> <abbr title="All viewers can use this command">Everyone</abbr></p>
+<details>
+<summary>Examples</summary>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>!pp</code></td>
+<td><code>pizza_tm has 34cm kok SpringlesLong</code></td>
+</tr>
+<tr>
+<td><code>!pp @big_daddy69</code></td>
+<td><code>big_daddy69 has 1cm kok SpringlesLong</code></td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h3 id="setvoice">!setvoice</h3>
+<p>Set your TTS voice prefix.</p>
+<p><strong>Usage:</strong> <code>!setvoice [voice]</code></p>
+<p><strong>Permission:</strong> <abbr title="Channel VIPs and above">VIP</abbr></p>
+<details>
+<summary>Examples</summary>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>!setvoice chewbacca</code></td>
+<td><code>TTS voice set to: chewbacca</code></td>
+</tr>
+<tr>
+<td><code>!setvoice</code></td>
+<td><code>Your TTS voice is chewbacca</code></td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h3 id="tts">!tts</h3>
+<p>Run a command with the result being spoken using TTS.</p>
+<p><strong>Usage:</strong> <code>!tts &lt;command&gt; [args]</code></p>
+<p><strong>Permission:</strong> <abbr title="Channel VIPs and above">VIP</abbr></p>
+<details>
+<summary>Examples</summary>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>!tts mark</code></td>
+<td><code>bestie: cats is thing</code></td>
+</tr>
+<tr>
+<td><code>!llm how are you?</code></td>
+<td><code>bestie: I'm wonderful!</code></td>
+</tr>
+<tr>
+<td><code>!tts weather London</code></td>
+<td><code>bestie: London: +10°C</code></td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="games">Games</h2>
+<h3 id="mudwrestle">!mudwrestle</h3>
+<p>Challenge another user to a mud wrestling match for pizza slices. The winner takes all.</p>
+<p><strong>Usage:</strong> <code>!mudwrestle &lt;user&gt; &lt;amount&gt; | !mudwrestle accept</code></p>
+<p><strong>Permission:</strong> <abbr title="All viewers can use this command">Everyone</abbr></p>
+<details>
+<summary>Examples</summary>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>!mudwrestle @sweaty_man67 100</code></td>
+<td><code>pizza_tm has challenged @sweaty_man67 to a mud wrestling match for 100 pizza slices! Type !mudwrestle accept within 60 seconds to accept.</code></td>
+</tr>
+<tr>
+<td><code>!mudwrestle accept</code></td>
+<td><code>sweaty_man67 has won the wrestling duel against pizza_tm and takes 100 slices.</code></td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="moderation">Moderation</h2>
+<h3 id="command">!command</h3>
+<p>Enable or disable commands in this channel.</p>
+<p><strong>Usage:</strong> <code>!command &lt;enable|disable|list&gt; [command]</code></p>
+<p><strong>Permission:</strong> <abbr title="Channel moderators and above">Moderator</abbr></p>
+<details>
+<summary>Examples</summary>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>!command enable hug</code></td>
+<td><code>Command !hug enabled.</code></td>
+</tr>
+<tr>
+<td><code>!command disable mark</code></td>
+<td><code>Command !mark disabled.</code></td>
+</tr>
+<tr>
+<td><code>!command list</code></td>
+<td><code>Disabled commands: !mark, !nsfw, !quote</code></td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h3 id="reloadconfig">!reloadconfig</h3>
+<p>Reloads the config file.</p>
+<p><strong>Usage:</strong> <code>!reloadconfig</code></p>
+<p><strong>Permission:</strong> <abbr title="Bot-specific moderators and above">Bot Moderator</abbr></p>
+<details>
+<summary>Examples</summary>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>!reloadconfig</code></td>
+<td><code>Config reloaded! meow</code></td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="quotes">Quotes</h2>
+<h3 id="quote">!quote</h3>
+<p>Manage and retrieve quotes. Only <abbr title="Channel VIPs and above">VIP</abbr>'s can add new quotes.</p>
+<p><strong>Usage:</strong> <code>!quote | !quote &lt;number&gt; | !quote add &lt;text&gt;</code></p>
+<p><strong>Permission:</strong> <abbr title="All viewers can use this command">Everyone</abbr></p>
+<details>
+<summary>Examples</summary>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>!quote</code></td>
+<td><code>#4: " I love cats " - added by pizza_tm on 2026-03-05</code></td>
+</tr>
+<tr>
+<td><code>!quote 2</code></td>
+<td><code>#2: " Dogs are alright too " - added by meowercat on 2026-03-02</code></td>
+</tr>
+<tr>
+<td><code>!quote add this is a quote</code></td>
+<td><code>Quote #5 added!</code></td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="utility">Utility</h2>
+<h3 id="commands_1">!commands</h3>
+<p>Returns site to all commands.</p>
+<p><strong>Usage:</strong> <code>!commands</code></p>
+<p><strong>Permission:</strong> <abbr title="All viewers can use this command">Everyone</abbr></p>
+<details>
+<summary>Examples</summary>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>!commands</code></td>
+<td><code>Use and abuse me with these commands: https://stumburs.github.io/pizza-son/commands</code></td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h3 id="perm">!perm</h3>
+<p>Returns the lowest permission level for calling user.</p>
+<p><strong>Usage:</strong> <code>!perm</code></p>
+<p><strong>Permission:</strong> <abbr title="All viewers can use this command">Everyone</abbr></p>
+<details>
+<summary>Examples</summary>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>!perm</code></td>
+<td><code>Your permission level is VIP</code></td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h3 id="ping">!ping</h3>
+<p>Responds with Pong!</p>
+<p><strong>Usage:</strong> <code>!ping</code></p>
+<p><strong>Permission:</strong> <abbr title="All viewers can use this command">Everyone</abbr></p>
+<details>
+<summary>Examples</summary>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>!ping</code></td>
+<td><code>Pong!</code></td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h3 id="repeat">!repeat</h3>
+<p>Repeats what you tell it to. Pretty self explanatory.</p>
+<p><strong>Usage:</strong> <code>!repeat &lt;text&gt;</code></p>
+<p><strong>Permission:</strong> <abbr title="Bot-specific moderators and above">Bot Moderator</abbr></p>
+<details>
+<summary>Examples</summary>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>!repeat meowdy</code></td>
+<td><code>meowdy</code></td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h3 id="signup">!signup</h3>
+<p>Sign up to have the bot added to your channel. Your channel will be manually reviewed to determine whether it meets certain criteria. Having pizza_son added to your channel might take a day or two after passing the criteria.</p>
+<p><strong>Usage:</strong> <code>!signup</code></p>
+<p><strong>Permission:</strong> <abbr title="All viewers can use this command">Everyone</abbr></p>
+<details>
+<summary>Examples</summary>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>!signup</code></td>
+<td><code>You have been added to the signup list, fantastic_streamer4235! Please wait for manual review.</code></td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h3 id="timer">!timer</h3>
+<p>Start a timer that sends an optional message after it expires. Duration can be formatted using {x}s, {x}m|min, {x}/h.</p>
+<p><strong>Usage:</strong> <code>!timer &lt;duration&gt; [message]</code></p>
+<p><strong>Permission:</strong> <abbr title="All viewers can use this command">Everyone</abbr></p>
+<details>
+<summary>Examples</summary>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>!timer 5m pizza is ready</code></td>
+<td><code>Timer set for 5m. | (after 5 minutes) | pizza_tm dinkDonk pizza is ready dinkDonk</code></td>
+</tr>
+<tr>
+<td><code>!timer 2.5h</code></td>
+<td><code>Timer set for 2.5h. | (after 2.5 hours) | dinkDonk Your end is nigh (timer is up) dinkDonk</code></td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h3 id="weather">!weather</h3>
+<p>Gets the temperature for a location.</p>
+<p><strong>Usage:</strong> <code>!weather &lt;location&gt;</code></p>
+<p><strong>Permission:</strong> <abbr title="All viewers can use this command">Everyone</abbr></p>
+<details>
+<summary>Examples</summary>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>!weather London</code></td>
+<td><code>London: +16°C</code></td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="permission-levels">Permission Levels</h2>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><abbr title="All viewers can use this command">Everyone</abbr></td>
+<td>All viewers</td>
+</tr>
+<tr>
+<td><abbr title="Channel subscribers and above">Subscriber</abbr></td>
+<td>Channel subscribers</td>
+</tr>
+<tr>
+<td><abbr title="Channel VIPs and above">VIP</abbr></td>
+<td>Channel VIPs</td>
+</tr>
+<tr>
+<td><abbr title="Channel moderators and above">Moderator</abbr></td>
+<td>Channel moderators</td>
+</tr>
+<tr>
+<td><abbr title="Bot-specific moderators and above">Bot Moderator</abbr></td>
+<td>Bot-specific moderators</td>
+</tr>
+<tr>
+<td><abbr title="The broadcaster only">Streamer</abbr></td>
+<td>The broadcaster</td>
+</tr>
+</tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-circle-arrow-up" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m16 12-4-4-4 4M12 16V8"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://zensical.org/" target="_blank" rel="noopener">
+      Zensical
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["navigation.tabs","navigation.tabs.sticky","navigation.path","toc.follow","toc.integrate","navigation.top","search.suggest","search.highlight","search.share"],"search":"../assets/javascripts/workers/search.e2d2d235.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
+    
+     
+      <script src="../assets/javascripts/bundle.c2b142ea.min.js"></script>
+      
+    
+<script src="https://storage.ko-fi.com/cdn/scripts/overlay-widget.js"></script>
+<script>
+  kofiWidgetOverlay.draw("stumburs", {
+    type: "floating-chat",
+    "floating-chat.donateButton.text": "Support me",
+    "floating-chat.donateButton.background-color": "#ffffff",
+    "floating-chat.donateButton.text-color": "#323842",
+  });
+</script>
+
+  </body>
+</html>
