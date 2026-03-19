@@ -41,8 +41,10 @@ func main() {
 	})
 
 	go func() {
-		if err := b.Start(); err != nil {
-			log.Fatal(err)
+		for {
+			if err := b.Start(); err != nil {
+				log.Println("[Bot] Disconnected:", err)
+			}
 		}
 	}()
 

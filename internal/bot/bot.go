@@ -36,7 +36,6 @@ func (b *Bot) Reconnect(newToken string) {
 	b.client.Disconnect()
 	b.client = twitch.NewClient(config.Get().Twitch.User, "oauth:"+newToken)
 	b.setupHandlers()
-	go b.client.Connect()
 	log.Println("[Bot] Reconnected")
 }
 
