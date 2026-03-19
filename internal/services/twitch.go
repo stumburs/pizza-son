@@ -11,9 +11,10 @@ import (
 )
 
 type TwitchService struct {
-	client *helix.Client
-	cache  map[string]cachedStreamInfo
-	mu     sync.Mutex
+	client         *helix.Client
+	cache          map[string]cachedStreamInfo
+	mu             sync.Mutex
+	onTokenRefresh func(string)
 }
 
 type cachedStreamInfo struct {
@@ -68,6 +69,10 @@ func NewTwitchService() {
 	log.Println("[Twitch] Service initialized")
 }
 
+func (s *TwitchService) SetTokenRefreshCallback(fn func(string)) {
+	s.onTokenRefresh = fn
+}
+
 func (s *TwitchService) startTokenRefresh() {
 	go func() {
 		for {
@@ -87,6 +92,10 @@ func (s *TwitchService) startTokenRefresh() {
 				log.Println("[Twitch] Failed to save tokens:", err)
 			} else {
 				log.Println("[Twitch] User token refreshed and saved")
+			}
+
+			if s.onTokenRefresh != nil {
+				s.onTokenRefresh(resp.Data.AccessToken)
 			}
 
 			log.Printf("[Twitch] App token refreshed, expires in %d seconds", resp.Data.ExpiresIn)

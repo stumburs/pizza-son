@@ -36,6 +36,10 @@ func main() {
 		registry,
 	)
 
+	services.TwitchServiceInstance.SetTokenRefreshCallback(func(newToken string) {
+		b.Reconnect(newToken)
+	})
+
 	go func() {
 		if err := b.Start(); err != nil {
 			log.Fatal(err)
