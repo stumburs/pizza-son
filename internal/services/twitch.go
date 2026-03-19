@@ -210,3 +210,29 @@ func (s *TwitchService) Timeout(channel, userID string, duration int, reason str
 		log.Printf("[Twitch] Failed to timeout %s: %v %s", userID, err, resp.ErrorMessage)
 	}
 }
+
+func (s *TwitchService) Ban(channel, userID string, reason string) {
+	broadcasterID, err := s.GetUserID(channel)
+	if err != nil {
+		log.Printf("[Twitch] Failed to resolve broadcaster ID for %s: %v", channel, err)
+		return
+	}
+
+	botID, err := s.GetUserID(config.Get().Twitch.User)
+	if err != nil {
+		log.Printf("[Twitch] Failed to resolve bot user ID: %v", err)
+		return
+	}
+
+	resp, err := s.client.BanUser(&helix.BanUserParams{
+		BroadcasterID: broadcasterID,
+		ModeratorId:   botID,
+		Body: helix.BanUserRequestBody{
+			UserId: userID,
+			Reason: reason,
+		},
+	})
+	if err != nil || resp.ErrorMessage != "" {
+		log.Printf("[Twitch] Failed to ban %s: %v %s", userID, err, resp.ErrorMessage)
+	}
+}
