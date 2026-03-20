@@ -9,6 +9,7 @@ import (
 	"pizza-son/internal/config"
 	"pizza-son/internal/services"
 	"syscall"
+	"time"
 )
 
 func main() {
@@ -45,6 +46,7 @@ func main() {
 			if err := b.Start(); err != nil {
 				log.Println("[Bot] Disconnected:", err)
 			}
+			time.Sleep(2 * time.Second)
 		}
 	}()
 

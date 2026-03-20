@@ -15,28 +15,24 @@ type Bot struct {
 }
 
 func New(username string, channels []string, registry *Registry) *Bot {
-	token := "oauth:" + services.TwitchServiceInstance.GetAccessToken()
-	client := twitch.NewClient(username, token)
-	b := &Bot{
-		client:   client,
+	return &Bot{
 		registry: registry,
 		channels: channels,
 	}
-	b.setupHandlers()
-	return b
 }
 
 func (b *Bot) Start() error {
+	token := "oauth:" + services.TwitchServiceInstance.GetAccessToken()
+	b.client = twitch.NewClient(config.Get().Twitch.User, token)
+	b.setupHandlers()
 	log.Println("[Bot] Bot connecting to:", b.channels)
 	return b.client.Connect()
 }
 
 func (b *Bot) Reconnect(newToken string) {
-	log.Println("[Bot] Reconnecting with new token...")
+	log.Println("[Bot] Token refreshed, disconnecting...")
 	b.client.Disconnect()
-	b.client = twitch.NewClient(config.Get().Twitch.User, "oauth:"+newToken)
-	b.setupHandlers()
-	log.Println("[Bot] Reconnected")
+	// Start() loop will reconnect automatically
 }
 
 func (b *Bot) setupHandlers() {
