@@ -104,7 +104,11 @@ func (s *ChannelSettingsService) DisableCommand(channel, command string) {
 func (s *ChannelSettingsService) ListDisabledCommands(channel string) []string {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	return listDisabled(s.settings[channel].DisabledCommands)
+	cs, ok := s.settings[channel]
+	if !ok {
+		return []string{}
+	}
+	return listDisabled(cs.DisabledCommands)
 }
 
 // Listeners
@@ -133,9 +137,13 @@ func (s *ChannelSettingsService) DisableListener(channel, listener string) {
 }
 
 func (s *ChannelSettingsService) ListDisabledListeners(channel string) []string {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	return listDisabled(s.settings[channel].DisabledListeners)
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	cs, ok := s.settings[channel]
+	if !ok {
+		return []string{}
+	}
+	return listDisabled(cs.DisabledListeners)
 }
 
 // Shared
