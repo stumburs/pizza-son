@@ -8,6 +8,7 @@ repo_name = "stumburs/pizza-son"
 nav = [
   { "Home" = "index.md" },
   { "Commands" = "commands.md" },
+  {"Listeners" = "listeners.md"},
 ]
 
 [project.theme]

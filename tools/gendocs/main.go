@@ -122,6 +122,33 @@ type TemplateData struct {
 	Tick       string
 }
 
+var listenerTemplate = `# Listeners
+
+Listeners run on every message passively, without requiring a command prefix.
+
+---
+
+{{ range .Listeners }}
+## {{ .Name }}
+
+{{ .Description }}
+
+**Permission:** {{ .Permission }}
+
+---
+{{ end }}
+`
+
+type ListenerDoc struct {
+	Name        string
+	Description string
+	Permission  string
+}
+
+type ListenerTemplateData struct {
+	Listeners []ListenerDoc
+}
+
 func main() {
 	registry := bot.NewRegistry("!")
 	commands.SetRegistry(registry)
@@ -179,28 +206,6 @@ func main() {
 		categories = append(categories, CategoryDoc{Name: name, Commands: cmds})
 	}
 
-	// docs := make([]CommandDoc, 0, len(cmds))
-	// for _, cmd := range cmds {
-	// 	examples := make([]ExampleDoc, 0, len(cmd.Examples))
-	// 	for _, ex := range cmd.Examples {
-	// 		examples = append(examples, ExampleDoc{
-	// 			Input:  ex.Input,
-	// 			Output: ex.Output,
-	// 		})
-	// 	}
-	// 	docs = append(docs, CommandDoc{
-	// 		Name:        cmd.Name,
-	// 		Description: cmd.Description,
-	// 		Usage:       cmd.Usage,
-	// 		Permission:  bot.PermissionName(cmd.Permission),
-	// 		Examples:    examples,
-	// 	})
-	// }
-
-	// sort.Slice(docs, func(i, j int) bool {
-	// 	return docs[i].Name < docs[j].Name
-	// })
-
 	tmpl, err := template.New("docs").Funcs(template.FuncMap{
 		"lower": strings.ToLower,
 	}).Parse(docTemplate)
@@ -208,12 +213,6 @@ func main() {
 		fmt.Println("Template error:", err)
 		os.Exit(1)
 	}
-
-	// tmpl, err := template.New("docs").fun(docTemplate)
-	// if err != nil {
-	// 	fmt.Println("Template error:", err)
-	// 	os.Exit(1)
-	// }
 
 	// Write to docs/commands.md
 	if err := os.MkdirAll("docs", os.ModePerm); err != nil {
@@ -237,5 +236,39 @@ func main() {
 	}
 
 	fmt.Printf("Generated docs/commands.md with %d categories\n", len(categories))
+
+	// Listeners
+	listenerDocs := make([]ListenerDoc, 0)
+	for _, l := range registry.Listeners() {
+		listenerDocs = append(listenerDocs, ListenerDoc{
+			Name:        l.Name,
+			Description: l.Description,
+			Permission:  bot.PermissionName(l.Permission),
+		})
+	}
+	sort.Slice(listenerDocs, func(i, j int) bool {
+		return listenerDocs[i].Name < listenerDocs[j].Name
+	})
+
+	listenerTmpl, err := template.New("listeners").Parse(listenerTemplate)
+	if err != nil {
+		fmt.Println("Listener template error:", err)
+		os.Exit(1)
+	}
+
+	lf, err := os.Create("docs/listeners.md")
+	if err != nil {
+		fmt.Println("Failed to create listeners.md", err)
+		os.Exit(1)
+	}
+	defer lf.Close()
+
+	if err := listenerTmpl.Execute(lf, ListenerTemplateData{Listeners: listenerDocs}); err != nil {
+		fmt.Println("Failed to execute listener template:", err)
+		os.Exit(1)
+	}
+
+	fmt.Printf("Generated docs/listeners.md with %d listeners\n", len(listenerDocs))
+
 	_ = strings.TrimSpace
 }
