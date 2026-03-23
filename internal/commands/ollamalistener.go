@@ -9,7 +9,7 @@ import (
 
 func init() {
 	RegisterListener(bot.ListenerEntry{
-		Name:        "ollama-context",
+		Name:        "ollama",
 		Description: "Feeds chat messages to LLM context",
 		Handler: func(ctx bot.CommandContext) bool {
 			if strings.HasPrefix(ctx.Message.Message, config.Get().Bot.Prefix) {

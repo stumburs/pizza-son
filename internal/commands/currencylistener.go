@@ -21,7 +21,7 @@ var (
 
 func init() {
 	RegisterListener(bot.ListenerEntry{
-		Name:        "currency-earner",
+		Name:        "currency",
 		Description: "Awards slices to users for chatting",
 		Handler: func(ctx bot.CommandContext) bool {
 			if strings.HasPrefix(ctx.Message.Message, config.Get().Bot.Prefix) {

@@ -122,6 +122,10 @@ func (r *Registry) Dispatch(client *twitch.Client, msg twitch.PrivateMessage) {
 		if !HasPermission(msg, l.Permission) {
 			continue
 		}
+		// Check for disabled listeners per channel
+		if !services.ChannelSettingsInstance.IsListenerEnabled(msg.Channel, l.Name) {
+			continue
+		}
 		l := l
 		go l.Handler(ctx)
 	}
@@ -157,6 +161,8 @@ func (r *Registry) Dispatch(client *twitch.Client, msg twitch.PrivateMessage) {
 }
 
 func (r *Registry) Commands() map[string]Command {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
 	return r.commands
 }
 
@@ -193,4 +199,10 @@ func (r *Registry) DispatchCommand(ctx CommandContext) {
 	}
 	ctx.Args = ctx.Args[1:]
 	go cmd.Handler(ctx)
+}
+
+func (r *Registry) Listeners() []ListenerEntry {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	return r.listeners
 }

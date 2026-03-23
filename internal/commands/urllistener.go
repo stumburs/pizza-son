@@ -9,7 +9,7 @@ var urlRegex = regexp.MustCompile(`(?i)(https?://(www\.)?[-a-zA-Z0-9@:%._+~#=]{1
 
 func init() {
 	RegisterListener(bot.ListenerEntry{
-		Name:        "url-benner",
+		Name:        "url",
 		Description: "Detects URLs in messages and ben's",
 		Handler: func(ctx bot.CommandContext) bool {
 			if !urlRegex.MatchString(ctx.Message.Message) {

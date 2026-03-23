@@ -13,7 +13,7 @@ var bannableTerms = []string{
 
 func init() {
 	RegisterListener(bot.ListenerEntry{
-		Name:        "scam-bot-banner",
+		Name:        "scam-banner",
 		Description: "Detects scam bots and automatically bans them.",
 		Handler: func(ctx bot.CommandContext) bool {
 			if !ctx.Message.FirstMessage {

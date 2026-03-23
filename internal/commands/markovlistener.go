@@ -9,7 +9,7 @@ import (
 
 func init() {
 	RegisterListener(bot.ListenerEntry{
-		Name:        "markov-learn",
+		Name:        "markov",
 		Description: "Feeds chat messages into Markov generator",
 		Handler: func(ctx bot.CommandContext) bool {
 			if strings.HasPrefix(ctx.Message.Message, config.Get().Bot.Prefix) {

@@ -4,17 +4,20 @@ import (
 	"encoding/json"
 	"log"
 	"os"
+	"slices"
+	"strings"
 	"sync"
 )
 
 const channelSettingsFile = "data/channel_settings.json"
 
 type ChannelSettings struct {
-	DisabledCommands map[string]bool `json:"disabled_commands"`
+	DisabledCommands  map[string]bool `json:"disabled_commands"`
+	DisabledListeners map[string]bool `json:"disabled_listeners"`
 }
 
 type ChannelSettingsService struct {
-	mu       sync.Mutex
+	mu       sync.RWMutex
 	settings map[string]*ChannelSettings // key - channel name
 }
 
@@ -59,48 +62,93 @@ func (s *ChannelSettingsService) save() {
 func (s *ChannelSettingsService) getOrCreate(channel string) *ChannelSettings {
 	if _, ok := s.settings[channel]; !ok {
 		s.settings[channel] = &ChannelSettings{
-			DisabledCommands: make(map[string]bool),
+			DisabledCommands:  make(map[string]bool),
+			DisabledListeners: make(map[string]bool),
 		}
 	}
-	return s.settings[channel]
+	cs := s.settings[channel]
+	if cs.DisabledCommands == nil {
+		cs.DisabledCommands = make(map[string]bool)
+	}
+	if cs.DisabledListeners == nil {
+		cs.DisabledListeners = make(map[string]bool)
+	}
+	return cs
 }
 
+// Commands
 func (s *ChannelSettingsService) IsCommandEnabled(channel, command string) bool {
-	s.mu.Lock()
-	defer s.mu.Unlock()
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 	cs, ok := s.settings[channel]
 	if !ok {
 		return true
 	}
-	return !cs.DisabledCommands[command]
+	return !cs.DisabledCommands[strings.ToLower(command)]
 }
 
 func (s *ChannelSettingsService) EnableCommand(channel, command string) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	cs := s.getOrCreate(channel)
-	delete(cs.DisabledCommands, command)
+	delete(s.getOrCreate(channel).DisabledCommands, strings.ToLower(command))
 	s.save()
 }
 
 func (s *ChannelSettingsService) DisableCommand(channel, command string) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	cs := s.getOrCreate(channel)
-	cs.DisabledCommands[command] = true
+	s.getOrCreate(channel).DisabledCommands[strings.ToLower(command)] = true
 	s.save()
 }
 
-func (s *ChannelSettingsService) ListDisabled(channel string) []string {
-	s.mu.Lock()
-	defer s.mu.Unlock()
+func (s *ChannelSettingsService) ListDisabledCommands(channel string) []string {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return listDisabled(s.settings[channel].DisabledCommands)
+}
+
+// Listeners
+func (s *ChannelSettingsService) IsListenerEnabled(channel, listener string) bool {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 	cs, ok := s.settings[channel]
 	if !ok {
+		return true
+	}
+	return !cs.DisabledListeners[strings.ToLower(listener)]
+}
+
+func (s *ChannelSettingsService) EnableListener(channel, listener string) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	delete(s.getOrCreate(channel).DisabledListeners, strings.ToLower(listener))
+	s.save()
+}
+
+func (s *ChannelSettingsService) DisableListener(channel, listener string) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.getOrCreate(channel).DisabledListeners[strings.ToLower(listener)] = true
+	s.save()
+}
+
+func (s *ChannelSettingsService) ListDisabledListeners(channel string) []string {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return listDisabled(s.settings[channel].DisabledListeners)
+}
+
+// Shared
+func listDisabled(m map[string]bool) []string {
+	if m == nil {
 		return []string{}
 	}
-	disabled := make([]string, 0)
-	for cmd := range cs.DisabledCommands {
-		disabled = append(disabled, cmd)
+	disabled := make([]string, 0, len(m))
+	for name, isDisabled := range m {
+		if isDisabled {
+			disabled = append(disabled, name)
+		}
 	}
+	slices.Sort(disabled)
 	return disabled
 }

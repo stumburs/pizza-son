@@ -11,7 +11,7 @@ var sixSevenRegex = regexp.MustCompile(`(?i)(^|\s)67(\s|$)|sixty[-\s]?seven|six[
 
 func init() {
 	RegisterListener(bot.ListenerEntry{
-		Name:        "67-benner",
+		Name:        "67",
 		Description: "Detects 67s in messages and ben's",
 		Handler: func(ctx bot.CommandContext) bool {
 			if !sixSevenRegex.MatchString(strings.TrimSpace(ctx.Message.Message)) {
