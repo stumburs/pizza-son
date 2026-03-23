@@ -38,12 +38,23 @@ func init() {
 					ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "Only VIP's can add quotes.")
 					return
 				}
-				if len(ctx.Args) < 2 {
-					ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "Usage: !quote add <text>")
-					return
+
+				var text, addedBy string
+
+				if ctx.Message.Reply.ParentMsgBody != "" && len(ctx.Args) < 2 {
+					// Use the replied-to message as the quote
+					text = ctx.Message.Reply.ParentMsgBody
+					addedBy = ctx.Message.Reply.ParentDisplayName
+				} else {
+					if len(ctx.Args) < 2 {
+						ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "Usage: !quote add <text>")
+						return
+					}
+					text = strings.Join(ctx.Args[1:], " ")
+					addedBy = ctx.Message.User.DisplayName
 				}
-				text := strings.Join(ctx.Args[1:], " ")
-				number := services.QuoteServiceInstance.Add(ctx.Message.Channel, text, ctx.Message.User.DisplayName)
+
+				number := services.QuoteServiceInstance.Add(ctx.Message.Channel, text, addedBy)
 				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, fmt.Sprintf("Quote #%d added!", number))
 			default:
 				// Specific quote by number
@@ -65,5 +76,5 @@ func init() {
 }
 
 func formatQuote(q services.Quote, number int) string {
-	return fmt.Sprintf("#%d: \" %s \" - added by %s on %s", number, q.Text, q.AddedBy, q.CreatedAt)
+	return fmt.Sprintf("#%d: \" %s \" - by %s on %s", number, q.Text, q.AddedBy, q.CreatedAt)
 }

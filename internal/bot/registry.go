@@ -100,7 +100,6 @@ func (r *Registry) RegisterListener(l ListenerEntry) {
 }
 
 func (r *Registry) Dispatch(client *twitch.Client, msg twitch.PrivateMessage) {
-
 	// Ignored users
 	for _, ignored := range config.Get().Bot.IgnoredUsers {
 		if strings.EqualFold(msg.User.Name, ignored) {
@@ -110,6 +109,16 @@ func (r *Registry) Dispatch(client *twitch.Client, msg twitch.PrivateMessage) {
 
 	r.mu.Lock()
 	defer r.mu.Unlock()
+
+	message := strings.TrimSpace(msg.Message)
+
+	// Trim leading @mention if this is a reply
+	if msg.Reply != nil && msg.Reply.ParentMsgID != "" {
+		parts := strings.SplitN(message, " ", 2)
+		if len(parts) == 2 && strings.HasPrefix(parts[0], "@") {
+			message = parts[1]
+		}
+	}
 
 	ctx := CommandContext{
 		Client:   &TwitchSender{client: client},
@@ -130,12 +139,11 @@ func (r *Registry) Dispatch(client *twitch.Client, msg twitch.PrivateMessage) {
 		go l.Handler(ctx)
 	}
 
-	// Run commands if starts with prefix
-	if !strings.HasPrefix(msg.Message, r.Prefix) {
+	if !strings.HasPrefix(message, r.Prefix) {
 		return
 	}
 
-	parts := strings.Fields(strings.TrimPrefix(msg.Message, r.Prefix))
+	parts := strings.Fields(strings.TrimPrefix(message, r.Prefix))
 	if len(parts) == 0 {
 		return
 	}
