@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"pizza-son/internal/config"
 	"strings"
+	"sync"
 
 	"github.com/JexSrs/go-ollama"
 	"github.com/gempir/go-twitch-irc/v4"
@@ -15,6 +16,7 @@ import (
 
 type OllamaService struct {
 	Client *ollama.Ollama
+	mu     sync.Mutex
 }
 
 var OllamaServiceInstance *OllamaService
@@ -54,6 +56,8 @@ func ExtractCommand(message string) string {
 }
 
 func (s *OllamaService) GenerateResponse(prompt string) string {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	res, err := s.Client.Generate(
 		s.Client.Generate.WithModel("mistral:latest"),
 		s.Client.Generate.WithPrompt(prompt),
@@ -66,6 +70,8 @@ func (s *OllamaService) GenerateResponse(prompt string) string {
 }
 
 func (s *OllamaService) OnPrivateMessage(msg twitch.PrivateMessage) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	chat := s.Client.GetChat(msg.Channel)
 	// Create a new chat instance if it doesn't exist yet on this channel
 	if chat == nil {
@@ -87,6 +93,8 @@ func (s *OllamaService) OnPrivateMessage(msg twitch.PrivateMessage) {
 }
 
 func (s *OllamaService) GenerateChatResponse(msg twitch.PrivateMessage, prompt string) (*ollama.ChatResponse, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	chatID := msg.Channel
 
 	// Get command from original message and load corresponding system prompt FIRST
@@ -129,6 +137,8 @@ func (s *OllamaService) GenerateChatResponse(msg twitch.PrivateMessage, prompt s
 }
 
 func (s *OllamaService) Lobotomize(channel string) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	s.Client.DeleteChat(channel)
 	log.Println("[Ollama] Bot Lobotomized in", channel)
 }
