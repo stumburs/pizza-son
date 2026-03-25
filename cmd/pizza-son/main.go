@@ -25,6 +25,7 @@ func main() {
 	services.NewRNNService()
 	services.NewLoggerService()
 	services.NewChannelSettingsService()
+	services.NewMudwrestleService()
 
 	// Command registry
 	registry := bot.NewRegistry(config.Get().Bot.Prefix)

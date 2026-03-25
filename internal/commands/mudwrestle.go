@@ -27,21 +27,44 @@ func init() {
 	Register(bot.Command{
 		Name:        "mudwrestle",
 		Description: "Challenge another user to a mud wrestling match for pizza slices. The winner takes all.",
-		Usage:       "!mudwrestle <user> <amount> | !mudwrestle accept",
+		Usage:       "!mudwrestle <user> <amount> | !mudwrestle accept | !mudwrestle stats [user]",
 		Category:    bot.CategoryGames,
 		Examples: []bot.CommandExample{
 			{Input: "!mudwrestle @sweaty_man67 100", Output: "pizza_tm has challenged @sweaty_man67 to a mud wrestling match for 100 pizza slices! Type !mudwrestle accept within 60 seconds to accept."},
 			{Input: "!mudwrestle accept", Output: "sweaty_man67 has won the wrestling duel against pizza_tm and takes 100 slices."},
+			{Input: "!mudwrestle stats", Output: "pizza_tm mudwrestle stats - Wins: 69 | Losses: 0 | Slices won: 420 | Slices lost: 0"},
+			{Input: "!mudwrestle stats @creamerman", Output: "creamerman mudwrestle stats - Wins: 4 | Losses: 7 | Slices won: 245 | Slices lost: 460"},
 		},
 		Handler: func(ctx bot.CommandContext) {
 			if len(ctx.Args) == 0 {
-				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "Usage: !mudwrestle <user> <amount> | !mudwrestle accept")
+				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "Usage: !mudwrestle <user> <amount> | !mudwrestle accept | !mudwrestle stats [user]")
 				return
 			}
 
 			switch ctx.Args[0] {
 			case "accept":
 				handleAccept(ctx)
+			case "stats":
+				var targetID, targetName string
+				if len(ctx.Args) > 1 {
+					targetName = strings.ToLower(strings.TrimPrefix(ctx.Args[1], "@"))
+					id, err := services.TwitchServiceInstance.GetUserID(targetName)
+					if err != nil {
+						ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "Could not find user: "+targetName)
+						return
+					}
+					targetID = id
+				} else {
+					targetID = ctx.Message.User.ID
+					targetName = ctx.Message.User.DisplayName
+				}
+
+				st := services.MudwrestleServiceInstance.GetStats(targetID)
+				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, fmt.Sprintf(
+					"%s mudwrestle stats - Wins: %d | Losses: %d | Slices won: %d | Slices lost: %d",
+					targetName, st.Wins, st.Losses, st.SlicesWon, st.SlicesLost,
+				))
+
 			default:
 				handleChallenge(ctx)
 			}
@@ -128,9 +151,13 @@ func handleAccept(ctx bot.CommandContext) {
 
 	if challengerWins {
 		services.CurrencyServiceInstance.Give(ctx.Message.User.ID, challenge.challengerID, challenge.amount)
+		services.MudwrestleServiceInstance.RecordWin(challenge.challengerID, challenge.amount)
+		services.MudwrestleServiceInstance.RecordLoss(ctx.Message.User.ID, challenge.amount)
 		ctx.Client.Say(ctx.Message.Channel, fmt.Sprintf("%s has won the wrestling duel against @%s and takes %d slices.", challenge.challengerName, ctx.Message.User.DisplayName, challenge.amount))
 	} else {
 		services.CurrencyServiceInstance.Give(challenge.challengerID, ctx.Message.User.ID, challenge.amount)
+		services.MudwrestleServiceInstance.RecordWin(ctx.Message.User.ID, challenge.amount)
+		services.MudwrestleServiceInstance.RecordLoss(challenge.challengerID, challenge.amount)
 		ctx.Client.Say(ctx.Message.Channel, fmt.Sprintf("%s has won the wrestling duel against @%s and takes %d slices.", ctx.Message.User.DisplayName, challenge.challengerName, challenge.amount))
 	}
 }
