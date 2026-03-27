@@ -7,14 +7,34 @@ import (
 	"strings"
 )
 
-var sixSevenRegex = regexp.MustCompile(`(?i)(^|\s)67(\s|$)|sixty[-\s]?seven|six[-\s]?seven`)
+var (
+	// very basic
+	basicUrlRegex = regexp.MustCompile(`(?i)https?:\\/S+|www\.\S+`)
+
+	sixSevenRegex = regexp.MustCompile(`(?i)` +
+		// numeric
+		`(?:^|[\s,!?(])` +
+		`[6б].{0,20}7` +
+		`(?:[\s,!?)]|$)` +
+		`|` +
+		// written
+		`six.{0,20}seven` +
+		`|` +
+		`sixty.{0,20}seven`,
+	)
+)
 
 func init() {
 	RegisterListener(bot.ListenerEntry{
 		Name:        "67",
 		Description: "Detects 67s in messages and ben's",
 		Handler: func(ctx bot.CommandContext) bool {
-			if !sixSevenRegex.MatchString(strings.TrimSpace(ctx.Message.Message)) {
+			msg := strings.TrimSpace(ctx.Message.Message)
+
+			// strip URLs
+			msg = basicUrlRegex.ReplaceAllString(msg, "")
+
+			if !sixSevenRegex.MatchString(msg) {
 				return false
 			}
 			ctx.Client.Say(ctx.Message.Channel, "ben")

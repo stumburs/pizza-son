@@ -46,6 +46,7 @@ var berts = []string{
 	"hamburgert",
 	"nert",
 	"bertrayal",
+	"adBERTisement",
 }
 
 func init() {
@@ -75,6 +76,24 @@ func init() {
 			for _, bert := range berts {
 				if strings.Contains(msg, strings.ToLower(bert)) {
 					ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "firsttimeberter")
+					return true
+				}
+			}
+			return false
+		},
+	})
+	RegisterListener(bot.ListenerEntry{
+		Name:        "snipebert",
+		Description: "Detects snipe messages",
+		Handler: func(ctx bot.CommandContext) bool {
+			msg := strings.ToLower(ctx.Message.Message)
+			if !strings.Contains(msg, "snip") {
+				return false
+			}
+			snipeWords := []string{"sniped", "snipe", "sniper", "get sniped", "got sniped"}
+			for _, word := range snipeWords {
+				if strings.Contains(msg, word) {
+					ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "snipebert")
 					return true
 				}
 			}
