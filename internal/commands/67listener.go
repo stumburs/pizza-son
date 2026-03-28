@@ -11,13 +11,23 @@ var (
 	// very basic
 	basicUrlRegex = regexp.MustCompile(`(?i)https?:\\/S+|www\.\S+`)
 
+	// AI save us (TODO: Improve and de-jankify)
 	sixSevenRegex = regexp.MustCompile(`(?i)` +
-		// numeric
+		// Numeric: 67, 6-7, 6 uh 7, etc.
 		`(?:^|[\s,!?(])` +
 		`[6б].{0,20}7` +
 		`(?:[\s,!?)]|$)` +
 		`|` +
-		// written
+		// Mixed: six...7, 6...seven
+		`(?:^|[\s,!?(])` +
+		`six.{0,20}7` +
+		`(?:[\s,!?)]|$)` +
+		`|` +
+		`(?:^|[\s,!?(])` +
+		`[6б].{0,20}seven` +
+		`(?:[\s,!?)]|$)` +
+		`|` +
+		// Written: six...seven, sixty...seven
 		`six.{0,20}seven` +
 		`|` +
 		`sixty.{0,20}seven`,

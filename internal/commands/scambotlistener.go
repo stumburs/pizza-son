@@ -9,6 +9,7 @@ import (
 var bannableTerms = []string{
 	"streamboo .com",
 	"streamboo .live",
+	"hypesm.online",
 }
 
 func init() {
