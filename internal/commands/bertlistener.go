@@ -3,6 +3,7 @@ package commands
 import (
 	"math/rand/v2"
 	"pizza-son/internal/bot"
+	"pizza-son/internal/services"
 	"strings"
 )
 
@@ -51,18 +52,37 @@ var berts = []string{
 	"yogBert",
 }
 
+type TrollRule struct {
+	User     string
+	Chance   float64
+	Response string
+}
+
+var trollRules = []TrollRule{
+	{
+		User:     "itzkxtee",
+		Chance:   0.4,
+		Response: "camembert",
+	},
+}
+
+const zazaChance = 0.05
+
 func init() {
 	RegisterListener(bot.ListenerEntry{
 		Name:        "bertcheck",
 		Description: "Responds with a random bert",
 		Handler: func(ctx bot.CommandContext) bool {
-			if !strings.Contains(strings.ToLower(ctx.Message.Message), "bertcheck") {
+			msg := strings.ToLower(ctx.Message.Message)
+
+			if !strings.Contains(msg, "bertcheck") {
 				return false
 			}
-			response := berts[rand.IntN(len(berts))]
-			if rand.Float64() < 0.05 {
-				response += " zaza"
+			if strings.HasPrefix(msg, "!") {
+				return false
 			}
+
+			response := pickBertResponse(ctx.Message.User.Name)
 			ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, response)
 			return true
 		},
@@ -102,4 +122,37 @@ func init() {
 			return false
 		},
 	})
+	RegisterListener(bot.ListenerEntry{
+		Name:        "!bertcheck corrector",
+		Description: "Corrects people who use !bertcheck instead of bertcheck",
+		Handler: func(ctx bot.CommandContext) bool {
+			msg := strings.ToLower(ctx.Message.Message)
+			if msg == "!bertcheck" {
+				services.TwitchServiceInstance.Timeout(ctx.Message.Channel, ctx.Message.User.ID, 21, "not using emote smh")
+				ctx.Client.Say(ctx.Message.Channel, "smh bertcheck isn't a command")
+				return true
+			}
+			return false
+		},
+	})
+}
+
+func pickBertResponse(user string) string {
+	// we do a bit of trolling
+	for _, rule := range trollRules {
+		if user == rule.User && rand.Float64() < rule.Chance {
+			resp := rule.Response
+			if rand.Float64() < zazaChance {
+				resp += " zaza"
+			}
+			return resp
+		}
+	}
+
+	// Normal berts
+	resp := berts[rand.IntN(len(berts))]
+	if rand.Float64() < zazaChance {
+		resp += " zaza"
+	}
+	return resp
 }
