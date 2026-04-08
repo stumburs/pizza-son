@@ -37,19 +37,19 @@ func (t *ttsSender) Reply(channel, msgID, message string) {
 
 func init() {
 	Register(bot.Command{
-		Name:        "tts",
+		Name:        "speak",
 		Description: "Run a command with the result being spoken using TTS.",
-		Usage:       "!tts <command> [args]",
+		Usage:       "!speak <command> [args]",
 		Category:    bot.CategoryFun,
 		Permission:  bot.VIP,
 		Examples: []bot.CommandExample{
-			{Input: "!tts mark", Output: "bestie: cats is thing"},
-			{Input: "!llm how are you?", Output: "bestie: I'm wonderful!"},
-			{Input: "!tts weather London", Output: "bestie: London: +10°C"},
+			{Input: "!speak mark", Output: "bestie: cats is thing"},
+			{Input: "!speak how are you?", Output: "bestie: I'm wonderful!"},
+			{Input: "!speak weather London", Output: "bestie: London: +10°C"},
 		},
 		Handler: func(ctx bot.CommandContext) {
 			if len(ctx.Args) == 0 {
-				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "Usage: !tts <command> [args]")
+				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "Usage: !speak <command> [args]")
 				return
 			}
 			voice := getTTSVoice(ctx.Message.User.ID)
