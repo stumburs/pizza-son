@@ -27,6 +27,7 @@ func main() {
 	services.NewChannelSettingsService()
 	services.NewMudwrestleService()
 	services.NewPredictionService()
+	services.NewSevenTVService()
 
 	// Command registry
 	registry := bot.NewRegistry(config.Get().Bot.Prefix)
