@@ -22,7 +22,7 @@ type OllamaService struct {
 var OllamaServiceInstance *OllamaService
 
 func NewOllamaService() {
-	url, err := url.Parse("http://192.168.0.101:11434")
+	url, err := url.Parse(config.Get().Ollama.Host)
 	if err != nil {
 		panic(err)
 	}
@@ -49,9 +49,25 @@ func (s *OllamaService) GetPromptByCommand(command string) string {
 
 func ExtractCommand(message string) string {
 	parts := strings.Fields(message)
-	if len(parts) > 0 && strings.HasPrefix(parts[0], "!") {
-		return parts[0]
+	if len(parts) == 0 {
+		return ""
 	}
+
+	first := parts[0]
+
+	// !speak <command>
+	if first == "!speak" {
+		if len(parts) > 1 {
+			return parts[1]
+		}
+		return ""
+	}
+
+	// other commands
+	if strings.HasPrefix(first, "!") {
+		return strings.TrimPrefix(first, "!")
+	}
+
 	return ""
 }
 
