@@ -3,6 +3,7 @@ package commands
 import (
 	"pizza-son/internal/bot"
 	"pizza-son/internal/services"
+	"strings"
 )
 
 func init() {
@@ -21,7 +22,8 @@ func init() {
 				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "Failed to get joke: "+err.Error())
 				return
 			}
-			ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, joke.Joke)
+			clean := strings.Join(strings.Fields(joke.Joke), " ")
+			ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, clean)
 		},
 	})
 }

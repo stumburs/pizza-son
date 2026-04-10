@@ -22,7 +22,8 @@ func init() {
 			if err != nil {
 				log.Println("[LLM]", err)
 			}
-			ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, *res.Message.Content)
+			clean := strings.Join(strings.Fields(*res.Message.Content), " ")
+			ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, clean)
 		},
 	})
 }

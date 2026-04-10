@@ -6,6 +6,7 @@ import (
 	"net/http"
 )
 
+// https://sv443.net/jokeapi/v2/
 // No racist jokes
 const jokeAPIURL = "https://v2.jokeapi.dev/joke/Any?blacklistFlags=racist&type=single"
 
