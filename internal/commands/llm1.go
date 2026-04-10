@@ -9,13 +9,13 @@ import (
 
 func init() {
 	Register(bot.Command{
-		Name:        "llm",
-		Description: "Responds as a basic LLM (latest version).",
-		Usage:       "!llm <text>",
+		Name:        "llm1",
+		Description: "Responds as a basic LLM v1.",
+		Usage:       "!llm1 <text>",
 		Category:    bot.CategoryAI,
 		Examples: []bot.CommandExample{
-			{Input: "!llm hello!", Output: "Hello, there, pizza_tm."},
-			{Input: "!llm what's the current stream title?", Output: "The current stream title is: 'Playing with kitties'"},
+			{Input: "!llm1 hello!", Output: "Hello, there, pizza_tm."},
+			{Input: "!llm1 what's the current stream title?", Output: "The current stream title is: 'Playing with kitties'"},
 		},
 		Handler: func(ctx bot.CommandContext) {
 			res, err := services.OllamaServiceInstance.GenerateChatResponse(ctx.Message, strings.Join(ctx.Args, " "))
