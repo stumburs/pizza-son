@@ -59,7 +59,7 @@ func (s *OllamaService) GenerateResponse(prompt string) string {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	res, err := s.Client.Generate(
-		s.Client.Generate.WithModel("mistral:latest"),
+		s.Client.Generate.WithModel(config.Get().Ollama.Model),
 		s.Client.Generate.WithPrompt(prompt),
 	)
 	if err != nil {
@@ -123,7 +123,7 @@ func (s *OllamaService) GenerateChatResponse(msg twitch.PrivateMessage, prompt s
 
 	res, err := s.Client.Chat(
 		&chatID,
-		s.Client.Chat.WithModel("mistral:latest"),
+		s.Client.Chat.WithModel(config.Get().Ollama.Model),
 		s.Client.Chat.WithMessage(message),
 		s.Client.Chat.WithOptions(ollama.Options{
 			NumPredict: &config.Get().Ollama.NumPredict,
