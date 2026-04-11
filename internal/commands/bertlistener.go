@@ -53,6 +53,7 @@ var berts = []string{
 	"BertRoss",
 	"beert",
 	"treb",
+	"kebabert",
 }
 
 type TrollRule struct {
