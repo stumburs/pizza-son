@@ -22,3 +22,8 @@ max_history = 80
 [markov]
 autosave_interval = 50
 length_to_generate = 200
+
+[[notifications]]
+# twitch_channel = "channel_name"
+# discord_webhook = "https://discord.com/api/webhooks/..."
+# message = "{{channel}} is now live playing {{game}}! https://twitch.tv/{{channel}}"

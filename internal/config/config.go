@@ -33,6 +33,11 @@ type Config struct {
 		AutosaveInterval int `toml:"autosave_interval"`
 		LengthToGenerate int `toml:"length_to_generate"`
 	} `toml:"markov"`
+
+	Notifications []struct {
+		TwitchChannel  string `toml:"twitch_channel"`
+		DiscordWebhook string `toml:"discord_webhook"`
+	} `toml:"notifications"`
 }
 
 var cfg *Config

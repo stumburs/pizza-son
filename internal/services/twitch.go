@@ -29,6 +29,7 @@ type StreamInfo struct {
 	ViewerCount  int
 	ChannelTags  []string
 	ThumbnailURL string
+	StartedAt    time.Time
 }
 
 const cacheDuration = 10 * time.Minute
@@ -153,6 +154,7 @@ func (s *TwitchService) GetStreamInfo(channel string) StreamInfo {
 	if err == nil && len(streamResp.Data.Streams) > 0 {
 		info.ViewerCount = streamResp.Data.Streams[0].ViewerCount
 		info.ThumbnailURL = streamResp.Data.Streams[0].ThumbnailURL
+		info.StartedAt = streamResp.Data.Streams[0].StartedAt
 	}
 
 	s.mu.Lock()
