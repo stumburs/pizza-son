@@ -13,7 +13,7 @@ func init() {
 			if !strings.Contains(strings.ToLower(ctx.Message.Text), "guess what") {
 				return false
 			}
-			ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "chicken butt")
+			ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "(ᶜʰᶦᶜᵏᵉⁿ ᵇᵘᵗᵗ)")
 			return true
 		},
 	})

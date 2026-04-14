@@ -32,7 +32,7 @@ type StreamInfo struct {
 	StartedAt    time.Time
 }
 
-const cacheDuration = 10 * time.Minute
+const cacheDuration = 1 * time.Minute
 
 var TwitchServiceInstance *TwitchService
 

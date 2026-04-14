@@ -28,9 +28,9 @@ func NewNotificationService() {
 }
 
 func (s *NotificationService) run() {
-	// Check on startup, then every 2 minutes
+	// Check on startup, then every 1 minute
 	s.check()
-	ticker := time.NewTicker(2 * time.Minute)
+	ticker := time.NewTicker(1 * time.Minute)
 	defer ticker.Stop()
 	for range ticker.C {
 		s.check()
