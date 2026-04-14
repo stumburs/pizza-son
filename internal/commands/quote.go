@@ -43,7 +43,7 @@ func init() {
 
 				if ctx.Message.Reply != nil && ctx.Message.Reply.ParentMsgBody != "" && len(ctx.Args) < 2 {
 					// Use the replied-to message as the quote
-					text = strings.ReplaceAll(ctx.Message.Reply.ParentMsgBody, "\\s", " ")
+					text = ctx.Message.Reply.ParentMsgBody
 					addedBy = ctx.Message.Reply.ParentDisplayName
 				} else {
 					if len(ctx.Args) < 2 {

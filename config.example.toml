@@ -7,11 +7,11 @@ client_secret = ""
 user_access_token = ""
 refresh_token = ""
 
-
 [bot]
 prefix = "!"
 channels = ["your_channel_here"]
 ignored_users = ["streamelements", "creatisbot", "nightbot", "fossabot"]
+moderators = [] # bot moderator permission
 
 [ollama]
 host = "192.168.0.101:11434"
@@ -27,3 +27,7 @@ length_to_generate = 200
 # twitch_channel = "channel_name"
 # discord_webhook = "https://discord.com/api/webhooks/..."
 # message = "{{channel}} is now live playing {{game}}! https://twitch.tv/{{channel}}"
+
+[discord]
+token = "bot_token"
+channels = ["channel_id"]

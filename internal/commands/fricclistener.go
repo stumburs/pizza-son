@@ -27,7 +27,7 @@ func init() {
 		Name:        "fricc",
 		Description: "fricc's someone back",
 		Handler: func(ctx bot.CommandContext) bool {
-			msg := strings.ToLower(ctx.Message.Message)
+			msg := strings.ToLower(ctx.Message.Text)
 			if !strings.Contains(msg, "fricc") {
 				return false
 			}

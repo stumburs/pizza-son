@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"log"
 	"os"
+	"pizza-son/internal/models"
 	"sync"
-
-	"github.com/gempir/go-twitch-irc/v4"
+	"time"
 )
 
 const logsDir = "data/logs"
@@ -60,7 +60,7 @@ func (s *LoggerService) getOrOpenFile(channel string) *json.Encoder {
 	return s.encoders[channel]
 }
 
-func (s *LoggerService) Log(msg twitch.PrivateMessage) {
+func (s *LoggerService) Log(msg models.Message) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -71,12 +71,12 @@ func (s *LoggerService) Log(msg twitch.PrivateMessage) {
 
 	entry := LogEntry{
 		Username:    msg.User.Name,
-		Message:     msg.Message,
-		Timestamp:   msg.Time.UnixMilli(),
+		Message:     msg.Text,
+		Timestamp:   time.Now().UnixMilli(),
 		Channel:     msg.Channel,
 		FirstMsg:    msg.FirstMessage,
-		Subscriber:  msg.User.Badges["subscriber"] > 0,
-		VIP:         msg.User.IsVip,
+		Subscriber:  msg.User.IsSubscriber,
+		VIP:         msg.User.IsVIP,
 		Mod:         msg.User.IsMod,
 		Broadcaster: msg.User.IsBroadcaster,
 	}

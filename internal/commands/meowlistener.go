@@ -10,7 +10,7 @@ func init() {
 		Name:        "meow",
 		Description: "meow's someone back",
 		Handler: func(ctx bot.CommandContext) bool {
-			if !strings.Contains(strings.ToLower(ctx.Message.Message), "meow") {
+			if !strings.Contains(strings.ToLower(ctx.Message.Text), "meow") {
 				return false
 			}
 			ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "meow")

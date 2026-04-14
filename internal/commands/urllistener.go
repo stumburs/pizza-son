@@ -12,7 +12,7 @@ func init() {
 		Name:        "url",
 		Description: "Detects URLs in messages and ben's",
 		Handler: func(ctx bot.CommandContext) bool {
-			if !urlRegex.MatchString(ctx.Message.Message) {
+			if !urlRegex.MatchString(ctx.Message.Text) {
 				return false
 			}
 			ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "ben")

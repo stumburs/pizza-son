@@ -7,11 +7,11 @@ import (
 	"os"
 	"path/filepath"
 	"pizza-son/internal/config"
+	"pizza-son/internal/models"
 	"strings"
 	"sync"
 
 	"github.com/JexSrs/go-ollama"
-	"github.com/gempir/go-twitch-irc/v4"
 )
 
 type OllamaService struct {
@@ -85,7 +85,7 @@ func (s *OllamaService) GenerateResponse(prompt string) string {
 	return res.Response
 }
 
-func (s *OllamaService) OnPrivateMessage(msg twitch.PrivateMessage) {
+func (s *OllamaService) OnPrivateMessage(msg models.Message) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	chat := s.Client.GetChat(msg.Channel)
@@ -98,7 +98,7 @@ func (s *OllamaService) OnPrivateMessage(msg twitch.PrivateMessage) {
 	}
 
 	role := "user"
-	content := fmt.Sprintf("%s chatted: %s", msg.User.DisplayName, msg.Message)
+	content := fmt.Sprintf("%s chatted: %s", msg.User.DisplayName, msg.Text)
 
 	message := ollama.Message{
 		Role:    &role,
@@ -108,13 +108,13 @@ func (s *OllamaService) OnPrivateMessage(msg twitch.PrivateMessage) {
 	chat.AddMessage(message)
 }
 
-func (s *OllamaService) GenerateChatResponse(msg twitch.PrivateMessage, prompt string) (*ollama.ChatResponse, error) {
+func (s *OllamaService) GenerateChatResponse(msg models.Message, prompt string) (*ollama.ChatResponse, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	chatID := msg.Channel
 
 	// Get command from original message and load corresponding system prompt FIRST
-	command := ExtractCommand(msg.Message)
+	command := ExtractCommand(msg.Text)
 	systemPrompt := s.GetPromptByCommand(command)
 
 	// Update the system prompt in the chat before generating response
@@ -126,7 +126,7 @@ func (s *OllamaService) GenerateChatResponse(msg twitch.PrivateMessage, prompt s
 	}
 
 	// Set system prompt
-	readdSystemPrompt(chat, systemPrompt)
+	readdSystemPrompt(msg, chat, systemPrompt)
 
 	role := "user"
 	prompt = fmt.Sprintf("%s asked: %s", msg.User.DisplayName, prompt)
@@ -177,10 +177,10 @@ func newChat(channel string) ollama.Chat {
 }
 
 // Clears and adds new system prompt to the beginning
-func readdSystemPrompt(chat *ollama.Chat, prompt string) {
+func readdSystemPrompt(msg models.Message, chat *ollama.Chat, prompt string) {
 	chat.DeleteMessage(0)
 	role := "system"
-	prompt = FillPlaceholders(prompt, chat.ID)
+	prompt = FillPlaceholders(msg, prompt)
 	promptMessage := &ollama.Message{
 		Role:    &role,
 		Content: &prompt,

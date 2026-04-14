@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/rand/v2"
 	"pizza-son/internal/bot"
+	"pizza-son/internal/models"
 	"pizza-son/internal/services"
 )
 
@@ -69,6 +70,11 @@ func init() {
 			{Input: "!eat", Output: ""},
 		},
 		Handler: func(ctx bot.CommandContext) {
+			// Exclude Discord
+			if ctx.Message.Platform == models.PlatformDiscord {
+				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "This is a Twitch exclusive command.")
+				return
+			}
 			_, ok := services.CurrencyServiceInstance.Deduct(ctx.Message.User.ID, 1)
 			if !ok {
 				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "You don't have any pizza slices to eat... :(")

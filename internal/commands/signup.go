@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"pizza-son/internal/bot"
+	"pizza-son/internal/models"
 	"pizza-son/internal/services"
 	"strings"
 	"time"
@@ -57,6 +58,11 @@ func init() {
 			{Input: "!signup", Output: "You have been added to the signup list, fantastic_streamer4235! Please wait for manual review."},
 		},
 		Handler: func(ctx bot.CommandContext) {
+			// Exclude Discord
+			if ctx.Message.Platform == models.PlatformDiscord {
+				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "This is a Twitch exclusive command.")
+				return
+			}
 			entries, err := loadSignups()
 			if err != nil {
 				log.Println("[Signup] Failed to load signups:", err)

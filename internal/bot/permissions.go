@@ -1,9 +1,9 @@
 package bot
 
 import (
+	"pizza-son/internal/config"
+	"pizza-son/internal/models"
 	"slices"
-
-	"github.com/gempir/go-twitch-irc/v4"
 )
 
 type Permission int
@@ -17,27 +17,27 @@ const (
 	Streamer
 )
 
-// TODO: Add config file support
-var botModerators = []string{"pizza_tm"}
-
-func HasPermission(msg twitch.PrivateMessage, required Permission) bool {
+func HasPermission(msg models.Message, required Permission) bool {
 	return GetPermissionLevel(msg) >= required
 }
 
-func GetPermissionLevel(msg twitch.PrivateMessage) Permission {
+func GetPermissionLevel(msg models.Message) Permission {
 	if msg.User.IsBroadcaster {
 		return Streamer
 	}
-	if slices.Contains(botModerators, msg.User.Name) {
+
+	botMods := config.Get().Bot.Moderators
+
+	if slices.Contains(botMods, msg.User.Name) || slices.Contains(botMods, msg.User.ID) {
 		return BotModerator
 	}
 	if msg.User.IsMod {
 		return Moderator
 	}
-	if msg.User.IsVip {
+	if msg.User.IsVIP {
 		return VIP
 	}
-	if msg.User.Badges["subscriber"] > 0 {
+	if msg.User.IsSubscriber {
 		return Subscriber
 	}
 	return All

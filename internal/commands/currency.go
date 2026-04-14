@@ -3,6 +3,7 @@ package commands
 import (
 	"fmt"
 	"pizza-son/internal/bot"
+	"pizza-son/internal/models"
 	"pizza-son/internal/services"
 	"strconv"
 	"strings"
@@ -21,6 +22,12 @@ func init() {
 			{Input: "!slices set @naughty_person 0", Output: "Set naughty_person slices to 0."},
 		},
 		Handler: func(ctx bot.CommandContext) {
+			// Exclude Discord
+			if ctx.Message.Platform == models.PlatformDiscord {
+				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "This is a Twitch exclusive command.")
+				return
+			}
+
 			if len(ctx.Args) == 0 {
 				balance := services.CurrencyServiceInstance.Balance(ctx.Message.User.ID)
 				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, fmt.Sprintf("You have %d pizza slices.", balance))

@@ -3,6 +3,7 @@ package commands
 import (
 	"fmt"
 	"pizza-son/internal/bot"
+	"pizza-son/internal/models"
 	"pizza-son/internal/services"
 	"strconv"
 	"strings"
@@ -50,6 +51,11 @@ func init() {
 			{Input: "!bet 1 100", Output: "Bet 100 slices on option 1!"},
 		},
 		Handler: func(ctx bot.CommandContext) {
+			// Exclude Discord
+			if ctx.Message.Platform == models.PlatformDiscord {
+				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "This is a Twitch exclusive command.")
+				return
+			}
 			p, ok := services.PredictionServiceInstance.GetActive(ctx.Message.Channel)
 			if !ok {
 				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "No active predictions, as mods to start one.")

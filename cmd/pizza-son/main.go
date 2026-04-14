@@ -34,23 +34,41 @@ func main() {
 	registry := bot.NewRegistry(config.Get().Bot.Prefix)
 	commands.SetRegistry(registry)
 
-	// Bot
-	b := bot.New(
+	// Twitch bot
+	twitchBot := bot.New(
 		config.Get().Twitch.User,
 		config.Get().Bot.Channels,
 		registry,
 	)
 
 	services.TwitchServiceInstance.SetTokenRefreshCallback(func(newToken string) {
-		b.Reconnect(newToken)
+		twitchBot.Reconnect(newToken)
 	})
 
+	// Discord bot
+	discordBot, err := bot.NewDiscordBot(
+		config.Get().Discord.Token,
+		config.Get().Discord.Channels,
+		registry,
+	)
+	if err != nil {
+		log.Fatalf("[Main] Failed to initialize Discord bot: %v", err)
+	}
+
+	// Run twitch in background
 	go func() {
 		for {
-			if err := b.Start(); err != nil {
-				log.Println("[Bot] Disconnected:", err)
+			if err := twitchBot.Start(); err != nil {
+				log.Println("[Twitch] Disconnected:", err)
 			}
 			time.Sleep(2 * time.Second)
+		}
+	}()
+
+	// Run Discord in background
+	go func() {
+		if err := discordBot.Start(); err != nil {
+			log.Fatalf("[Discord] Failed to start: %v", err)
 		}
 	}()
 
@@ -60,5 +78,6 @@ func main() {
 	<-sc
 
 	log.Println("Shutting down...")
+	discordBot.Stop()
 	services.LoggerServiceInstance.Close()
 }

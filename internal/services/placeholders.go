@@ -1,15 +1,25 @@
 package services
 
 import (
+	"pizza-son/internal/models"
 	"strconv"
 	"strings"
 	"time"
 )
 
-func FillPlaceholders(prompt, channel string) string {
-	channelInfo := TwitchServiceInstance.GetStreamInfo(channel)
+func FillPlaceholders(msg models.Message, prompt string) string {
+	var channelInfo StreamInfo
 
-	// TODO: Replace with proper placeholders
+	if msg.Platform == models.PlatformTwitch {
+		channelInfo = TwitchServiceInstance.GetStreamInfo(msg.Channel)
+	} else {
+		channelInfo = StreamInfo{
+			ChannelName: "Discord",
+			GameName:    "N/A",
+			StreamTitle: "Not a Twitch Stream",
+		}
+	}
+
 	replacer := strings.NewReplacer(
 		"{{game_name}}", channelInfo.GameName,
 		"{{channel_name}}", channelInfo.ChannelName,

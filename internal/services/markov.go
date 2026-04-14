@@ -73,10 +73,11 @@ func (s *MarkovService) Generate(channel string) string {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	if s.messageCounts[channel] < 1 {
+	g := s.getOrCreate(channel)
+
+	if len(g.Ngrams) == 0 {
 		return ""
 	}
 
-	g := s.getOrCreate(channel)
 	return g.GenerateText(config.Get().Markov.LengthToGenerate)
 }

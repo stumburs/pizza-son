@@ -20,6 +20,7 @@ type Config struct {
 		Prefix       string   `toml:"prefix"`
 		Channels     []string `toml:"channels"`
 		IgnoredUsers []string `toml:"ignored_users"`
+		Moderators   []string `toml:"moderators"`
 	} `toml:"bot"`
 
 	Ollama struct {
@@ -38,6 +39,11 @@ type Config struct {
 		TwitchChannel  string `toml:"twitch_channel"`
 		DiscordWebhook string `toml:"discord_webhook"`
 	} `toml:"notifications"`
+
+	Discord struct {
+		Token    string   `toml:"token"`
+		Channels []string `toml:"channels"` // List of channels IDs the bot is allowed to participate in
+	} `toml:"discord"`
 }
 
 var cfg *Config

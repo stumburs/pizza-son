@@ -12,7 +12,7 @@ func init() {
 		Name:        "ollama",
 		Description: "Feeds chat messages to LLM context",
 		Handler: func(ctx bot.CommandContext) bool {
-			if strings.HasPrefix(ctx.Message.Message, config.Get().Bot.Prefix) {
+			if strings.HasPrefix(ctx.Message.Text, config.Get().Bot.Prefix) {
 				return false
 			}
 			go services.OllamaServiceInstance.OnPrivateMessage(ctx.Message)

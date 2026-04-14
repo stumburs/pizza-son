@@ -3,6 +3,7 @@ package commands
 import (
 	"math/rand/v2"
 	"pizza-son/internal/bot"
+	"pizza-son/internal/models"
 	"pizza-son/internal/services"
 	"strings"
 )
@@ -77,7 +78,7 @@ func init() {
 		Name:        "bertcheck",
 		Description: "Responds with a random bert",
 		Handler: func(ctx bot.CommandContext) bool {
-			msg := strings.ToLower(ctx.Message.Message)
+			msg := strings.ToLower(ctx.Message.Text)
 
 			if !strings.Contains(msg, "bertcheck") {
 				return false
@@ -98,7 +99,7 @@ func init() {
 			if !ctx.Message.FirstMessage {
 				return false
 			}
-			msg := strings.ToLower(ctx.Message.Message)
+			msg := strings.ToLower(ctx.Message.Text)
 			for _, bert := range berts {
 				if strings.Contains(msg, strings.ToLower(bert)) {
 					ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "firsttimeberter")
@@ -112,7 +113,7 @@ func init() {
 		Name:        "snipebert",
 		Description: "Detects snipe messages",
 		Handler: func(ctx bot.CommandContext) bool {
-			msg := strings.ToLower(ctx.Message.Message)
+			msg := strings.ToLower(ctx.Message.Text)
 			if !strings.Contains(msg, "snip") {
 				return false
 			}
@@ -130,9 +131,12 @@ func init() {
 		Name:        "!bertcheck corrector",
 		Description: "Corrects people who use !bertcheck instead of bertcheck",
 		Handler: func(ctx bot.CommandContext) bool {
-			msg := strings.ToLower(ctx.Message.Message)
+			msg := strings.ToLower(ctx.Message.Text)
 			if msg == "!bertcheck" {
-				services.TwitchServiceInstance.Timeout(ctx.Message.Channel, ctx.Message.User.ID, 21, "not using emote smh")
+				// Only timeout on Twitch
+				if ctx.Message.Platform == models.PlatformTwitch {
+					services.TwitchServiceInstance.Timeout(ctx.Message.Channel, ctx.Message.User.ID, 21, "not using emote smh")
+				}
 				ctx.Client.Say(ctx.Message.Channel, "smh !bertcheck isn't a command")
 				return true
 			}

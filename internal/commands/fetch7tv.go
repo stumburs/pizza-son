@@ -3,6 +3,7 @@ package commands
 import (
 	"fmt"
 	"pizza-son/internal/bot"
+	"pizza-son/internal/models"
 	"pizza-son/internal/services"
 )
 
@@ -17,6 +18,11 @@ func init() {
 			{Input: "!fetch7tv", Output: "Fetched 69 emotes for nice_streamer87"},
 		},
 		Handler: func(ctx bot.CommandContext) {
+			// Exclude Discord
+			if ctx.Message.Platform == models.PlatformDiscord {
+				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "This is a Twitch exclusive command.")
+				return
+			}
 			count, err := services.SevenTVServiceInstance.Fetch(ctx.Message.Channel)
 			if err != nil {
 				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "Failed to fetch emotes: "+err.Error())

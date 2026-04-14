@@ -2,11 +2,10 @@ package bot
 
 import (
 	"pizza-son/internal/config"
+	"pizza-son/internal/models"
 	"pizza-son/internal/services"
 	"strings"
 	"sync"
-
-	"github.com/gempir/go-twitch-irc/v4"
 )
 
 type Sender interface {
@@ -14,21 +13,21 @@ type Sender interface {
 	Reply(channel, msgID, message string)
 }
 
-type TwitchSender struct {
-	client *twitch.Client
-}
+// type TwitchSender struct {
+// 	client *twitch.Client
+// }
 
-func (t *TwitchSender) Say(channel, message string) {
-	t.client.Say(channel, message)
-}
+// func (t *TwitchSender) Say(channel, message string) {
+// 	t.client.Say(channel, message)
+// }
 
-func (t *TwitchSender) Reply(channel, msgID, message string) {
-	t.client.Reply(channel, msgID, message)
-}
+// func (t *TwitchSender) Reply(channel, msgID, message string) {
+// 	t.client.Reply(channel, msgID, message)
+// }
 
 type CommandContext struct {
 	Client   Sender
-	Message  twitch.PrivateMessage
+	Message  models.Message
 	Args     []string // command args
 	Registry *Registry
 }
@@ -99,7 +98,7 @@ func (r *Registry) RegisterListener(l ListenerEntry) {
 	r.listeners = append(r.listeners, l)
 }
 
-func (r *Registry) Dispatch(client *twitch.Client, msg twitch.PrivateMessage) {
+func (r *Registry) Dispatch(client Sender, msg models.Message) {
 	// Ignored users
 	for _, ignored := range config.Get().Bot.IgnoredUsers {
 		if strings.EqualFold(msg.User.Name, ignored) {
@@ -110,7 +109,7 @@ func (r *Registry) Dispatch(client *twitch.Client, msg twitch.PrivateMessage) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	message := strings.TrimSpace(msg.Message)
+	message := strings.TrimSpace(msg.Text)
 
 	// Trim leading @mention if this is a reply
 	if msg.Reply != nil && msg.Reply.ParentMsgID != "" {
@@ -121,7 +120,7 @@ func (r *Registry) Dispatch(client *twitch.Client, msg twitch.PrivateMessage) {
 	}
 
 	ctx := CommandContext{
-		Client:   &TwitchSender{client: client},
+		Client:   client,
 		Message:  msg,
 		Registry: r,
 	}

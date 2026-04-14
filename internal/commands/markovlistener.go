@@ -12,10 +12,10 @@ func init() {
 		Name:        "markov",
 		Description: "Feeds chat messages into Markov generator",
 		Handler: func(ctx bot.CommandContext) bool {
-			if strings.HasPrefix(ctx.Message.Message, config.Get().Bot.Prefix) {
+			if strings.HasPrefix(ctx.Message.Text, config.Get().Bot.Prefix) {
 				return false
 			}
-			go services.MarkovServiceInstance.Learn(ctx.Message.Channel, ctx.Message.Message)
+			go services.MarkovServiceInstance.Learn(ctx.Message.Channel, ctx.Message.Text)
 			return true
 		},
 	})

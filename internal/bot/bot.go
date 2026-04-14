@@ -3,7 +3,9 @@ package bot
 import (
 	"log"
 	"pizza-son/internal/config"
+	"pizza-son/internal/models"
 	"pizza-son/internal/services"
+	"strings"
 
 	"github.com/gempir/go-twitch-irc/v4"
 )
@@ -12,6 +14,18 @@ type Bot struct {
 	client   *twitch.Client
 	registry *Registry
 	channels []string
+}
+
+type TwitchSender struct {
+	client *twitch.Client
+}
+
+func (t *TwitchSender) Say(channel, message string) {
+	t.client.Say(channel, message)
+}
+
+func (t *TwitchSender) Reply(channel, msgID, message string) {
+	t.client.Reply(channel, msgID, message)
 }
 
 func New(username string, channels []string, registry *Registry) *Bot {
@@ -37,7 +51,8 @@ func (b *Bot) Reconnect(newToken string) {
 
 func (b *Bot) setupHandlers() {
 	b.client.OnPrivateMessage(func(message twitch.PrivateMessage) {
-		b.registry.Dispatch(b.client, message)
+		msg := twitchMessageToMessage(message)
+		b.registry.Dispatch(&TwitchSender{client: b.client}, msg)
 	})
 	b.client.OnConnect(func() {
 		log.Println("[Bot] Connected")
@@ -45,4 +60,32 @@ func (b *Bot) setupHandlers() {
 			b.client.Join(ch)
 		}
 	})
+}
+
+func twitchMessageToMessage(m twitch.PrivateMessage) models.Message {
+	msg := models.Message{
+		ID:       m.ID,
+		Channel:  m.Channel,
+		Platform: models.PlatformTwitch,
+		Text:     m.Message,
+		User: models.MessageUser{
+			ID:            m.User.ID,
+			Name:          m.User.Name,
+			DisplayName:   m.User.DisplayName,
+			IsBroadcaster: m.User.IsBroadcaster,
+			IsMod:         m.User.IsMod,
+			IsSubscriber:  m.User.Badges["subscriber"] > 0,
+		},
+	}
+	if m.Reply != nil {
+		cleanBody := strings.ReplaceAll(m.Reply.ParentMsgBody, "\\s", " ")
+
+		msg.Reply = &models.ParentMessage{
+			ParentMsgID:       m.Reply.ParentMsgID,
+			ParentMsgBody:     cleanBody,
+			ParentDisplayName: m.Reply.ParentDisplayName,
+		}
+	}
+
+	return msg
 }

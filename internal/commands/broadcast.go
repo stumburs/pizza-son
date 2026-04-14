@@ -3,6 +3,7 @@ package commands
 import (
 	"pizza-son/internal/bot"
 	"pizza-son/internal/config"
+	"pizza-son/internal/models"
 	"strings"
 )
 
@@ -17,6 +18,10 @@ func init() {
 			{Input: "!broadcast Hello!", Output: "Hello! (In every connected channel.)"},
 		},
 		Handler: func(ctx bot.CommandContext) {
+			// Exclude Discord
+			if ctx.Message.Platform == models.PlatformDiscord {
+				return
+			}
 			if len(ctx.Args) == 0 {
 				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "Usage: !broadcast <text>")
 				return
