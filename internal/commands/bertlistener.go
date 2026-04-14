@@ -133,7 +133,7 @@ func init() {
 			msg := strings.ToLower(ctx.Message.Message)
 			if msg == "!bertcheck" {
 				services.TwitchServiceInstance.Timeout(ctx.Message.Channel, ctx.Message.User.ID, 21, "not using emote smh")
-				ctx.Client.Say(ctx.Message.Channel, "smh bertcheck isn't a command")
+				ctx.Client.Say(ctx.Message.Channel, "smh !bertcheck isn't a command")
 				return true
 			}
 			return false
