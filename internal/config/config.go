@@ -7,6 +7,12 @@ import (
 	"github.com/pelletier/go-toml/v2"
 )
 
+type StreamerLink struct {
+	TwitchChannel  string `toml:"twitch_channel"`
+	DiscordWebhook string `toml:"discord_webhook"`
+	DiscordUserID  string `toml:"discord_user_id"` // UserID to ping the target person
+}
+
 type Config struct {
 	Twitch struct {
 		User            string `toml:"user"`
@@ -41,8 +47,9 @@ type Config struct {
 	} `toml:"notifications"`
 
 	Discord struct {
-		Token    string   `toml:"token"`
-		Channels []string `toml:"channels"` // List of channels IDs the bot is allowed to participate in
+		Token    string         `toml:"token"`
+		Channels []string       `toml:"channels"` // List of channels IDs the bot is allowed to participate in
+		Links    []StreamerLink `toml:"links"`    // Twitch - Discord
 	} `toml:"discord"`
 }
 

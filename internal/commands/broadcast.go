@@ -20,6 +20,7 @@ func init() {
 		Handler: func(ctx bot.CommandContext) {
 			// Exclude Discord
 			if ctx.Message.Platform == models.PlatformDiscord {
+				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "This is a Twitch exclusive command.")
 				return
 			}
 			if len(ctx.Args) == 0 {

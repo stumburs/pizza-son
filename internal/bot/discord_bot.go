@@ -139,3 +139,7 @@ func hasDiscordModPerms(m *discordgo.Member) bool {
 	return m.Permissions&discordgo.PermissionAdministrator != 0 ||
 		m.Permissions&discordgo.PermissionManageMessages != 0
 }
+
+func (b *DiscordBot) SendGlobalMessage(channelID, message string) {
+	b.session.ChannelMessageSend(channelID, message)
+}

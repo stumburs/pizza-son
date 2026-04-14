@@ -31,3 +31,8 @@ length_to_generate = 200
 [discord]
 token = "bot_token"
 channels = ["channel_id"]
+
+[[discord.links]]
+# twitch_channel = "username"
+# discord_webhook = "webhook_url"
+# discord_user_id = "user_id"
