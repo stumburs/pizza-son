@@ -115,7 +115,7 @@ func init() {
 		Category:    bot.CategoryFun,
 		Examples: []bot.CommandExample{
 			{Input: "!8ball will i win today?", Output: "🎱 Only you can decide."},
-			{Input: "!8ball should i sleep?", Output: "Perform a coin toss."},
+			{Input: "!8ball should i sleep?", Output: "🎱 Perform a coin toss."},
 		},
 		Handler: func(ctx bot.CommandContext) {
 			if len(ctx.Args) == 0 {
