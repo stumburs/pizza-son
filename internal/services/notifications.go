@@ -62,12 +62,13 @@ func (s *NotificationService) check() {
 
 func (s *NotificationService) sendDiscord(webhookURL string, info StreamInfo) {
 	payload := map[string]any{
+		"content": "@everyone",
 		"embeds": []map[string]any{
 			{
 				"title":       info.ChannelName + " is now live!",
-				"description": "@everyone " + info.StreamTitle,
+				"description": info.StreamTitle,
 				"url":         "https://twitch.tv/" + strings.ToLower(info.ChannelName),
-				"color":       0x9146FF, // purple
+				"color":       0xE01B3C, // red
 				"fields": []map[string]any{
 					{"name": "Game", "value": info.GameName, "inline": true},
 					{"name": "Viewers", "value": fmt.Sprintf("%d", info.ViewerCount), "inline": true},
