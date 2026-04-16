@@ -166,6 +166,13 @@ func (s *TwitchService) GetStreamInfo(channel string) StreamInfo {
 	return info
 }
 
+func (s *TwitchService) GetStreamInfoFresh(channel string) StreamInfo {
+	s.mu.Lock()
+	delete(s.cache, channel)
+	s.mu.Unlock()
+	return s.GetStreamInfo(channel)
+}
+
 func (s *TwitchService) GetUserID(username string) (string, error) {
 	resp, err := s.client.GetUsers(&helix.UsersParams{
 		Logins: []string{username},

@@ -113,7 +113,7 @@ func (s *NotificationService) updateUptime(webhookURL, messageID string, info St
 
 	for range ticker.C {
 		// check if live
-		current := TwitchServiceInstance.GetStreamInfo(strings.ToLower(info.ChannelName))
+		current := TwitchServiceInstance.GetStreamInfoFresh(strings.ToLower(info.ChannelName))
 		if current.ViewerCount == 0 {
 			log.Printf("[Notifications] %s is no longer live, stopping uptime updater", info.ChannelName)
 			return
