@@ -3,15 +3,15 @@ module pizza-son
 go 1.25.0
 
 require (
-	github.com/gempir/go-twitch-irc/v4 v4.3.1
-	github.com/pelletier/go-toml/v2 v2.2.4
+	github.com/gempir/go-twitch-irc/v4 v4.4.1
+	github.com/pelletier/go-toml/v2 v2.3.0
 	github.com/stumburs/mgo v1.0.0
 )
 
 require (
 	github.com/JexSrs/go-ollama v1.1.1
 	github.com/bwmarrin/discordgo v0.29.0
-	github.com/nicklaw5/helix/v2 v2.32.0
+	github.com/nicklaw5/helix/v2 v2.34.0
 )
 
 require (

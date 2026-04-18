@@ -43,128 +43,117 @@ func (s *NotificationService) check() {
 		isLive := info.ViewerCount > 0
 
 		s.mu.Lock()
-		wasLive := s.wasLive[n.TwitchChannel]
+		alreadyTracked := s.wasLive[n.TwitchChannel]
+		s.wasLive[n.TwitchChannel] = isLive
+		s.mu.Unlock()
 
-		if isLive && !wasLive {
+		if isLive && !alreadyTracked {
 			// Only notify if stream started within the last 5 minutes
 			streamAge := time.Since(info.StartedAt)
 			if streamAge <= 5*time.Minute {
 				log.Printf("[Notifications] %s went live (%s ago), sending Discord notification", n.TwitchChannel, streamAge.Round(time.Second))
-				go s.sendDiscord(n.DiscordWebhook, info)
+				go s.handleLiveSession(n.DiscordWebhook, info)
 			} else {
 				log.Printf("[Notifications] %s is live but started %s ago, skipping notification", n.TwitchChannel, streamAge.Round(time.Second))
 			}
 		}
-		s.wasLive[n.TwitchChannel] = isLive
-		s.mu.Unlock()
 	}
 }
 
-func (s *NotificationService) sendDiscord(webhookURL string, info StreamInfo) {
-	payload := map[string]any{
-		"content": "@everyone",
+func (s *NotificationService) handleLiveSession(webhookURL string, info StreamInfo) {
+	// Initial message
+	payload := s.buildPayload(info, false)
+	messageID, err := s.executeRequest(http.MethodPost, webhookURL+"?wait=true", payload)
+	if err != nil {
+		log.Println("[Notifications] Initial send failed:", err)
+		return
+	}
+
+	// Uptime updates
+	ticker := time.NewTicker(1 * time.Minute)
+	defer ticker.Stop()
+
+	editURL := fmt.Sprintf("%s/messages/%s", webhookURL, messageID)
+
+	for range ticker.C {
+		current := TwitchServiceInstance.GetStreamInfoFresh(strings.ToLower(info.ChannelName))
+
+		if current.ViewerCount == 0 {
+			log.Printf("[Notifications] %s offline, stopping updater", info.ChannelName)
+			return
+		}
+
+		updatePayload := s.buildPayload(current, true)
+
+		_, err := s.executeRequest(http.MethodPatch, editURL, updatePayload)
+		if err != nil {
+			log.Println("[Notofications] Update failed:", err)
+			continue
+		}
+		log.Printf("[Notifications] Updated uptime for %s", info.ChannelName)
+	}
+}
+
+func (s *NotificationService) buildPayload(info StreamInfo, isUpdate bool) map[string]any {
+	content := "@everyone"
+
+	fields := []map[string]any{
+		{"name": "Game", "value": info.GameName, "inline": true},
+		{"name": "Viewers", "value": fmt.Sprintf("%d", info.ViewerCount), "inline": true},
+	}
+
+	if isUpdate {
+		uptime := time.Since(info.StartedAt).Round(time.Minute)
+		uptimeStr := fmt.Sprintf("%dm", int(uptime.Minutes())%60)
+		if uptime.Hours() >= 1 {
+			uptimeStr = fmt.Sprintf("%dh %dm", int(uptime.Hours()), int(uptime.Minutes())%60)
+		}
+		fields = append(fields, map[string]any{"name": "Uptime", "value": uptimeStr, "inline": true})
+	}
+
+	return map[string]any{
+		"content": content,
 		"embeds": []map[string]any{
 			{
 				"title":       info.ChannelName + " is now live!",
 				"description": info.StreamTitle,
 				"url":         "https://twitch.tv/" + strings.ToLower(info.ChannelName),
 				"color":       0xE01B3C, // red
-				"fields": []map[string]any{
-					{"name": "Game", "value": info.GameName, "inline": true},
-					{"name": "Viewers", "value": fmt.Sprintf("%d", info.ViewerCount), "inline": true},
-				},
+				"fields":      fields,
 				"image": map[string]string{
 					"url": strings.ReplaceAll(info.ThumbnailURL, "{width}x{height}", "1280x720"),
 				},
 			},
 		},
 	}
+}
 
-	body, err := json.Marshal(payload)
+func (s *NotificationService) executeRequest(method, url string, payload map[string]any) (string, error) {
+	body, _ := json.Marshal(payload)
+	req, err := http.NewRequest(method, url, bytes.NewReader(body))
 	if err != nil {
-		log.Println("[Notifications] Failed to marshal payload:", err)
-		return
+		return "", err
 	}
+	req.Header.Set("Content-Type", "application/json")
 
-	// ?wait=true to get message ID back
-	resp, err := http.Post(webhookURL+"?wait=true", "application/json", bytes.NewReader(body))
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		log.Println("[Notifications] Failed to send Discord notification:", err)
-		return
+		return "", err
 	}
 	defer resp.Body.Close()
 
-	var discordMsg struct {
-		ID string `json:"id"`
-	}
-	if err := json.NewDecoder(resp.Body).Decode(&discordMsg); err != nil || discordMsg.ID == "" {
-		log.Println("[Notifications] Failed to get message ID:", err)
-		return
+	if resp.StatusCode >= 400 {
+		return "", fmt.Errorf("discord API error: %s", resp.Status)
 	}
 
-	log.Printf("[Notifications] Message sent, ID: %s", discordMsg.ID)
-
-	go s.updateUptime(webhookURL, discordMsg.ID, info)
-}
-
-func (s *NotificationService) updateUptime(webhookURL, messageID string, info StreamInfo) {
-	ticker := time.NewTicker(1 * time.Minute)
-	defer ticker.Stop()
-
-	for range ticker.C {
-		// check if live
-		current := TwitchServiceInstance.GetStreamInfoFresh(strings.ToLower(info.ChannelName))
-		if current.ViewerCount == 0 {
-			log.Printf("[Notifications] %s is no longer live, stopping uptime updater", info.ChannelName)
-			return
+	// Only decode ID if we're doing a POST with ?wait=true
+	if method == http.MethodPost {
+		var discordMsg struct {
+			ID string `json:"id"`
 		}
-
-		uptime := time.Since(info.StartedAt).Round(time.Minute)
-		hours := int(uptime.Hours())
-		mins := int(uptime.Minutes()) % 60
-
-		uptimeStr := fmt.Sprintf("%dm", mins)
-		if hours > 0 {
-			uptimeStr = fmt.Sprintf("%dh %dm", hours, mins)
-		}
-
-		payload := map[string]any{
-			"embeds": []map[string]any{
-				{
-					"title":       info.ChannelName + " is now live!",
-					"description": "@everyone " + info.StreamTitle,
-					"url":         "https://twitch.tv/" + strings.ToLower(info.ChannelName),
-					"color":       0xE01B3C, // red
-					"fields": []map[string]any{
-						{"name": "Game", "value": info.GameName, "inline": true},
-						{"name": "Viewers", "value": fmt.Sprintf("%d", info.ViewerCount), "inline": true},
-						{"name": "Uptime", "value": uptimeStr, "inline": true},
-					},
-					"image": map[string]string{
-						"url": strings.ReplaceAll(info.ThumbnailURL, "{width}x{height}", "1280x720"),
-					},
-				},
-			},
-		}
-
-		body, err := json.Marshal(payload)
-		if err != nil {
-			continue
-		}
-
-		editURL := fmt.Sprintf("%s/messages/%s", webhookURL, messageID)
-		req, err := http.NewRequest(http.MethodPatch, editURL, bytes.NewReader(body))
-		if err != nil {
-			continue
-		}
-		req.Header.Set("Content-Type", "application/json")
-
-		resp, err := http.DefaultClient.Do(req)
-		if err != nil {
-			log.Println("[Notifications] Failed to update message:", err)
-			continue
-		}
-		resp.Body.Close()
-		log.Printf("[Notifications] Updated uptime for %s: %s", info.ChannelName, uptimeStr)
+		json.NewDecoder(resp.Body).Decode(&discordMsg)
+		return discordMsg.ID, nil
 	}
+
+	return "", nil
 }
