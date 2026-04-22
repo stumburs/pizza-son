@@ -30,7 +30,7 @@ func init() {
 
 			channels := config.Get().Bot.Channels
 			for _, channel := range channels {
-				ctx.Client.Say(channel, strings.Join(ctx.Args, ""))
+				ctx.Client.Say(channel, "/me "+strings.Join(ctx.Args, " "))
 			}
 		},
 	})
