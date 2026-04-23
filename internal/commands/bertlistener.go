@@ -62,6 +62,7 @@ var berts = []string{
 	"alBERTa",
 	"eepybert",
 	"bertman",
+	"cheesebert",
 }
 
 type TrollRule struct {
@@ -73,8 +74,13 @@ type TrollRule struct {
 var trollRules = []TrollRule{
 	{
 		User:     "itzkxtee",
-		Chance:   0.4,
+		Chance:   0.2,
 		Response: "camembert",
+	},
+	{
+		User:     "itzkxtee",
+		Chance:   0.2,
+		Response: "cheesebert",
 	},
 }
 
