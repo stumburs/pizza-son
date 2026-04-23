@@ -113,6 +113,13 @@ func init() {
 				return false
 			}
 			msg := strings.ToLower(ctx.Message.Text)
+
+			// separate bertcheck test so we don't add 'bertcheck' to the list of berts
+			if strings.Contains(msg, "bertcheck") {
+				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "firsttimeberter")
+				return true
+			}
+
 			for _, bert := range berts {
 				if strings.Contains(msg, strings.ToLower(bert)) {
 					ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "firsttimeberter")
