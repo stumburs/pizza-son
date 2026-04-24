@@ -1,4 +1,4 @@
-# Quotes — grubbyyyy
+# Quotes - grubbyyyy
 
 | # | Quote | Added By | Date |
 |---|-------|----------|------|

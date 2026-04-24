@@ -1,7 +1,6 @@
 package services
 
 import (
-	"bufio"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -15,9 +14,14 @@ import (
 const sevenTVDir = "data/7tv"
 const sevenTVAPIURL = "https://7tv.io/v3/users/twitch/%s"
 
+type SevenTVEmote struct {
+	Name string `json:"name"`
+	ID   string `json:"id"`
+}
+
 type SevenTVService struct {
 	mu     sync.RWMutex
-	emotes map[string][]string // channel -> emote names
+	emotes map[string][]SevenTVEmote // channel -> emote
 }
 
 var SevenTVServiceInstance *SevenTVService
@@ -27,7 +31,7 @@ func NewSevenTVService() {
 		log.Fatal("[7TV] Failed to create directory:", err)
 	}
 	svc := &SevenTVService{
-		emotes: make(map[string][]string),
+		emotes: make(map[string][]SevenTVEmote),
 	}
 
 	// Load any existing emote files
@@ -42,10 +46,10 @@ func (s *SevenTVService) loadAll() {
 		return
 	}
 	for _, entry := range entries {
-		if entry.IsDir() || !strings.HasSuffix(entry.Name(), ".txt") {
+		if entry.IsDir() || !strings.HasSuffix(entry.Name(), ".json") {
 			continue
 		}
-		channel := strings.TrimSuffix(entry.Name(), ".txt")
+		channel := strings.TrimSuffix(entry.Name(), ".json")
 		emotes, err := s.loadFromFile(channel)
 		if err != nil {
 			log.Printf("[7TV] Failed to load emotes for %s: %v", channel, err)
@@ -56,36 +60,24 @@ func (s *SevenTVService) loadAll() {
 	}
 }
 
-func (s *SevenTVService) loadFromFile(channel string) ([]string, error) {
-	path := fmt.Sprintf("%s/%s.txt", sevenTVDir, channel)
-	f, err := os.Open(path)
+func (s *SevenTVService) loadFromFile(channel string) ([]SevenTVEmote, error) {
+	path := fmt.Sprintf("%s/%s.json", sevenTVDir, channel)
+	data, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
-	defer f.Close()
 
-	var emotes []string
-	scanner := bufio.NewScanner(f)
-	for scanner.Scan() {
-		line := strings.TrimSpace(scanner.Text())
-		if line != "" {
-			emotes = append(emotes, line)
-		}
-	}
-	return emotes, scanner.Err()
+	var emotes []SevenTVEmote
+	return emotes, json.Unmarshal(data, &emotes)
 }
 
-func (s *SevenTVService) saveToFile(channel string, emotes []string) error {
-	path := fmt.Sprintf("%s/%s.txt", sevenTVDir, channel)
-	f, err := os.Create(path)
+func (s *SevenTVService) saveToFile(channel string, emotes []SevenTVEmote) error {
+	path := fmt.Sprintf("%s/%s.json", sevenTVDir, channel)
+	data, err := json.Marshal(emotes)
 	if err != nil {
 		return err
 	}
-	defer f.Close()
-	for _, e := range emotes {
-		fmt.Fprintln(f, e)
-	}
-	return nil
+	return os.WriteFile(path, data, 0644)
 }
 
 // Fetches emotes from 7TV api and saves them to file
@@ -117,6 +109,7 @@ func (s *SevenTVService) Fetch(channel string) (int, error) {
 	var result struct {
 		EmoteSet struct {
 			Emotes []struct {
+				ID   string `json:"id"`
 				Name string `json:"name"`
 			} `json:"emotes"`
 		} `json:"emote_set"`
@@ -125,10 +118,10 @@ func (s *SevenTVService) Fetch(channel string) (int, error) {
 		return 0, fmt.Errorf("failed to parse response: %w", err)
 	}
 
-	emotes := make([]string, 0, len(result.EmoteSet.Emotes))
+	emotes := make([]SevenTVEmote, 0, len(result.EmoteSet.Emotes))
 	for _, e := range result.EmoteSet.Emotes {
-		if e.Name != "" {
-			emotes = append(emotes, e.Name)
+		if e.Name != "" && e.ID != "" {
+			emotes = append(emotes, SevenTVEmote{Name: e.Name, ID: e.ID})
 		}
 	}
 
@@ -143,7 +136,7 @@ func (s *SevenTVService) Fetch(channel string) (int, error) {
 	return len(emotes), nil
 }
 
-func (s *SevenTVService) GetEmotes(channel string) []string {
+func (s *SevenTVService) GetEmotes(channel string) []SevenTVEmote {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	return s.emotes[channel]
@@ -153,7 +146,7 @@ func (s *SevenTVService) HasEmote(channel, emote string) bool {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	for _, e := range s.emotes[channel] {
-		if e == emote {
+		if e.Name == emote {
 			return true
 		}
 	}

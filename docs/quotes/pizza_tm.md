@@ -1,4 +1,4 @@
-# Quotes — pizza_tm
+# Quotes - pizza_tm
 
 | # | Quote | Added By | Date |
 |---|-------|----------|------|

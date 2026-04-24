@@ -1,4 +1,4 @@
-# Quotes — pectha
+# Quotes - pectha
 
 | # | Quote | Added By | Date |
 |---|-------|----------|------|

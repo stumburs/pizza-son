@@ -1,4 +1,4 @@
-# Quotes — skogsros
+# Quotes - skogsros
 
 | # | Quote | Added By | Date |
 |---|-------|----------|------|

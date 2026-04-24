@@ -89,7 +89,7 @@ func init() {
 					select {
 					case <-ticker.C:
 						emote := emotes[rand.IntN(len(emotes))]
-						ctx.Client.Say(ctx.Message.Channel, emote)
+						ctx.Client.Say(ctx.Message.Channel, emote.Name)
 					case <-stop:
 						return
 					}

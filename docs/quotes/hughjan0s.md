@@ -1,4 +1,4 @@
-# Quotes — hughjan0s
+# Quotes - hughjan0s
 
 | # | Quote | Added By | Date |
 |---|-------|----------|------|
