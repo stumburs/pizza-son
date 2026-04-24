@@ -8,6 +8,8 @@ import (
 	"strings"
 )
 
+const quotesBaseURL = "https://stumburs.github.io/pizza-son/quotes"
+
 func init() {
 	Register(bot.Command{
 		Name:        "quote",
@@ -56,6 +58,11 @@ func init() {
 
 				number := services.QuoteServiceInstance.Add(ctx.Message.Channel, text, addedBy)
 				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, fmt.Sprintf("Quote #%d added!", number))
+			// Gives link to current channels quotes
+			case "list":
+				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID,
+					fmt.Sprintf("All quotes for %s: %s/%s", ctx.Message.Channel, quotesBaseURL, ctx.Message.Channel))
+				return
 			default:
 				// Specific quote by number
 				number, err := strconv.Atoi(ctx.Args[0])
@@ -71,6 +78,18 @@ func init() {
 				}
 				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, formatQuote(quote, number))
 			}
+		},
+	})
+
+	// Another command to return all quotes for this channel
+	Register(bot.Command{
+		Name:        "quotes",
+		Description: "Get the link to all quotes for this channel.",
+		Usage:       "!quotes",
+		Category:    bot.CategoryQuotes,
+		Handler: func(ctx bot.CommandContext) {
+			ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID,
+				fmt.Sprintf("All quotes for %s: %s/%s", ctx.Message.Channel, quotesBaseURL, ctx.Message.Channel))
 		},
 	})
 }

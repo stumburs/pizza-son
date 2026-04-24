@@ -9,6 +9,14 @@ nav = [
   { "Home" = "index.md" },
   { "Commands" = "commands.md" },
   {"Listeners" = "listeners.md"},
+  { "Quotes" = [
+    { "grubbyyyy" = "quotes/grubbyyyy.md"},
+    { "hughjan0s" = "quotes/hughjan0s.md"},
+    { "pectha" = "quotes/pectha.md"},
+    { "pizza_tm" = "quotes/pizza_tm.md"},
+    { "sir_lysergium" = "quotes/sir_lysergium.md"},
+    { "skogsros" = "quotes/skogsros.md"},
+  ]},
 ]
 
 [project.theme]
