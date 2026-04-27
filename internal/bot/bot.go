@@ -17,15 +17,15 @@ type Bot struct {
 }
 
 type TwitchSender struct {
-	client *twitch.Client
+	bot *Bot
 }
 
 func (t *TwitchSender) Say(channel, message string) {
-	t.client.Say(channel, message)
+	t.bot.client.Say(channel, message)
 }
 
 func (t *TwitchSender) Reply(channel, msgID, message string) {
-	t.client.Reply(channel, msgID, message)
+	t.bot.client.Reply(channel, msgID, message)
 }
 
 func New(username string, channels []string, registry *Registry) *Bot {
@@ -52,7 +52,7 @@ func (b *Bot) Reconnect(newToken string) {
 func (b *Bot) setupHandlers() {
 	b.client.OnPrivateMessage(func(message twitch.PrivateMessage) {
 		msg := twitchMessageToMessage(message)
-		b.registry.Dispatch(&TwitchSender{client: b.client}, msg)
+		b.registry.Dispatch(&TwitchSender{bot: b}, msg)
 	})
 	b.client.OnConnect(func() {
 		log.Println("[Bot] Connected")
