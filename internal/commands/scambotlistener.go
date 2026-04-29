@@ -11,6 +11,7 @@ var bannableTerms = []string{
 	"streamboo .com",
 	"streamboo .live",
 	"hypesm.online",
+	"turboaim.ru",
 }
 
 func init() {
