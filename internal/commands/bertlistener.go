@@ -13,7 +13,6 @@ var berts = []string{
 	"bertbert",
 	"camembert",
 	"cucumbert",
-	"deadbertfather",
 	"drugbustbert",
 	"glitchbert",
 	"hackerbert",
