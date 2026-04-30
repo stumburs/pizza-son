@@ -97,7 +97,7 @@ func (s *CounterService) Remove(channel, name string) error {
 
 func (s *CounterService) Increment(channel, name string) (int, error) {
 	s.mu.Lock()
-	defer s.mu.Lock()
+	defer s.mu.Unlock()
 	c, ok := s.counters[channel][name]
 	if !ok {
 		return 0, fmt.Errorf("counter %q not found", name)
