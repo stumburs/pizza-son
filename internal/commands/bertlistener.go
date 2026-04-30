@@ -1,68 +1,13 @@
 package commands
 
 import (
+	"fmt"
 	"math/rand/v2"
 	"pizza-son/internal/bot"
 	"pizza-son/internal/models"
 	"pizza-son/internal/services"
 	"strings"
 )
-
-var berts = []string{
-	"bert",
-	"bertbert",
-	"camembert",
-	"cucumbert",
-	"drugbustbert",
-	"glitchbert",
-	"hackerbert",
-	"heisenbert",
-	"LiBERTy",
-	"londonbert",
-	"Lubert",
-	"monsterbert",
-	"pipebombbert",
-	"russiabert",
-	"tylenolbert",
-	"weinerbert",
-	"zazabert",
-	"fishbert",
-	"Error404bert",
-	"bertsittingverycomfortablearoundacampfirewithitsfriends",
-	"sorbert",
-	"berttosis",
-	"Bertnard",
-	"robbert",
-	"bertsimpson",
-	"Bort",
-	"numbert",
-	"strawberty",
-	"cyBERTerrorist",
-	"berthquake",
-	"alBertEinstein",
-	"snipebert",
-	"bertJam",
-	"BertlinWall",
-	"bertha",
-	"hamburgert",
-	"nert",
-	"bertrayal",
-	"adBERTisement",
-	"bertday",
-	"yogBert",
-	"BertRoss",
-	"beert",
-	"treb",
-	"kebabert",
-	"spiderbert",
-	"katebert",
-	"bertge",
-	"BertFloyd",
-	"alBERTa",
-	"eepybert",
-	"bertman",
-	"cheesebert",
-}
 
 type TrollRule struct {
 	User     string
@@ -92,18 +37,94 @@ func init() {
 		Handler: func(ctx bot.CommandContext) bool {
 			msg := strings.ToLower(ctx.Message.Text)
 
-			if !strings.Contains(msg, "bertcheck") {
-				return false
-			}
-			if strings.HasPrefix(msg, "!") {
+			// Ignore if command like !bertstats or !bertcheck add
+			if strings.HasPrefix(msg, "!") || !strings.Contains(msg, "bertcheck") {
 				return false
 			}
 
-			response := pickBertResponse(ctx.Message.User.Name)
-			ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, response)
+			available := services.BertServiceInstance.GetBerts(ctx.Message.Channel)
+
+			baseResponse := pickBertResponse(ctx.Message.User.Name, available)
+
+			if baseResponse == "" {
+				return false
+			}
+
+			services.BertServiceInstance.RegisterActivation(ctx.Message.Channel, ctx.Message.User.Name, baseResponse)
+
+			finalMessage := baseResponse
+			if rand.Float64() < zazaChance {
+				finalMessage += " zaza"
+			}
+
+			ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, finalMessage)
 			return true
 		},
 	})
+	// Add/remove berts
+	Register(bot.Command{
+		Name:        "bertcheck",
+		Description: "Add or remove berts used by 'bertcheck' on this channel.",
+		Usage:       "!bertcheck <add|remove> <bert>",
+		Permission:  bot.Moderator,
+		Category:    bot.CategoryFun,
+		Examples: []bot.CommandExample{
+			{Input: "!bertcheck add bertnard", Output: "Added bertnard to the bert log"},
+			{Input: "!bertcheck remove beert", Output: "Removed bertnard from the bert log"},
+		},
+		Handler: func(ctx bot.CommandContext) {
+			args := strings.Fields(ctx.Message.Text)
+			if len(args) < 3 {
+				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "Usage: !bertcheck <add|remove> <bert>")
+				return
+			}
+
+			action, name := strings.ToLower(args[1]), args[2]
+
+			switch action {
+			case "add":
+				services.BertServiceInstance.AddBert(ctx.Message.Channel, name)
+				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, fmt.Sprintf("Added %s to the bert log", name))
+			case "remove":
+				if services.BertServiceInstance.RemoveBert(ctx.Message.Channel, name) {
+					ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, fmt.Sprintf("Removed %s from the bert log", name))
+				} else {
+					ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, fmt.Sprintf("Could not find %s in the bert log", name))
+				}
+			}
+		},
+	})
+
+	Register(bot.Command{
+		Name:        "bertstats",
+		Description: "Shows bertcheck stats for any user.",
+		Usage:       "!bertstats [user]",
+		Permission:  bot.All,
+		Category:    bot.CategoryFun,
+		Examples: []bot.CommandExample{
+			{Input: "!bertstats", Output: "casual_berter: 12 total berts. Most common: bertday (2x)"},
+			{Input: "!bertstats @bertman", Output: "bertman: 69420 total berts. Most common: bert (5325x)"},
+		},
+		Handler: func(ctx bot.CommandContext) {
+			target := ctx.Message.User.Name
+			args := strings.Fields(ctx.Message.Text)
+			if len(args) > 1 {
+				target = strings.TrimPrefix(args[1], "@")
+			}
+
+			total, common, count := services.BertServiceInstance.GetUserStats(ctx.Message.Channel, target)
+			if total == 0 {
+				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, fmt.Sprintf("%s has never bertchecked smh", target))
+				return
+			}
+
+			ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, fmt.Sprintf(
+				"%s: %d total berts. Most common: %s (%dx)",
+				target, total, common, count,
+			))
+		},
+	})
+
 	RegisterListener(bot.ListenerEntry{
 		Name:        "firsttimebert",
 		Description: "Detects first time bert'ers",
@@ -119,7 +140,9 @@ func init() {
 				return true
 			}
 
-			for _, bert := range berts {
+			availableBerts := services.BertServiceInstance.GetBerts(ctx.Message.Channel)
+
+			for _, bert := range availableBerts {
 				if strings.Contains(msg, strings.ToLower(bert)) {
 					ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "firsttimeberter")
 					return true
@@ -164,22 +187,18 @@ func init() {
 	})
 }
 
-func pickBertResponse(user string) string {
+func pickBertResponse(user string, availableBerts []string) string {
 	// we do a bit of trolling
 	for _, rule := range trollRules {
 		if user == rule.User && rand.Float64() < rule.Chance {
-			resp := rule.Response
-			if rand.Float64() < zazaChance {
-				resp += " zaza"
-			}
-			return resp
+			return rule.Response
 		}
 	}
 
 	// Normal berts
-	resp := berts[rand.IntN(len(berts))]
-	if rand.Float64() < zazaChance {
-		resp += " zaza"
+	if len(availableBerts) > 0 {
+		return availableBerts[rand.IntN(len(availableBerts))]
 	}
-	return resp
+
+	return "No berts on this channel :("
 }

@@ -30,6 +30,7 @@ func main() {
 	services.NewSevenTVService()
 	services.NewNotificationService()
 	services.NewCounterService()
+	services.NewBertService()
 
 	// Command registry
 	registry := bot.NewRegistry(config.Get().Bot.Prefix)
