@@ -147,7 +147,7 @@ func init() {
 		},
 	})
 	RegisterListener(bot.ListenerEntry{
-		Name:        "!bertcheck corrector",
+		Name:        "!bertcheckcorrector",
 		Description: "Corrects people who use !bertcheck instead of bertcheck",
 		Handler: func(ctx bot.CommandContext) bool {
 			msg := strings.ToLower(ctx.Message.Text)
