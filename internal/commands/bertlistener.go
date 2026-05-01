@@ -42,6 +42,12 @@ func init() {
 				return false
 			}
 
+			// bertcheckcheck funnies
+			if strings.Contains(msg, "bertcheckcheck") {
+				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "bertcheck")
+				return true
+			}
+
 			available := services.BertServiceInstance.GetBerts(ctx.Message.Channel)
 
 			baseResponse := pickBertResponse(ctx.Message.User.Name, available)
