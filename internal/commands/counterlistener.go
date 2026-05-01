@@ -24,7 +24,9 @@ func init() {
 			if err != nil {
 				return false
 			}
-			ctx.Client.Say(ctx.Message.Channel, fmt.Sprintf("%s: %d", name, value))
+			c, _ := services.CounterServiceInstance.Get(ctx.Message.Channel, name)
+			output := strings.ReplaceAll(c.Message, "{}", fmt.Sprintf("%d", value))
+			ctx.Client.Say(ctx.Message.Channel, output)
 			return true
 		},
 	})

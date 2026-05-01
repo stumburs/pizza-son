@@ -12,28 +12,33 @@ func init() {
 	Register(bot.Command{
 		Name:        "counter",
 		Description: "Manage counters for this channel.",
-		Usage:       "!counter add <name> | !counter remove <name> | !counter set <name> <value> | !counter list",
+		Usage:       "!counter add <name> [message] | !counter remove <name> | !counter set <name> <value> | !counter list",
 		Category:    bot.CategoryModeration,
 		Permission:  bot.Moderator,
 		Examples: []bot.CommandExample{
-			{Input: "!counter add deaths", Output: "Counter 'deaths' created. Use !deaths to increment it."},
+			{Input: "!counter add deaths i've died {} times", Output: "Counter 'deaths' created. Use !deaths to increment it."},
 			{Input: "!counter remove deaths", Output: "Counter 'deaths' removed."},
 			{Input: "!counter set deaths 5", Output: "Counter 'deaths' set to 5."},
 			{Input: "!counter list", Output: "Counters: deaths (3), wins (7)"},
+			{Input: "!counter", Output: "i've died 4 times"},
 		},
 		Handler: func(ctx bot.CommandContext) {
 			if len(ctx.Args) == 0 {
-				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "Usage: !counter add <name> | !counter remove <name> | !counter set <name> <value> | !counter list")
+				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "Usage: !counter add <name> [message] | !counter remove <name> | !counter set <name> <value> | !counter list")
 				return
 			}
 			switch strings.ToLower(ctx.Args[0]) {
 			case "add":
 				if len(ctx.Args) < 2 {
-					ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "Usage: !counter add <name>")
+					ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "Usage: !counter add <name> [message]")
 					return
 				}
 				name := strings.ToLower(ctx.Args[1])
-				if err := services.CounterServiceInstance.Add(ctx.Message.Channel, name); err != nil {
+				message := ""
+				if len(ctx.Args) > 2 {
+					message = strings.Join(ctx.Args[2:], " ")
+				}
+				if err := services.CounterServiceInstance.Add(ctx.Message.Channel, name, message); err != nil {
 					ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, err.Error())
 					return
 				}

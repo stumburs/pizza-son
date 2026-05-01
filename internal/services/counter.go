@@ -14,6 +14,7 @@ type Counter struct {
 	Name    string `json:"name"`
 	Value   int    `json:"value"`
 	Channel string `json:"channel"`
+	Message string `json:"message"`
 }
 
 type CounterService struct {
@@ -70,7 +71,7 @@ func (s *CounterService) save() {
 	os.WriteFile(counterFile, data, 0644)
 }
 
-func (s *CounterService) Add(channel, name string) error {
+func (s *CounterService) Add(channel, name, message string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if _, ok := s.counters[channel]; !ok {
@@ -79,7 +80,10 @@ func (s *CounterService) Add(channel, name string) error {
 	if _, exists := s.counters[channel][name]; exists {
 		return fmt.Errorf("counter %q already exists", name)
 	}
-	s.counters[channel][name] = &Counter{Name: name, Value: 0, Channel: channel}
+	if message == "" {
+		message = fmt.Sprintf("%s: {}", name)
+	}
+	s.counters[channel][name] = &Counter{Name: name, Value: 0, Channel: channel, Message: message}
 	s.save()
 	return nil
 }
