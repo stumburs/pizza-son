@@ -17,4 +17,20 @@ func init() {
 			return true
 		},
 	})
+	RegisterListener(bot.ListenerEntry{
+		Name:        "damn",
+		Description: "responds with 'damn' when 'dam' appears as a standalone word",
+		Handler: func(ctx bot.CommandContext) bool {
+			words := strings.FieldsSeq(strings.ToLower(ctx.Message.Text))
+
+			for w := range words {
+				if w == "dam" {
+					ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "damn")
+					return true
+				}
+			}
+
+			return false
+		},
+	})
 }
