@@ -29,8 +29,9 @@ type BertStats struct {
 	TotalBertchecks        int // times bertchecked
 	MostCommonBert         string
 	MostCommonCount        int
-	BertsCollectedOutOfAll int // collectec out of all berts count
+	BertsCollectedOutOfAll int // collected out of all berts count
 	TotalBerts             int // all bert count
+	ChannelTotalBertchecks int // total bertchecks done by all chatters
 }
 
 var BertServiceInstance *BertService
@@ -112,10 +113,17 @@ func (s *BertService) GetUserStats(channel, user string) BertStats {
 	if !ok {
 		return BertStats{}
 	}
+
+	channelTotal := 0
+	for _, uStats := range data.UserStats {
+		channelTotal += uStats.TotalActivations
+	}
+
 	stats, ok := data.UserStats[user]
 	if !ok {
 		return BertStats{
-			TotalBerts: len(data.Berts),
+			TotalBerts:             len(data.Berts),
+			ChannelTotalBertchecks: channelTotal,
 		}
 	}
 
@@ -132,6 +140,7 @@ func (s *BertService) GetUserStats(channel, user string) BertStats {
 		MostCommonCount:        max,
 		BertsCollectedOutOfAll: len(stats.BertCounts),
 		TotalBerts:             len(data.Berts),
+		ChannelTotalBertchecks: channelTotal,
 	}
 }
 

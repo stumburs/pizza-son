@@ -125,13 +125,14 @@ func init() {
 			}
 
 			ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, fmt.Sprintf(
-				"%s: %d total berts. Most common: %s (%dx). %d/%d collected.",
+				"%s: %d total berts. Most common: %s (%dx). %d/%d collected. %d berts by all chatters.",
 				target,
 				stats.TotalBertchecks,
 				stats.MostCommonBert,
 				stats.MostCommonCount,
 				stats.BertsCollectedOutOfAll,
 				stats.TotalBerts,
+				stats.ChannelTotalBertchecks,
 			))
 		},
 	})
