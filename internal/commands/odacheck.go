@@ -21,7 +21,7 @@ func init() {
 
 			emote := "oda"
 			if rand.Float64() < odaListeningChance {
-				emote += "odaListening"
+				emote = "odaListening"
 			}
 
 			finalMessage := emote
