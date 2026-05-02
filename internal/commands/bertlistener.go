@@ -115,7 +115,7 @@ func init() {
 			target := ctx.Message.User.Name
 			args := strings.Fields(ctx.Message.Text)
 			if len(args) > 1 {
-				target = strings.TrimPrefix(args[1], "@")
+				target = strings.ToLower(strings.TrimPrefix(args[1], "@"))
 			}
 
 			stats := services.BertServiceInstance.GetUserStats(ctx.Message.Channel, target)
