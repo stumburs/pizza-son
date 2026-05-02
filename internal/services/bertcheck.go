@@ -25,6 +25,14 @@ type BertService struct {
 	path string
 }
 
+type BertStats struct {
+	TotalBertchecks        int // times bertchecked
+	MostCommonBert         string
+	MostCommonCount        int
+	BertsCollectedOutOfAll int // collectec out of all berts count
+	TotalBerts             int // all bert count
+}
+
 var BertServiceInstance *BertService
 
 func NewBertService() {
@@ -96,17 +104,19 @@ func (s *BertService) RemoveBert(channel, name string) bool {
 	return len(newBerts) < originalLen
 }
 
-func (s *BertService) GetUserStats(channel, user string) (int, string, int) {
+func (s *BertService) GetUserStats(channel, user string) BertStats {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
 	data, ok := s.Data[channel]
 	if !ok {
-		return 0, "", 0
+		return BertStats{}
 	}
 	stats, ok := data.UserStats[user]
 	if !ok {
-		return 0, "", 0
+		return BertStats{
+			TotalBerts: len(data.Berts),
+		}
 	}
 
 	bestBert, max := "", -1
@@ -116,7 +126,13 @@ func (s *BertService) GetUserStats(channel, user string) (int, string, int) {
 			bestBert = name
 		}
 	}
-	return stats.TotalActivations, bestBert, max
+	return BertStats{
+		TotalBertchecks:        stats.TotalActivations,
+		MostCommonBert:         bestBert,
+		MostCommonCount:        max,
+		BertsCollectedOutOfAll: len(stats.BertCounts),
+		TotalBerts:             len(data.Berts),
+	}
 }
 
 func (s *BertService) ensureChannel(channel string) {

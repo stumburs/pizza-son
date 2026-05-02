@@ -118,15 +118,20 @@ func init() {
 				target = strings.TrimPrefix(args[1], "@")
 			}
 
-			total, common, count := services.BertServiceInstance.GetUserStats(ctx.Message.Channel, target)
-			if total == 0 {
+			stats := services.BertServiceInstance.GetUserStats(ctx.Message.Channel, target)
+			if stats.TotalBertchecks == 0 {
 				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, fmt.Sprintf("%s has never bertchecked smh", target))
 				return
 			}
 
 			ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, fmt.Sprintf(
-				"%s: %d total berts. Most common: %s (%dx)",
-				target, total, common, count,
+				"%s: %d total berts. Most common: %s (%dx). %d/%d collected.",
+				target,
+				stats.TotalBertchecks,
+				stats.MostCommonBert,
+				stats.MostCommonCount,
+				stats.BertsCollectedOutOfAll,
+				stats.TotalBerts,
 			))
 		},
 	})
