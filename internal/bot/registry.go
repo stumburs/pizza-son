@@ -6,6 +6,7 @@ import (
 	"pizza-son/internal/services"
 	"strings"
 	"sync"
+	"time"
 )
 
 type Sender interface {
@@ -55,6 +56,8 @@ type Command struct {
 	Usage       string
 	Permission  Permission
 	Category    Category
+	Cooldown    time.Duration
+	OnCooldown  func(ctx CommandContext, remaining time.Duration)
 	Examples    []CommandExample
 	Handler     CommandHandler
 }
@@ -68,6 +71,9 @@ type ListenerEntry struct {
 	Name        string
 	Description string
 	Permission  Permission
+	Cooldown    time.Duration
+	Matcher     func(ctx CommandContext) bool
+	OnCooldown  func(ctx CommandContext, remaining time.Duration)
 	Handler     Listener
 }
 
@@ -135,7 +141,29 @@ func (r *Registry) Dispatch(client Sender, msg models.Message) {
 			continue
 		}
 		l := l
-		go l.Handler(ctx)
+
+		// cooldown
+		go func() {
+			// match listener
+			if l.Matcher != nil && !l.Matcher(ctx) {
+				return
+			}
+
+			// cooldown
+			if l.Cooldown > 0 {
+				if GlobalCooldowns.IsOnCooldown(l.Name, msg.Channel, msg.User.ID, l.Cooldown) {
+					if l.OnCooldown != nil {
+						remaining := GlobalCooldowns.Remaining(l.Name, msg.Channel, msg.User.ID, l.Cooldown)
+						l.OnCooldown(ctx, remaining)
+					}
+					return
+				}
+			}
+			l.Handler(ctx)
+			if l.Cooldown > 0 {
+				GlobalCooldowns.Set(l.Name, msg.Channel, msg.User.ID)
+			}
+		}()
 	}
 
 	if !strings.HasPrefix(message, r.Prefix) {
@@ -163,6 +191,18 @@ func (r *Registry) Dispatch(client Sender, msg models.Message) {
 	}
 
 	ctx.Args = parts[1:]
+
+	// cooldowns
+	if cmd.Cooldown > 0 {
+		if GlobalCooldowns.IsOnCooldown(cmd.Name, msg.Channel, msg.User.ID, cmd.Cooldown) {
+			if cmd.OnCooldown != nil {
+				remaining := GlobalCooldowns.Remaining(cmd.Name, msg.Channel, msg.User.ID, cmd.Cooldown)
+				go cmd.OnCooldown(ctx, remaining)
+			}
+			return
+		}
+		GlobalCooldowns.Set(cmd.Name, msg.Channel, msg.User.ID)
+	}
 
 	go cmd.Handler(ctx)
 }

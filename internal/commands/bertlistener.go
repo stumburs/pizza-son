@@ -7,6 +7,7 @@ import (
 	"pizza-son/internal/models"
 	"pizza-son/internal/services"
 	"strings"
+	"time"
 )
 
 type TrollRule struct {
@@ -34,6 +35,14 @@ func init() {
 	RegisterListener(bot.ListenerEntry{
 		Name:        "bertcheck",
 		Description: "Responds with a random bert",
+		Cooldown:    69 * time.Second,
+		Matcher: func(ctx bot.CommandContext) bool {
+			msg := strings.ToLower(ctx.Message.Text)
+			return !strings.HasPrefix(msg, "!") && strings.Contains(msg, "bertcheck")
+		},
+		OnCooldown: func(ctx bot.CommandContext, remaining time.Duration) {
+			services.TwitchServiceInstance.Timeout(ctx.Message.Channel, ctx.Message.User.ID, 69, "overberting smh")
+		},
 		Handler: func(ctx bot.CommandContext) bool {
 			msg := strings.ToLower(ctx.Message.Text)
 

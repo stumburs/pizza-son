@@ -62,6 +62,8 @@ Use the search bar above to find a specific command.
 
 **Permission:** {{ .Permission }}
 
+{{ if .Cooldown }}**Cooldown:** {{ .Cooldown }}{{ end }}
+
 {{ if .Examples -}}
 <details markdown>
 <summary>Examples</summary>
@@ -108,6 +110,7 @@ type CommandDoc struct {
 	Description string
 	Usage       string
 	Permission  string
+	Cooldown    string
 	Examples    []ExampleDoc
 }
 
@@ -135,6 +138,8 @@ Listeners run on every message passively, without requiring a command prefix.
 
 **Permission:** {{ .Permission }}
 
+{{ if .Cooldown }}**Cooldown:** {{ .Cooldown }}{{ end }}
+
 ---
 {{ end }}
 `
@@ -143,6 +148,7 @@ type ListenerDoc struct {
 	Name        string
 	Description string
 	Permission  string
+	Cooldown    string
 }
 
 type ListenerTemplateData struct {
@@ -169,12 +175,17 @@ func main() {
 				Output: ex.Output,
 			})
 		}
+		cooldown := ""
+		if cmd.Cooldown > 0 {
+			cooldown = cmd.Cooldown.String()
+		}
 		categoryMap[category] = append(categoryMap[category], CommandDoc{
 			Name:        cmd.Name,
 			Description: cmd.Description,
 			Usage:       cmd.Usage,
 			Permission:  bot.PermissionName(cmd.Permission),
 			Examples:    examples,
+			Cooldown:    cooldown,
 		})
 	}
 
@@ -240,10 +251,15 @@ func main() {
 	// Listeners
 	listenerDocs := make([]ListenerDoc, 0)
 	for _, l := range registry.Listeners() {
+		cooldown := ""
+		if l.Cooldown > 0 {
+			cooldown = l.Cooldown.String()
+		}
 		listenerDocs = append(listenerDocs, ListenerDoc{
 			Name:        l.Name,
 			Description: l.Description,
 			Permission:  bot.PermissionName(l.Permission),
+			Cooldown:    cooldown,
 		})
 	}
 	sort.Slice(listenerDocs, func(i, j int) bool {
