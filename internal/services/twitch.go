@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log"
 	"pizza-son/internal/config"
+	"slices"
+	"strings"
 	"sync"
 	"time"
 
@@ -194,6 +196,19 @@ func (s *TwitchService) GetUsername(userID string) (string, error) {
 }
 
 func (s *TwitchService) Timeout(channel, userID string, duration int, reason string) {
+	// Skip supproters
+	username, err := s.GetUsername(userID)
+	if err == nil {
+		username = strings.ToLower(username)
+		supporters := config.Get().Bot.Supporters
+		botMods := config.Get().Bot.Moderators
+		if slices.Contains(supporters, username) || slices.Contains(supporters, userID) ||
+			slices.Contains(botMods, username) || slices.Contains(botMods, userID) {
+			log.Printf("[Twitch] Skipping timeout for protected user %s", username)
+			return
+		}
+	}
+
 	broadcasterID, err := s.GetUserID(channel)
 	if err != nil {
 		log.Printf("[Twitch] Failed to resolve broadcaster ID for %s: %v", channel, err)
@@ -221,6 +236,19 @@ func (s *TwitchService) Timeout(channel, userID string, duration int, reason str
 }
 
 func (s *TwitchService) Ban(channel, userID string, reason string) {
+	// Skip supproters
+	username, err := s.GetUsername(userID)
+	if err == nil {
+		username = strings.ToLower(username)
+		supporters := config.Get().Bot.Supporters
+		botMods := config.Get().Bot.Moderators
+		if slices.Contains(supporters, username) || slices.Contains(supporters, userID) ||
+			slices.Contains(botMods, username) || slices.Contains(botMods, userID) {
+			log.Printf("[Twitch] Skipping timeout for protected user %s", username)
+			return
+		}
+	}
+
 	broadcasterID, err := s.GetUserID(channel)
 	if err != nil {
 		log.Printf("[Twitch] Failed to resolve broadcaster ID for %s: %v", channel, err)

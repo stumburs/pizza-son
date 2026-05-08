@@ -12,6 +12,7 @@ const (
 	All Permission = iota
 	Subscriber
 	VIP
+	Supporter
 	Moderator
 	BotModerator
 	Streamer
@@ -34,6 +35,12 @@ func GetPermissionLevel(msg models.Message) Permission {
 	if msg.User.IsMod {
 		return Moderator
 	}
+	// Supporter
+	supporters := config.Get().Bot.Supporters
+	if slices.Contains(supporters, msg.User.Name) || slices.Contains(supporters, msg.User.ID) {
+		return Supporter
+	}
+
 	if msg.User.IsVIP {
 		return VIP
 	}

@@ -27,6 +27,7 @@ type Config struct {
 		Channels     []string `toml:"channels"`
 		IgnoredUsers []string `toml:"ignored_users"`
 		Moderators   []string `toml:"moderators"`
+		Supporters   []string `toml:"supporters"`
 	} `toml:"bot"`
 
 	Ollama struct {

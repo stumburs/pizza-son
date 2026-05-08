@@ -14,6 +14,7 @@ type TrollRule struct {
 	User     string
 	Chance   float64
 	Response string
+	Channel  string
 }
 
 var trollRules = []TrollRule{
@@ -21,11 +22,13 @@ var trollRules = []TrollRule{
 		User:     "itzkxtee",
 		Chance:   0.2,
 		Response: "camembert",
+		Channel:  "sir_lysergium",
 	},
 	{
 		User:     "itzkxtee",
 		Chance:   0.2,
 		Response: "cheesebert",
+		Channel:  "sir_lysergium",
 	},
 }
 
@@ -59,9 +62,10 @@ func init() {
 
 			available := services.BertServiceInstance.GetBerts(ctx.Message.Channel)
 
-			baseResponse := pickBertResponse(ctx.Message.User.Name, available)
+			baseResponse := pickBertResponse(ctx.Message.User.Name, available, ctx.Message.Channel)
 
 			if baseResponse == "" {
+				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "No berts on this channel :(")
 				return false
 			}
 
@@ -208,10 +212,10 @@ func init() {
 	})
 }
 
-func pickBertResponse(user string, availableBerts []string) string {
+func pickBertResponse(user string, availableBerts []string, channel string) string {
 	// we do a bit of trolling
 	for _, rule := range trollRules {
-		if user == rule.User && rand.Float64() < rule.Chance {
+		if user == rule.User && rand.Float64() < rule.Chance && rule.Channel == channel {
 			return rule.Response
 		}
 	}
@@ -221,5 +225,5 @@ func pickBertResponse(user string, availableBerts []string) string {
 		return availableBerts[rand.IntN(len(availableBerts))]
 	}
 
-	return "No berts on this channel :("
+	return ""
 }

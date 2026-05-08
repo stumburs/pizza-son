@@ -23,6 +23,7 @@ type MessageUser struct {
 	DisplayName   string
 	IsBroadcaster bool
 	IsMod         bool
+	IsSupporter   bool
 	IsVIP         bool
 	IsSubscriber  bool
 }
