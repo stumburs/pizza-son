@@ -77,7 +77,7 @@ func init() {
 					return
 				}
 				if number == 420 && ctx.Message.Channel == "sir_lysergium" {
-					ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, formatQuote(services.Quote{Text: "zazabert Herbge zaza realkate zaza", AddedBy: "Sir_Lysergium", CreatedAt: "420-04-20"}, 420))
+					ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, formatQuote(services.Quote{Text: "zazabert Herbge zaza realkate zaza", AddedBy: "Herbge", CreatedAt: "420-04-20"}, 420))
 					return
 				}
 				quote, ok := services.QuoteServiceInstance.Get(ctx.Message.Channel, number)

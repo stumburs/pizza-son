@@ -68,11 +68,18 @@
 | 64 | bercheck | baconpatroller | 2026-04-26 |
 | 65 | it's a thin line between goth and ghost | baconpatroller | 2026-04-26 |
 | 66 | call me hasan piker the way i leave these bitches in shock | WagyuPatties | 2026-04-29 |
-| 67 | if you support women in this stream, you get banned | GrongFA_ | 2026-04-29 |
-| 68 | the best beer is always the next beer | IAmLubes | 2026-04-29 |
+| 67 | ʖᒷ∷ℸ ̣   ╎ᓭ  ꖎ𝙹⍊ᒷ,  ʖᒷ∷ℸ ̣   ╎ᓭ  ꖎ╎⎓ᒷ | ʖᒷ∷ℸ ̣ | ʖᒷ∷ℸ ̣ ↸ᔑ|| |
+| 68 | if you support women in this stream, you get banned | GrongFA_ | 2026-04-29 |
 | 69 | <img src="https://cdn.7tv.app/emote/01GM8GEJ000000Z7XNKE4SJ1Q3/1x.webp" alt="nise" title="nise" style="height:1.5em;vertical-align:middle;"> | SweatySando | 2026-04-29 |
-| 70 | "my grandmas said a tiny <img src="https://cdn.7tv.app/emote/01J99BDVA80009MAMR2DZMK7KV/1x.webp" alt="pb" title="pb" style="height:1.5em;vertical-align:middle;"> is better than a small pp" - @Sir_Lysergium | itzkxtee | 2026-04-30 |
-| 71 | whos 2st | kalamity14lol | 2026-04-30 |
-| 72 | oh i got the case of no sugar mango monster i ordered | baconpatroller | 2026-04-30 |
-| 73 | I CAME TO GOON 💯🗣‼️ 4'10 4️⃣🔟 A BISCUIT LOOSE 🥐 CHINA WING 🇨🇳🪽 A PEANUT BUTTER HOUSE 🥜🧈🏡 I'M BEATING IT 🥊🥩 IT’S 40 IN THE COW 4️⃣0️⃣🐄 A LETTUCE SPIN 🥬🌀 WHERE'S THE DOG'S LEAN❓️🍇🥤 BETTER CALL IAN 📞👦🏻 SHE DA TOP DOG LAW SHE DA TOP ⬆️🐕⚖️👩👬 | WEEFxd | 2026-05-01 |
+| 70 | the best beer is always the next beer | IAmLubes | 2026-04-29 |
+| 71 | "my grandmas said a tiny <img src="https://cdn.7tv.app/emote/01J99BDVA80009MAMR2DZMK7KV/1x.webp" alt="pb" title="pb" style="height:1.5em;vertical-align:middle;"> is better than a small pp" - @Sir_Lysergium | itzkxtee | 2026-04-30 |
+| 72 | whos 2st | kalamity14lol | 2026-04-30 |
+| 73 | oh i got the case of no sugar mango monster i ordered | baconpatroller | 2026-04-30 |
+| 74 | I CAME TO GOON 💯🗣‼️ 4'10 4️⃣🔟 A BISCUIT LOOSE 🥐 CHINA WING 🇨🇳🪽 A PEANUT BUTTER HOUSE 🥜🧈🏡 I'M BEATING IT 🥊🥩 IT’S 40 IN THE COW 4️⃣0️⃣🐄 A LETTUCE SPIN 🥬🌀 WHERE'S THE DOG'S LEAN❓️🍇🥤 BETTER CALL IAN 📞👦🏻 SHE DA TOP DOG LAW SHE DA TOP ⬆️🐕⚖️👩👬 | WEEFxd | 2026-05-01 |
+| 75 | true <img src="https://cdn.7tv.app/emote/01GHJC52QG000331BEKHKK9RPV/1x.webp" alt="fricc" title="fricc" style="height:1.5em;vertical-align:middle;"> RL | Cl_mentB | 2026-05-04 |
+| 76 | !sr music | red_eggz | 2026-05-04 |
+| 77 | !qoute | notnope111 | 2026-05-05 |
+| 78 | The : Bertest Of All Time.  B.O.A.T | Clems_88 | 2026-05-05 |
+| 79 | hit em were it berts | Clems_88 | 2026-05-07 |
+| 80 | Do the bri'ish people still do the accent when no one is around | frytek2k | 2026-05-07 |
 
