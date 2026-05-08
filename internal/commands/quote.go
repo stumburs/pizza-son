@@ -71,6 +71,15 @@ func init() {
 					ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "Usage: !quote | !quote <number> | !quote add <text> | !quote list")
 					return
 				}
+				// funny number
+				if number == 67 && ctx.Message.Channel == "sir_lysergium" {
+					ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, fmt.Sprintf("Quote #%d not found.", number))
+					return
+				}
+				if number == 420 && ctx.Message.Channel == "sir_lysergium" {
+					ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, formatQuote(services.Quote{Text: "zazabert Herbge zaza realkate zaza", AddedBy: "Sir_Lysergium", CreatedAt: "420-04-20"}, 420))
+					return
+				}
 				quote, ok := services.QuoteServiceInstance.Get(ctx.Message.Channel, number)
 				if !ok {
 					count := services.QuoteServiceInstance.Count(ctx.Message.Channel)
