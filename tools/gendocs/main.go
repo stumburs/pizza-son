@@ -88,6 +88,7 @@ Use the search bar above to find a specific command.
 | Everyone | All viewers |
 | Subscriber | Channel subscribers |
 | VIP | Channel VIPs |
+| Supporter | Ko-fi supporter |
 | Moderator | Channel moderators |
 | Bot Moderator | Bot-specific moderators |
 | Streamer | The broadcaster |
