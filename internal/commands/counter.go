@@ -11,7 +11,7 @@ import (
 func init() {
 	Register(bot.Command{
 		Name:        "counter",
-		Description: "Manage counters for this channel.",
+		Description: "Manage counters for this channel. If you want to include the count in your custom message use '{}', for example. 'This counter has been activated {} times'.",
 		Usage:       "!counter add <name> [message] | !counter remove <name> | !counter set <name> <value> | !counter list",
 		Category:    bot.CategoryModeration,
 		Permission:  bot.Moderator,
