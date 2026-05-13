@@ -6,6 +6,7 @@ import (
 	"pizza-son/internal/services"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func init() {
@@ -22,6 +23,7 @@ func init() {
 			{Input: "!counter list", Output: "Counters: deaths (3), wins (7)"},
 			{Input: "!counter", Output: "i've died 4 times"},
 		},
+		Cooldown: 10 * time.Second,
 		Handler: func(ctx bot.CommandContext) {
 			if len(ctx.Args) == 0 {
 				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "Usage: !counter add <name> [message] | !counter remove <name> | !counter set <name> <value> | !counter list")

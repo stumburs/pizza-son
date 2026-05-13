@@ -32,6 +32,16 @@ var trollRules = []TrollRule{
 	},
 }
 
+var trollRulesEnabled = make(map[string]bool) // channel -> enabled/disabled
+
+func isTrollEnabled(channel string) bool {
+	enabled, exists := trollRulesEnabled[channel]
+	if !exists {
+		return true
+	}
+	return enabled
+}
+
 const zazaChance = 0.05
 
 func init() {
@@ -210,13 +220,35 @@ func init() {
 			return false
 		},
 	})
+
+	Register(bot.Command{
+		Name:        "rigbert",
+		Description: "Toggle bertcheck rigged responses on/off for this channel.",
+		Usage:       "!rigbert",
+		Permission:  bot.Moderator,
+		Category:    bot.CategoryFun,
+		Examples: []bot.CommandExample{
+			{Input: "!rigbert", Output: "bertcheck rigging enabled/disabled"},
+		},
+		Handler: func(ctx bot.CommandContext) {
+			current := isTrollEnabled(ctx.Message.Channel)
+			trollRulesEnabled[ctx.Message.Channel] = !current
+			if !current {
+				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "bertcheck rigging enabled")
+			} else {
+				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "bertcheck rigging disabled")
+			}
+		},
+	})
 }
 
 func pickBertResponse(user string, availableBerts []string, channel string) string {
 	// we do a bit of trolling
-	for _, rule := range trollRules {
-		if user == rule.User && rand.Float64() < rule.Chance && rule.Channel == channel {
-			return rule.Response
+	if isTrollEnabled(channel) {
+		for _, rule := range trollRules {
+			if user == rule.User && rand.Float64() < rule.Chance && rule.Channel == channel {
+				return rule.Response
+			}
 		}
 	}
 
