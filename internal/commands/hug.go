@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/rand/v2"
 	"pizza-son/internal/bot"
+	"strings"
 )
 
 func init() {
@@ -17,10 +18,9 @@ func init() {
 			{Input: "!hug @creamyperson", Output: "pizza_tm hugs creamyperson with 23% love :3"},
 		},
 		Handler: func(ctx bot.CommandContext) {
-			target := ctx.Message.User.DisplayName
 			loveAmount := rand.IntN(100)
 			if len(ctx.Args) > 0 {
-				target = ctx.Args[0]
+				target := strings.Join(ctx.Args, " ")
 				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, fmt.Sprintf("%s hugs %s with %d%% love :3", ctx.Message.User.DisplayName, target, loveAmount))
 				return
 			} else {
