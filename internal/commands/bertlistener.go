@@ -87,6 +87,19 @@ func init() {
 			}
 
 			ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, finalMessage)
+
+			// goldenzazabert
+			if finalMessage == "goldenzazabert" && ctx.Message.Channel == "sir_lysergium" {
+				ctx.Client.Say(ctx.Message.Channel, fmt.Sprintf("oda %s got a goldenzazabert oda !!! omg ur so cool BigDog oda", ctx.Message.User.DisplayName))
+				return true
+			}
+
+			// goldenzazabert zaza
+			if finalMessage == "goldenzazabert zaza" && ctx.Message.Channel == "sir_lysergium" {
+				ctx.Client.Say(ctx.Message.Channel, fmt.Sprintf("dinkDonk oda Banger oh hell nah, %s got a goldenzazabert zaza !!! (ur VIP now) ABSOLUTEMUPPET oda dinkDonk ", ctx.Message.User.DisplayName))
+				return true
+			}
+
 			return true
 		},
 	})
@@ -250,6 +263,11 @@ func pickBertResponse(user string, availableBerts []string, channel string) stri
 				return rule.Response
 			}
 		}
+	}
+
+	// goldenzazabert - 0.005% chance in sir_lysergium
+	if channel == "sir_lysergium" && rand.Float64() < 0.00005 {
+		return "goldenzazabert"
 	}
 
 	// Normal berts
