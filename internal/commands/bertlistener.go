@@ -270,9 +270,16 @@ func pickBertResponse(user string, availableBerts []string, channel string) stri
 		return "goldenzazabert"
 	}
 
+	var filteredBerts []string
+	for _, b := range availableBerts {
+		if b != "goldenzazabert" {
+			filteredBerts = append(filteredBerts, b)
+		}
+	}
+
 	// Normal berts
-	if len(availableBerts) > 0 {
-		return availableBerts[rand.IntN(len(availableBerts))]
+	if len(filteredBerts) > 0 {
+		return filteredBerts[rand.IntN(len(filteredBerts))]
 	}
 
 	return ""
