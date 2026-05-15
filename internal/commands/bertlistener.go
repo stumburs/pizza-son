@@ -88,16 +88,21 @@ func init() {
 
 			ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, finalMessage)
 
-			// goldenzazabert
-			if finalMessage == "goldenzazabert" && ctx.Message.Channel == "sir_lysergium" {
-				ctx.Client.Say(ctx.Message.Channel, fmt.Sprintf("oda %s got a goldenzazabert oda !!! omg ur so cool BigDog oda", ctx.Message.User.DisplayName))
-				return true
-			}
+			// lyser
+			if ctx.Message.Channel == "sir_lysergium" {
+				// goldenzazabert
+				if finalMessage == "goldenzazabert" {
+					ctx.Client.Say(ctx.Message.Channel, fmt.Sprintf("oda %s got a goldenzazabert oda !!! omg ur so cool BigDog oda", ctx.Message.User.DisplayName))
+				}
 
-			// goldenzazabert zaza
-			if finalMessage == "goldenzazabert zaza" && ctx.Message.Channel == "sir_lysergium" {
-				ctx.Client.Say(ctx.Message.Channel, fmt.Sprintf("dinkDonk oda Banger oh hell nah, %s got a goldenzazabert zaza !!! (ur VIP now) ABSOLUTEMUPPET oda dinkDonk ", ctx.Message.User.DisplayName))
-				return true
+				// goldenzazabert zaza
+				if finalMessage == "goldenzazabert zaza" {
+					ctx.Client.Say(ctx.Message.Channel, fmt.Sprintf("dinkDonk oda Banger oh hell nah, %s got a goldenzazabert zaza !!! (ur VIP now) ABSOLUTEMUPPET oda dinkDonk ", ctx.Message.User.DisplayName))
+				}
+
+				if strings.Contains(finalMessage, "Angine-de-Bertrine") {
+					ctx.Client.Say(ctx.Message.Channel, "oda ADP oda")
+				}
 			}
 
 			return true
