@@ -210,7 +210,7 @@ func init() {
 			snipeWords := []string{"sniped", "snipe", "sniper", "get sniped", "got sniped"}
 			for _, word := range snipeWords {
 				if strings.Contains(msg, word) {
-					ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "snipebert")
+					ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "AWPert")
 					return true
 				}
 			}
