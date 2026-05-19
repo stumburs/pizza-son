@@ -82,4 +82,17 @@
 | 78 | The : Bertest Of All Time.  B.O.A.T | Clems_88 | 2026-05-05 |
 | 79 | hit em were it berts | Clems_88 | 2026-05-07 |
 | 80 | Do the bri'ish people still do the accent when no one is around | frytek2k | 2026-05-07 |
+| 81 | when i said it was a bad morning i didnt say make it worse <img src="https://cdn.7tv.app/emote/01F6R50PYR0004V0XPDH2CKXCH/1x.webp" alt="smh" title="smh" style="height:1.5em;vertical-align:middle;"> | itzkxtee | 2026-05-09 |
+| 82 | Scandonadian yep | Stoxy999 | 2026-05-10 |
+| 83 | they tried to shut <img src="https://cdn.7tv.app/emote/01HM7VPTC800022X3E2804NWA3/1x.webp" alt="gunter" title="gunter" style="height:1.5em;vertical-align:middle;"> down on MTV | baconpatroller | 2026-05-10 |
+| 84 | no buttscratching <img src="https://cdn.7tv.app/emote/01G6ZFM000000AZHM5CT7YKZ46/1x.webp" alt="sadge" title="sadge" style="height:1.5em;vertical-align:middle;"> | poco98 | 2026-05-10 |
+| 85 | i cant listen when i have dancing feet Infront of my face <img src="https://cdn.7tv.app/emote/01HQ65F1Z8000BET8PBZNYJ5TA/1x.webp" alt="0-0" title="0-0" style="height:1.5em;vertical-align:middle;"> | itzkxtee | 2026-05-12 |
+| 86 | DAM | wendsdayy | 2026-05-15 |
+| 87 | bro 98 to 99th percentile is the top 10 million in India | baconpatroller | 2026-05-15 |
+| 88 | you will not see me ask about the tittie block again peepoHappy | SneakyAnnie | 2026-05-16 |
+| 89 | <img src="https://cdn.7tv.app/emote/01K6V8JPEH3V5KVJ5FAZX603GP/1x.webp" alt="o" title="o" style="height:1.5em;vertical-align:middle;"> <img src="https://cdn.7tv.app/emote/01JBHY1T7RWKHNMC4TV7C7A54T/1x.webp" alt="zaza" title="zaza" style="height:1.5em;vertical-align:middle;"> zazaL | pizza_tm | 2026-05-16 |
+| 90 | I can’t stand the rain against my window bringing back sweet memories | baconpatroller | 2026-05-16 |
+| 91 | "Your music taste sucks, Frozen" - Lysergium | Frozenthia | 2026-05-17 |
+| 92 | Just kidding, me and satan aren't cool anymore after I never got my reward from selling my soul in the 90's | AvatimTM | 2026-05-17 |
+| 93 | a lot of house tech uses goat sound effects these days | baconpatroller | 2026-05-17 |
 
