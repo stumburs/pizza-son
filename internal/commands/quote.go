@@ -24,11 +24,21 @@ func init() {
 		},
 		Handler: func(ctx bot.CommandContext) {
 			if len(ctx.Args) == 0 {
-				// Random quote
-				quote, number, ok := services.QuoteServiceInstance.Random(ctx.Message.Channel)
-				if !ok {
-					ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "No quotes yet! Add one with !quote add <text>")
-					return
+				var quote services.Quote
+				var number int
+				var ok bool
+				for {
+					// Random quote
+					quote, number, ok = services.QuoteServiceInstance.Random(ctx.Message.Channel)
+					if !ok {
+						ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "No quotes yet! Add one with !quote add <text>")
+						return
+					}
+					// re-roll if got 67
+					if ctx.Message.Channel == "sir_lysergium" && number == 67 {
+						continue
+					}
+					break
 				}
 				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, formatQuote(quote, number))
 				return
