@@ -16,7 +16,11 @@ func init() {
 			if !strings.HasPrefix(msg, "!") {
 				return false
 			}
-			name := strings.ToLower(strings.Fields(strings.TrimPrefix(msg, "!"))[0])
+			parts := strings.Fields(strings.TrimPrefix(msg, "!"))
+			if len(parts) == 0 {
+				return false
+			}
+			name := strings.ToLower(parts[0])
 			if !services.CounterServiceInstance.Exists(ctx.Message.Channel, name) {
 				return false
 			}
