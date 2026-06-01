@@ -38,7 +38,7 @@
 | 34 | zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz | RobynLTW | 2026-04-08 |
 | 35 | ice is a meme surface | weelenon152 | 2026-04-09 |
 | 36 | baby girl loves wood | baconpatroller | 2026-04-09 |
-| 37 | after all the angine i have poitrined | WagyuPatties | 2026-04-11 |
+| 37 | after all the <img src="https://cdn.7tv.app/emote/01KP4837J0NJ40W3MED73EV583/1x.webp" alt="angine" title="angine" style="height:1.5em;vertical-align:middle;"> i have poitrined | WagyuPatties | 2026-04-11 |
 | 38 | so your telling me a shrimp fried that rice | SweatySando | 2026-04-11 |
 | 39 | got to go lawn the mow | sunrix3 | 2026-04-12 |
 | 40 | i sleep i just cant tpye for some resaaon | oCybex | 2026-04-13 |
@@ -61,7 +61,7 @@
 | 57 | <img src="https://cdn.7tv.app/emote/01KPPE603FB9SE1CPNDVHBC535/1x.webp" alt="katebert" title="katebert" style="height:1.5em;vertical-align:middle;"> <img src="https://cdn.7tv.app/emote/01JBHY1T7RWKHNMC4TV7C7A54T/1x.webp" alt="zaza" title="zaza" style="height:1.5em;vertical-align:middle;"> | itzkxtee | 2026-04-23 |
 | 58 | <img src="https://cdn.7tv.app/emote/01HCCXW2M00003DZM5HVHF63FP/1x.webp" alt="BOBER" title="BOBER" style="height:1.5em;vertical-align:middle;"> <img src="https://cdn.7tv.app/emote/01JBHY1T7RWKHNMC4TV7C7A54T/1x.webp" alt="zaza" title="zaza" style="height:1.5em;vertical-align:middle;"> | itzkxtee | 2026-04-23 |
 | 59 | nadeo is the representation of russian government, completely irrational | kMercuryy | 2026-04-23 |
-| 60 | angine de beninging | Slodderhaai | 2026-04-24 |
+| 60 | <img src="https://cdn.7tv.app/emote/01KP4837J0NJ40W3MED73EV583/1x.webp" alt="angine" title="angine" style="height:1.5em;vertical-align:middle;"> de beninging | Slodderhaai | 2026-04-24 |
 | 61 | !ыщтп | vov4ik107_ | 2026-04-24 |
 | 62 | Who is <img src="https://cdn.7tv.app/emote/01K6B3Y3SG5ZBAWXXVKX7BKBE5/1x.webp" alt="bert" title="bert" style="height:1.5em;vertical-align:middle;"> ? To the blind, he is the light. To the hungry, he is bread. To the sick, he is the cure. To the lonely, he is company. To the sad, he is joy. To the prisoner, he is freedom. For the poor, he is treasure. For me, he is everything. | frytek2k | 2026-04-26 |
 | 63 | stream volume changed to 2% | PietPaco | 2026-04-26 |
@@ -90,7 +90,7 @@
 | 86 | DAM | wendsdayy | 2026-05-15 |
 | 87 | bro 98 to 99th percentile is the top 10 million in India | baconpatroller | 2026-05-15 |
 | 88 | you will not see me ask about the tittie block again peepoHappy | SneakyAnnie | 2026-05-16 |
-| 89 | <img src="https://cdn.7tv.app/emote/01K6V8JPEH3V5KVJ5FAZX603GP/1x.webp" alt="o" title="o" style="height:1.5em;vertical-align:middle;"> <img src="https://cdn.7tv.app/emote/01JBHY1T7RWKHNMC4TV7C7A54T/1x.webp" alt="zaza" title="zaza" style="height:1.5em;vertical-align:middle;"> zazaL | pizza_tm | 2026-05-16 |
+| 89 | <img src="https://cdn.7tv.app/emote/01K6V8JPEH3V5KVJ5FAZX603GP/1x.webp" alt="o" title="o" style="height:1.5em;vertical-align:middle;"> <img src="https://cdn.7tv.app/emote/01JBHY1T7RWKHNMC4TV7C7A54T/1x.webp" alt="zaza" title="zaza" style="height:1.5em;vertical-align:middle;"> <img src="https://cdn.7tv.app/emote/01KRRDPG9MCPC4NEAHJSBQDPPY/1x.webp" alt="zazaL" title="zazaL" style="height:1.5em;vertical-align:middle;"> | pizza_tm | 2026-05-16 |
 | 90 | I can’t stand the rain against my window bringing back sweet memories | baconpatroller | 2026-05-16 |
 | 91 | "Your music taste sucks, Frozen" - Lysergium | Frozenthia | 2026-05-17 |
 | 92 | Just kidding, me and satan aren't cool anymore after I never got my reward from selling my soul in the 90's | AvatimTM | 2026-05-17 |
