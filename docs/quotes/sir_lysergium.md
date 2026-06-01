@@ -6,7 +6,7 @@
 | 2 | hopefully !quote should work correctly now | pizza_tm | 2026-03-01 |
 | 3 | Sir_Lysergium, added Men I Trust - "The Apple bottom jeans by Louis Armstrong (FULL VERSION) [JoedEcher Reupload]" to the queue at #1 (playing ~now) https://youtu. | pizza_son | 2026-03-02 |
 | 4 | balls around 4 hours | pizza_son | 2026-03-02 |
-| 5 | just a small town <img src="https://cdn.7tv.app/emote/01K6B3Y3SG5ZBAWXXVKX7BKBE5/1x.webp" alt="bert" title="bert" style="height:1.5em;vertical-align:middle;">, living in a lonely <img src="https://cdn.7tv.app/emote/01K6B3Y3SG5ZBAWXXVKX7BKBE5/1x.webp" alt="bert" title="bert" style="height:1.5em;vertical-align:middle;"> | SweatySando | 2026-03-02 |
+| 5 | just a small town <img src="https://cdn.7tv.app/emote/01K6B3Y3SG5ZBAWXXVKX7BKBE5/1x.webp" alt="bert" title="bert" style="height:1.5em;vertical-align:middle;"> , living in a lonely <img src="https://cdn.7tv.app/emote/01K6B3Y3SG5ZBAWXXVKX7BKBE5/1x.webp" alt="bert" title="bert" style="height:1.5em;vertical-align:middle;"> | SweatySando | 2026-03-02 |
 | 6 | <img src="https://cdn.7tv.app/emote/01K6V8JPEH3V5KVJ5FAZX603GP/1x.webp" alt="o" title="o" style="height:1.5em;vertical-align:middle;"> | Sir_Lysergium | 2026-03-02 |
 | 7 | <img src="https://cdn.7tv.app/emote/01J17WK010000DX4MZBQSYH8ZA/1x.webp" alt="oda" title="oda" style="height:1.5em;vertical-align:middle;"> | Sir_Lysergium | 2026-03-02 |
 | 8 | Absolute banger!! Alien dance | Clems_88 | 2026-03-04 |
@@ -95,4 +95,8 @@
 | 91 | "Your music taste sucks, Frozen" - Lysergium | Frozenthia | 2026-05-17 |
 | 92 | Just kidding, me and satan aren't cool anymore after I never got my reward from selling my soul in the 90's | AvatimTM | 2026-05-17 |
 | 93 | a lot of house tech uses goat sound effects these days | baconpatroller | 2026-05-17 |
+| 94 | get unlucky | PepekBezlepek | 2026-05-21 |
+| 95 | <img src="https://cdn.7tv.app/emote/01GMKRKZF80006JB07GQ8VVGGG/1x.webp" alt="hey" title="hey" style="height:1.5em;vertical-align:middle;"> wtf | baconpatroller | 2026-05-22 |
+| 96 | but as it turns out, it might be what you geeeeet | onion_tm | 2026-05-30 |
+| 97 | you can count your grandma as a bicycle but she aint gonna be happy when you try to ride her | baconpatroller | 2026-06-01 |
 
