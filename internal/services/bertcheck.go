@@ -20,7 +20,7 @@ type ChannelData struct {
 }
 
 type BertService struct {
-	mu   sync.RWMutex
+	Mu   sync.RWMutex
 	Data map[string]*ChannelData // channel name -> data
 	path string
 }
@@ -48,8 +48,8 @@ func NewBertService() {
 }
 
 func (s *BertService) GetBerts(channel string) []string {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
+	s.Mu.RLock()
+	defer s.Mu.RUnlock()
 
 	if d, ok := s.Data[channel]; ok {
 		return d.Berts
@@ -58,8 +58,8 @@ func (s *BertService) GetBerts(channel string) []string {
 }
 
 func (s *BertService) RegisterActivation(channel, user, bert string) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
+	s.Mu.Lock()
+	defer s.Mu.Unlock()
 	s.ensureChannel(channel)
 
 	stats := s.Data[channel].UserStats[user]
@@ -74,8 +74,8 @@ func (s *BertService) RegisterActivation(channel, user, bert string) {
 }
 
 func (s *BertService) AddBert(channel, name string) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
+	s.Mu.Lock()
+	defer s.Mu.Unlock()
 	s.ensureChannel(channel)
 
 	// prevent duplicates
@@ -88,8 +88,8 @@ func (s *BertService) AddBert(channel, name string) {
 }
 
 func (s *BertService) RemoveBert(channel, name string) bool {
-	s.mu.Lock()
-	defer s.mu.Unlock()
+	s.Mu.Lock()
+	defer s.Mu.Unlock()
 	s.ensureChannel(channel)
 
 	originalLen := len(s.Data[channel].Berts)
@@ -106,8 +106,8 @@ func (s *BertService) RemoveBert(channel, name string) bool {
 }
 
 func (s *BertService) GetUserStats(channel, user string) BertStats {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
+	s.Mu.RLock()
+	defer s.Mu.RUnlock()
 
 	data, ok := s.Data[channel]
 	if !ok {

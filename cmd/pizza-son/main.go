@@ -8,6 +8,7 @@ import (
 	"pizza-son/internal/commands"
 	"pizza-son/internal/config"
 	"pizza-son/internal/services"
+	"pizza-son/internal/web"
 	"syscall"
 	"time"
 )
@@ -56,6 +57,10 @@ func main() {
 	if err != nil {
 		log.Fatalf("[Main] Failed to initialize Discord bot: %v", err)
 	}
+
+	// bertstats
+	webServer := web.NewWebService(":8080")
+	webServer.Start()
 
 	// Run twitch in background
 	go func() {

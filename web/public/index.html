@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>bert stats</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: #0e0e10;
+        color: #efeff1;
+        padding: 20px;
+      }
+      .container {
+        max-width: 900px;
+        margin: auto;
+      }
+      .tabs {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+      .tab {
+        padding: 10px 20px;
+        background: #1f1f23;
+        border: none;
+        color: white;
+        cursor: pointer;
+        border-radius: 5px;
+      }
+      .tab.active {
+        background: #9146ff;
+        font-weight: bold;
+      }
+
+      .panel {
+        display: none;
+        background: #18181b;
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid #303032;
+      }
+      .panel.active {
+        display: block;
+      }
+
+      input {
+        padding: 10px;
+        width: 60%;
+        border-radius: 5px;
+        border: 1px solid #303032;
+        background: #1f1f23;
+        color: white;
+      }
+      button {
+        padding: 10px 15px;
+        cursor: pointer;
+        background: #9146ff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+      }
+      button:hover {
+        background: #772ce8;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-top: 15px;
+      }
+      .box {
+        background: #1f1f23;
+        padding: 15px;
+        border-radius: 8px;
+      }
+
+      .badge {
+        display: inline-block;
+        background: #3a3a3d;
+        padding: 5px 10px;
+        margin: 4px;
+        border-radius: 4px;
+        font-size: 0.9em;
+      }
+      .badge.missing {
+        background: #4a1c1c;
+        color: #ff9999;
+      }
+      .badge.gold {
+        border: 1px solid #bf94ff;
+        color: #bf94ff;
+      }
+
+      h2,
+      h3 {
+        margin-top: 0;
+        color: #bf94ff;
+      }
+      hr {
+        border-color: #303032;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Bert Analytics</h1>
+
+      <div class="tabs">
+        <button
+          class="tab active"
+          onclick="
+            switchTab('global', this);
+            loadGlobal();
+          "
+        >
+          🌎 Global
+        </button>
+        <button class="tab" onclick="switchTab('channel', this)">
+          📺 Channel
+        </button>
+        <button class="tab" onclick="switchTab('user', this)">👤 User</button>
+      </div>
+
+      <div id="global" class="panel active">
+        <h2>Global Stats</h2>
+        <p>
+          Total Berts Triggered: <strong id="gTotal">0</strong> across
+          <span id="gChans">0</span> channels.
+        </p>
+        <div class="grid">
+          <div class="box">
+            <h3>🏆 Top Users</h3>
+            <div id="gUsers">Loading...</div>
+          </div>
+          <div class="box">
+            <h3>🔥 Most Popular Berts</h3>
+            <div id="gBerts">Loading...</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="channel" class="panel">
+        <h2>Channel Lookup</h2>
+        <input type="text" id="chInput" placeholder="Enter channel name..." />
+        <button onclick="loadChannel()">Search</button>
+        <div id="chResults" style="display: none; margin-top: 20px">
+          <h3 id="chTitle"></h3>
+          <p>Total Berts in channel: <strong id="chTotal">0</strong></p>
+          <div class="grid">
+            <div class="box">
+              <h3>🏆 Top Users Here</h3>
+              <div id="chUsers"></div>
+            </div>
+            <div class="box">
+              <h3>Active Berts List</h3>
+              <div id="chBertsList"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="user" class="panel">
+        <h2>User Lookup</h2>
+        <input type="text" id="uInput" placeholder="Enter username..." />
+        <button onclick="loadUser()">Search</button>
+
+        <div id="uResults" style="display: none; margin-top: 20px">
+          <h3 id="uTitle"></h3>
+          <p>
+            Global Berts Collected (All Channels):
+            <strong id="uTotal">0</strong>
+          </p>
+
+          <div style="margin: 15px 0">
+            <label
+              for="uChannelSelect"
+              style="color: #bf94ff; font-weight: bold"
+              >Select Channel:
+            </label>
+            <select
+              id="uChannelSelect"
+              onchange="updateUserChannelView()"
+              style="
+                padding: 8px;
+                border-radius: 5px;
+                background: #1f1f23;
+                color: white;
+                border: 1px solid #303032;
+                min-width: 150px;
+              "
+            ></select>
+            <span style="margin-left: 10px; color: #adadb8"
+              >Channel activations: <strong id="uChannelTotal">0</strong></span
+            >
+          </div>
+
+          <div class="grid">
+            <div class="box">
+              <h3>✅ Collected Here</h3>
+              <div id="uCollected"></div>
+            </div>
+            <div class="box">
+              <h3>❌ Missing Here</h3>
+              <div id="uMissing"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Tab switching logic
+      function switchTab(tabId, btn) {
+        document
+          .querySelectorAll(".panel")
+          .forEach((p) => p.classList.remove("active"));
+        document
+          .querySelectorAll(".tab")
+          .forEach((t) => t.classList.remove("active"));
+        document.getElementById(tabId).classList.add("active");
+        btn.classList.add("active");
+      }
+
+      // Helper to sort object by values and return top N HTML
+      function getTopHTML(obj, limit, isGold = false) {
+        let sorted = Object.entries(obj)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, limit);
+        if (sorted.length === 0) return "<i>None</i>";
+        return sorted
+          .map(
+            ([name, count], i) =>
+              `<span class="badge ${isGold && i === 0 ? "gold" : ""}">#${i + 1} ${name} <small>x${count}</small></span>`,
+          )
+          .join("<br>");
+      }
+
+      async function loadGlobal() {
+        const res = await fetch("/api/global");
+        if (!res.ok) return;
+        const data = await res.json();
+
+        document.getElementById("gTotal").innerText = data.total_activations;
+        document.getElementById("gChans").innerText = data.channel_count;
+        document.getElementById("gUsers").innerHTML = getTopHTML(
+          data.users,
+          10,
+          true,
+        );
+        document.getElementById("gBerts").innerHTML = getTopHTML(
+          data.berts,
+          10,
+          true,
+        );
+      }
+
+      async function loadChannel() {
+        const name = document.getElementById("chInput").value;
+        if (!name) return;
+        const res = await fetch(`/api/channel?name=${name}`);
+        if (!res.ok) {
+          alert("Channel not found!");
+          return;
+        }
+        const data = await res.json();
+
+        document.getElementById("chResults").style.display = "block";
+        document.getElementById("chTitle").innerText =
+          `Stats for #${data.channel}`;
+        document.getElementById("chTotal").innerText = data.total_activations;
+        document.getElementById("chUsers").innerHTML = getTopHTML(
+          data.users,
+          10,
+          true,
+        );
+
+        document.getElementById("chBertsList").innerHTML = data.active_berts
+          .map((b) => `<span class="badge">${b}</span>`)
+          .join(" ");
+      }
+
+      let currentUserData = null;
+
+      async function loadUser() {
+        const name = document.getElementById("uInput").value;
+        if (!name) return;
+
+        const res = await fetch(`/api/user?name=${name}`);
+        if (!res.ok) {
+          alert("User not found or has no active stats!");
+          document.getElementById("uResults").style.display = "none";
+          return;
+        }
+
+        // Save data payload to our state variable
+        currentUserData = await res.json();
+
+        // Unhide layout and set global stats
+        document.getElementById("uResults").style.display = "block";
+        document.getElementById("uTitle").innerText =
+          `Player: ${currentUserData.username}`;
+        document.getElementById("uTotal").innerText =
+          currentUserData.global_total;
+
+        // Populate the dropdown selector with the channels this specific user belongs to
+        const select = document.getElementById("uChannelSelect");
+        select.innerHTML = "";
+
+        const channels = Object.keys(currentUserData.channels);
+        channels.forEach((chName) => {
+          select.innerHTML += `<option value="${chName}">#${chName}</option>`;
+        });
+
+        // Render the data for the very first channel by default
+        if (channels.length > 0) {
+          updateUserChannelView();
+        }
+      }
+
+      // This function fires automatically whenever the user changes the dropdown selection
+      function updateUserChannelView() {
+        if (!currentUserData) return;
+
+        const selectedChan = document.getElementById("uChannelSelect").value;
+        const channelStats = currentUserData.channels[selectedChan];
+
+        // Update the local channel count summary
+        document.getElementById("uChannelTotal").innerText = channelStats.total;
+
+        // Render Collected Berts badges
+        const cDiv = document.getElementById("uCollected");
+        const collectedEntries = Object.entries(channelStats.collected);
+        cDiv.innerHTML =
+          collectedEntries
+            .map(
+              ([bert, count]) =>
+                `<span class="badge">${bert} <small>x${count}</small></span>`,
+            )
+            .join(" ") || "<i>None yet! Keep bertchecking.</i>";
+
+        // Render Missing Berts badges
+        const mDiv = document.getElementById("uMissing");
+        mDiv.innerHTML =
+          channelStats.missing
+            .map((bert) => `<span class="badge missing">${bert}</span>`)
+            .join(" ") || "<i>Got 'em all! Complete collection! 🎉</i>";
+      }
+
+      // Load global on startup
+      loadGlobal();
+    </script>
+  </body>
+</html>
