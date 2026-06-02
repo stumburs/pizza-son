@@ -114,9 +114,19 @@ func (s *BertService) GetUserStats(channel, user string) BertStats {
 		return BertStats{}
 	}
 
+	activeBerts := make(map[string]bool, len(data.Berts))
+	for _, b := range data.Berts {
+		activeBerts[b] = true
+	}
+
+	// channel total only counts currently active berts
 	channelTotal := 0
 	for _, uStats := range data.UserStats {
-		channelTotal += uStats.TotalActivations
+		for bert, count := range uStats.BertCounts {
+			if activeBerts[bert] {
+				channelTotal += count
+			}
+		}
 	}
 
 	stats, ok := data.UserStats[user]
@@ -127,18 +137,27 @@ func (s *BertService) GetUserStats(channel, user string) BertStats {
 		}
 	}
 
+	// only count activations of currently active berts
+	activeTotal := 0
 	bestBert, max := "", -1
-	for name, count := range stats.BertCounts {
+	collectedBerts := 0
+	for bert, count := range stats.BertCounts {
+		if !activeBerts[bert] {
+			continue
+		}
+		activeTotal += count
+		collectedBerts++
 		if count > max {
 			max = count
-			bestBert = name
+			bestBert = bert
 		}
 	}
+
 	return BertStats{
-		TotalBertchecks:        stats.TotalActivations,
+		TotalBertchecks:        activeTotal,
 		MostCommonBert:         bestBert,
 		MostCommonCount:        max,
-		BertsCollectedOutOfAll: len(stats.BertCounts),
+		BertsCollectedOutOfAll: collectedBerts,
 		TotalBerts:             len(data.Berts),
 		ChannelTotalBertchecks: channelTotal,
 	}
