@@ -115,6 +115,62 @@
       hr {
         border-color: #303032;
       }
+
+      /* Emote Layout wrapper */
+      .emote-wrapper {
+        position: relative;
+        display: inline-block;
+        margin: 4px;
+        vertical-align: middle;
+        cursor: pointer;
+      }
+
+      /* Emote Image */
+      .twitch-emote {
+        height: 32px;
+        object-fit: contain;
+        vertical-align: middle;
+        transition: transform 0.1s ease-in-out;
+      }
+      .emote-wrapper:hover .twitch-emote {
+        transform: scale(1.15);
+      }
+
+      /* Custom Tooltip */
+      .emote-tooltip {
+        visibility: hidden;
+        position: absolute;
+        bottom: 130%;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #1f1f23;
+        color: #efeff1;
+        text-align: center;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.85em;
+        font-weight: bold;
+        white-space: nowrap;
+        border: 1px solid #303032;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+        z-index: 10;
+        opacity: 0;
+        transition: opacity 0.15s ease-in-out;
+      }
+      .emote-tooltip::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        margin-left: -5px;
+        border-width: 5px;
+        border-style: solid;
+        border-color: #1f1f23 transparent transparent transparent;
+      }
+      .emote-wrapper:hover .emote-tooltip {
+        visibility: visible;
+        opacity: 1;
+      }
     </style>
   </head>
   <body>
@@ -447,6 +503,50 @@
         });
       }
 
+      async function loadChannelEmotes(channelName) {
+        try {
+          // 1. Request the data from your Go API endpoint
+          const response = await fetch(`/api/emotes?channel=${channelName}`);
+
+          if (!response.ok) {
+            console.error("Failed to fetch emotes from server");
+            return;
+          }
+
+          // 2. Parse the JSON payload back into a JavaScript array of objects
+          const emotesData = await response.json(); // Looks like: [{name: "BertW", id: "60b..."}, ...]
+
+          // 3. Target the HTML container where the images should live
+          const emotesContainer = document.getElementById("chBertsList");
+
+          // Check if the Go backend sent an empty array or null
+          if (!emotesData || emotesData.length === 0) {
+            emotesContainer.innerHTML =
+              "<i>No emotes found for this channel.</i>";
+            return;
+          }
+
+          // 4. Loop through the array, transform each object into our image HTML template, and inject it
+          emotesContainer.innerHTML = emotesData
+            .map((emote) => {
+              return `
+          <div class="emote-wrapper">
+            <img 
+              src="https://cdn.7tv.app/emote/${emote.id}/2x.webp" 
+              alt="${emote.name}" 
+              title="${emote.name}"
+              class="twitch-emote"
+            />
+            <span class="emote-tooltip">${emote.name}</span>
+          </div>
+        `;
+            })
+            .join(" "); // Joins the array elements into one clean HTML string
+        } catch (error) {
+          console.error("Network error fetching emotes:", error);
+        }
+      }
+
       async function loadChannel() {
         const name = document.getElementById("chInput").value;
         if (!name) return;
@@ -456,6 +556,22 @@
           return;
         }
         const data = await res.json();
+
+        // \ud83d\udd25 NEW: Fetch 7TV emotes and build a lookup map (Name -> ID)
+        let emotesMap = {};
+        try {
+          const emoteRes = await fetch(`/api/emotes?channel=${name}`);
+          if (emoteRes.ok) {
+            const emotesData = await emoteRes.json();
+            emotesData.forEach((emote) => {
+              emotesMap[emote.name] = emote.id;
+            });
+          }
+        } catch (err) {
+          console.error("Failed to load emotes map:", err);
+        }
+        // Store globally so the User Tab can use it too!
+        window.currentChannelEmotes = emotesMap;
 
         document.getElementById("chResults").style.display = "block";
         document.getElementById("chTitle").innerText =
@@ -467,10 +583,22 @@
           true,
         );
 
+        // \ud83d\udd25 UPDATED: Render images if found in 7TV map, otherwise fallback to text badge
         document.getElementById("chBertsList").innerHTML = (
           data.active_berts || []
         )
-          .map((b) => `<span class="badge">${b}</span>`)
+          .map((b) => {
+            const emoteId = emotesMap[b];
+            if (emoteId) {
+              return `
+          <div class="emote-wrapper">
+            <img src="https://cdn.7tv.app/emote/${emoteId}/2x.webp" alt="${b}" class="twitch-emote" />
+            <span class="emote-tooltip">${b}</span>
+          </div>
+        `;
+            }
+            return `<span class="badge">${b}</span>`; // Fallback
+          })
           .join(" ");
 
         // --- CHANNEL TIMELINE CHART ---
@@ -511,7 +639,8 @@
         });
 
         // --- CHANNEL HOURLY TIMELINE CHART (Last 24 Hours) ---
-        const hourlyTimeline = data.hourly_timeline || {};
+        const hourlyTimeline =
+          data.hourly_activations || data.hourly_timeline || {}; // Adjusted to match your backend struct
         const allSortedHours = Object.keys(hourlyTimeline).sort();
         const sortedHours24 = allSortedHours.slice(-24);
         const hourlyCounts = sortedHours24.map((h) => hourlyTimeline[h]);
@@ -524,7 +653,7 @@
         channelHourlyChartInstance = new Chart(ctxHourly, {
           type: "bar",
           data: {
-            labels: sortedHours24.map((h) => h.split(" ")[1]),
+            labels: sortedHours24.map((h) => h.split(" ")[1] || h),
             datasets: [
               {
                 label: "Hourly Hits",
@@ -630,16 +759,33 @@
         }
       }
 
-      function updateUserChannelView() {
+      async function updateUserChannelView() {
         if (!currentUserData) return;
 
         const selectedChan = document.getElementById("uChannelSelect").value;
         const channelStats = currentUserData.channels[selectedChan];
 
+        if (!channelStats) return;
+
         document.getElementById("uChannelTotal").innerText = channelStats.total;
 
+        // 🔥 FIX: Dynamically fetch the 7TV emotes map specifically for the selected dropdown channel
+        let emotesMap = {};
+        try {
+          const emoteRes = await fetch(`/api/emotes?channel=${selectedChan}`);
+          if (emoteRes.ok) {
+            const emotesData = await emoteRes.json();
+            emotesData.forEach((emote) => {
+              emotesMap[emote.name] = emote.id;
+            });
+          }
+        } catch (err) {
+          console.error(`Failed to load emotes map for #${selectedChan}:`, err);
+        }
+
         const cDiv = document.getElementById("uCollected");
-        const collectedEntries = Object.entries(channelStats.collected || {}); // Guarded against null objects
+        const collectedEntries = Object.entries(channelStats.collected || {});
+
         cDiv.innerHTML =
           collectedEntries
             .map(([bert, info]) => {
@@ -647,15 +793,37 @@
               const dateStr = info.first_seen
                 ? new Date(info.first_seen).toLocaleDateString()
                 : "Unknown";
+              const emoteId = emotesMap[bert];
+
+              if (emoteId) {
+                return `
+            <div class="emote-wrapper">
+              <img src="https://cdn.7tv.app/emote/${emoteId}/2x.webp" alt="${bert}" class="twitch-emote" />
+              <small style="color: #adadb8; font-weight: bold; margin-left: 2px;">x${count}</small>
+              <span class="emote-tooltip">${bert} (First: ${dateStr})</span>
+            </div>
+          `;
+              }
               return `<span class="badge" title="First seen: ${dateStr}">${bert} <small>x${count}</small></span>`;
             })
             .join(" ") || "<i>None yet! Keep bertchecking.</i>";
 
         const mDiv = document.getElementById("uMissing");
-        // 🔥 FIX: Added (channelStats.missing || []) to handle nil Go slices safely
+
         mDiv.innerHTML =
           (channelStats.missing || [])
-            .map((bert) => `<span class="badge missing">${bert}</span>`)
+            .map((bert) => {
+              const emoteId = emotesMap[bert];
+              if (emoteId) {
+                return `
+            <div class="emote-wrapper" style="opacity: 0.35; filter: grayscale(100%);">
+              <img src="https://cdn.7tv.app/emote/${emoteId}/2x.webp" alt="${bert}" class="twitch-emote" />
+              <span class="emote-tooltip">${bert} (Missing)</span>
+            </div>
+          `;
+              }
+              return `<span class="badge missing">${bert}</span>`;
+            })
             .join(" ") || "<i>Got 'em all! Complete collection! 🎉</i>";
 
         // --- USER ACCUMULATED TIMELINE CHART (Daily) ---
@@ -702,7 +870,8 @@
         });
 
         // --- USER HOURLY TIMELINE CHART (Last 24 Hours) ---
-        const userHourlyTimeline = channelStats.hourly_timeline || {};
+        const userHourlyTimeline =
+          channelStats.hourly_timeline || channelStats.hourly_activations || {};
         const allUserSortedHours = Object.keys(userHourlyTimeline).sort();
         const sortedUserHours24 = allUserSortedHours.slice(-24);
         const userHourlyCounts = sortedUserHours24.map(
@@ -717,7 +886,7 @@
         userHourlyChartInstance = new Chart(ctxUserHourly, {
           type: "bar",
           data: {
-            labels: sortedUserHours24.map((h) => h.split(" ")[1]),
+            labels: sortedUserHours24.map((h) => h.split(" ")[1] || h),
             datasets: [
               {
                 label: "User Hourly Counts",

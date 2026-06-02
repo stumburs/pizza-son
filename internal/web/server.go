@@ -24,6 +24,7 @@ func (ws *WebService) Start() {
 	http.HandleFunc("/api/global", ws.handleGlobalStats)
 	http.HandleFunc("/api/channel", ws.handleChannelStats)
 	http.HandleFunc("/api/user", ws.handleUserStats)
+	http.HandleFunc("/api/emotes", ws.handleChannelEmotes)
 
 	log.Printf("[Web] Starting local dashboard on http://localhost%s/\n", ws.port)
 	go func() {
@@ -168,4 +169,22 @@ func (ws *WebService) handleUserStats(w http.ResponseWriter, r *http.Request) {
 		"global_total": globalTotal,
 		"channels":     channelBreakdown,
 	})
+}
+
+func (ws *WebService) handleChannelEmotes(w http.ResponseWriter, r *http.Request) {
+	// Extract the channel name from the URL query parameters (e.g., /api/emotes?channel=pizza_tm)
+	channel := r.URL.Query().Get("channel")
+	if channel == "" {
+		http.Error(w, "Missing channel parameter", http.StatusBadRequest)
+		return
+	}
+
+	// fetch the emotes from your SevenTVService
+	emotes := services.SevenTVServiceInstance.GetEmotes(channel)
+
+	// set the headers so the browser knows it's getting JSON data
+	w.Header().Set("Content-Type", "application/json")
+
+	// encode the slice of SevenTVEmote structs directly into the HTTP response stream
+	json.NewEncoder(w).Encode(emotes)
 }
