@@ -86,18 +86,17 @@ func init() {
 				finalMessage += " zaza"
 			}
 
+			if rand.Float64() < zazaChance {
+				finalMessage += " zazaL"
+			}
+
 			ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, finalMessage)
 
 			// lyser
 			if ctx.Message.Channel == "sir_lysergium" {
-				// goldenzazabert
-				if finalMessage == "goldenzazabert" {
-					ctx.Client.Say(ctx.Message.Channel, fmt.Sprintf("oda %s got a goldenzazabert oda !!! omg ur so cool BigDog oda", ctx.Message.User.DisplayName))
-				}
-
-				// goldenzazabert zaza
-				if finalMessage == "goldenzazabert zaza" {
-					ctx.Client.Say(ctx.Message.Channel, fmt.Sprintf("dinkDonk oda Banger oh hell nah, %s got a goldenzazabert zaza !!! (ur VIP now) ABSOLUTEMUPPET oda dinkDonk ", ctx.Message.User.DisplayName))
+				// goldenzazabert things
+				if strings.Contains(finalMessage, "goldenzazabert") {
+					ctx.Client.Say(ctx.Message.Channel, fmt.Sprintf("oda %s got a %s oda !!! omg ur so cool BigDog oda", ctx.Message.User.DisplayName, finalMessage))
 				}
 
 				if strings.Contains(finalMessage, "Angine-de-Bertrine") {
