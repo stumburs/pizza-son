@@ -38,25 +38,33 @@ func (ws *WebService) handleGlobalStats(w http.ResponseWriter, r *http.Request) 
 	services.BertServiceInstance.Mu.RLock()
 	defer services.BertServiceInstance.Mu.RUnlock()
 
-	totalBerts := 0
-	userTotals := make(map[string]int)
-	bertTotals := make(map[string]int)
+	totalActivations := 0
+	globalUsers := make(map[string]int)
+	globalBerts := make(map[string]int)
+	globalHourly := make(map[string]int)
 
 	for _, chData := range services.BertServiceInstance.Data {
-		for user, uStats := range chData.UserStats {
-			totalBerts += uStats.TotalActivations
-			userTotals[user] += uStats.TotalActivations
-			for bert, count := range uStats.BertCounts {
-				bertTotals[bert] += count
+		for username, stats := range chData.UserStats {
+			totalActivations += stats.TotalActivations
+			globalUsers[username] += stats.TotalActivations
+
+			for bertName, record := range stats.BertRecords {
+				globalBerts[bertName] += record.Count
+			}
+
+			for hour, count := range stats.HourlyActivations {
+				globalHourly[hour] += count
 			}
 		}
 	}
 
-	json.NewEncoder(w).Encode(map[string]any{
-		"total_activations": totalBerts,
-		"users":             userTotals,
-		"berts":             bertTotals,
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"total_activations": totalActivations,
 		"channel_count":     len(services.BertServiceInstance.Data),
+		"users":             globalUsers,
+		"berts":             globalBerts,
+		"hourly_timeline":   globalHourly,
 	})
 }
 
@@ -84,10 +92,13 @@ func (ws *WebService) handleChannelStats(w http.ResponseWriter, r *http.Request)
 	for user, uStats := range data.UserStats {
 		totalBerts += uStats.TotalActivations
 		userTotals[user] = uStats.TotalActivations
-		for bert, count := range uStats.BertCounts {
-			bertTotals[bert] += count
+
+		for bert, record := range uStats.BertRecords {
+			bertTotals[bert] += record.Count
 		}
 	}
+
+	w.Header().Set("Content-Type", "application/json")
 
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"channel":           channel,
@@ -95,6 +106,8 @@ func (ws *WebService) handleChannelStats(w http.ResponseWriter, r *http.Request)
 		"active_berts":      data.Berts,
 		"users":             userTotals,
 		"berts":             bertTotals,
+		"daily_timeline":    data.DailyActivations,
+		"hourly_timeline":   data.HourlyActivations,
 	})
 }
 
@@ -110,7 +123,7 @@ func (ws *WebService) handleUserStats(w http.ResponseWriter, r *http.Request) {
 	defer services.BertServiceInstance.Mu.RUnlock()
 
 	globalTotal := 0
-	channelBreakdown := make(map[string]interface{})
+	channelBreakdown := make(map[string]any)
 
 	// loop through all channels to see where this user exists
 	for chName, chData := range services.BertServiceInstance.Data {
@@ -118,20 +131,28 @@ func (ws *WebService) handleUserStats(w http.ResponseWriter, r *http.Request) {
 			globalTotal += stats.TotalActivations
 
 			// calculate missing/collected for this specific channel
-			collected := make(map[string]int)
+			collected := make(map[string]any)
 			var missing []string
 			for _, b := range chData.Berts {
-				if count, exists := stats.BertCounts[b]; exists && count > 0 {
-					collected[b] = count
+				if record, exists := stats.BertRecords[b]; exists && record.Count > 0 {
+					collected[b] = map[string]any{
+						"count":      record.Count,
+						"zaza_count": record.ZazaCount,
+						"first_seen": record.FirstSeen,
+						"last_seen":  record.LastSeen,
+					}
 				} else {
 					missing = append(missing, b)
 				}
 			}
 
-			channelBreakdown[chName] = map[string]interface{}{
-				"total":     stats.TotalActivations,
-				"collected": collected,
-				"missing":   missing,
+			channelBreakdown[chName] = map[string]any{
+				"total":           stats.TotalActivations,
+				"total_zazas":     stats.TotalZazas,
+				"daily_timeline":  stats.DailyActivations, // feeds the Chart.js timeline
+				"hourly_timeline": stats.HourlyActivations,
+				"collected":       collected,
+				"missing":         missing,
 			}
 		}
 	}
@@ -141,6 +162,7 @@ func (ws *WebService) handleUserStats(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"username":     user,
 		"global_total": globalTotal,

@@ -79,16 +79,21 @@ func init() {
 				return false
 			}
 
-			services.BertServiceInstance.RegisterActivation(ctx.Message.Channel, ctx.Message.User.Name, baseResponse)
-
 			finalMessage := baseResponse
+
+			var isZazaRoll bool = false
+
 			if rand.Float64() < zazaChance {
 				finalMessage += " zaza"
+				isZazaRoll = true
 			}
 
 			if rand.Float64() < zazaChance {
 				finalMessage += " zazaL"
+				isZazaRoll = true
 			}
+
+			services.BertServiceInstance.RegisterActivation(ctx.Message.Channel, ctx.Message.User.Name, baseResponse, isZazaRoll)
 
 			ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, finalMessage)
 

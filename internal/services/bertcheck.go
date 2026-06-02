@@ -7,16 +7,30 @@ import (
 	"path/filepath"
 	"slices"
 	"sync"
+	"time"
 )
 
+type BertRecord struct {
+	Count     int       `json:"count"`
+	ZazaCount int       `json:"zaza_count"`
+	FirstSeen time.Time `json:"first_seen"`
+	LastSeen  time.Time `json:"last_seen"`
+}
+
 type UserStats struct {
-	TotalActivations int            `json:"total"`
-	BertCounts       map[string]int `json:"bert_counts"`
+	TotalActivations  int                   `json:"total"`
+	TotalZazas        int                   `json:"total_zazas"`
+	BertRecords       map[string]BertRecord `json:"bert_records"`
+	DailyActivations  map[string]int        `json:"daily_activations"`
+	HourlyActivations map[string]int        `json:"hourly_activations"`
+	BertCounts        map[string]int        `json:"bert_counts,omitempty"` // legacy support for migrating
 }
 
 type ChannelData struct {
-	Berts     []string             `json:"berts"`
-	UserStats map[string]UserStats `json:"user_stats"`
+	Berts             []string             `json:"berts"`
+	UserStats         map[string]UserStats `json:"user_stats"`
+	DailyActivations  map[string]int       `json:"daily_activations"`
+	HourlyActivations map[string]int       `json:"hourly_activations"`
 }
 
 type BertService struct {
@@ -57,19 +71,59 @@ func (s *BertService) GetBerts(channel string) []string {
 	return []string{}
 }
 
-func (s *BertService) RegisterActivation(channel, user, bert string) {
+func (s *BertService) RegisterActivation(channel, user, bert string, isZaza bool) {
 	s.Mu.Lock()
 	defer s.Mu.Unlock()
 	s.ensureChannel(channel)
 
-	stats := s.Data[channel].UserStats[user]
-	if stats.BertCounts == nil {
-		stats.BertCounts = make(map[string]int)
+	now := time.Now()
+	dateStr := now.Format("2006-01-02")
+	hourStr := now.Format("2006-01-02 15:00")
+
+	chData := s.Data[channel]
+
+	// log channel timeline
+	if chData.DailyActivations == nil {
+		chData.DailyActivations = make(map[string]int)
+	}
+	chData.DailyActivations[dateStr]++
+
+	if chData.HourlyActivations == nil {
+		chData.HourlyActivations = make(map[string]int)
+	}
+	chData.HourlyActivations[hourStr]++
+
+	stats := chData.UserStats[user]
+	if stats.BertRecords == nil {
+		stats.BertRecords = make(map[string]BertRecord)
+	}
+	if stats.DailyActivations == nil {
+		stats.DailyActivations = make(map[string]int)
+	}
+	if stats.HourlyActivations == nil {
+		stats.HourlyActivations = make(map[string]int)
 	}
 
+	// fetch or initialize item record
+	record := stats.BertRecords[bert]
+	if record.Count == 0 {
+		record.FirstSeen = now
+	}
+	record.Count++
+	record.LastSeen = now
+
+	if isZaza {
+		record.ZazaCount++
+		stats.TotalZazas++
+	}
+
+	// save updates back to state
+	stats.BertRecords[bert] = record
 	stats.TotalActivations++
-	stats.BertCounts[bert]++
-	s.Data[channel].UserStats[user] = stats
+	stats.DailyActivations[dateStr]++
+	stats.HourlyActivations[hourStr]++
+
+	chData.UserStats[user] = stats
 	s.save()
 }
 
@@ -122,9 +176,9 @@ func (s *BertService) GetUserStats(channel, user string) BertStats {
 	// channel total only counts currently active berts
 	channelTotal := 0
 	for _, uStats := range data.UserStats {
-		for bert, count := range uStats.BertCounts {
+		for bert, record := range uStats.BertRecords {
 			if activeBerts[bert] {
-				channelTotal += count
+				channelTotal += record.Count
 			}
 		}
 	}
@@ -141,14 +195,14 @@ func (s *BertService) GetUserStats(channel, user string) BertStats {
 	activeTotal := 0
 	bestBert, max := "", -1
 	collectedBerts := 0
-	for bert, count := range stats.BertCounts {
+	for bert, record := range stats.BertRecords {
 		if !activeBerts[bert] {
 			continue
 		}
-		activeTotal += count
+		activeTotal += record.Count
 		collectedBerts++
-		if count > max {
-			max = count
+		if record.Count > max {
+			max = record.Count
 			bestBert = bert
 		}
 	}
@@ -166,8 +220,10 @@ func (s *BertService) GetUserStats(channel, user string) BertStats {
 func (s *BertService) ensureChannel(channel string) {
 	if _, ok := s.Data[channel]; !ok {
 		s.Data[channel] = &ChannelData{
-			Berts:     []string{},
-			UserStats: make(map[string]UserStats),
+			Berts:             []string{},
+			UserStats:         make(map[string]UserStats),
+			DailyActivations:  make(map[string]int),
+			HourlyActivations: make(map[string]int),
 		}
 	}
 }
@@ -180,7 +236,43 @@ func (s *BertService) save() {
 
 func (s *BertService) load() {
 	b, err := os.ReadFile(s.path)
-	if err == nil {
-		_ = json.Unmarshal(b, &s.Data)
+	if err != nil {
+		return
+	}
+	_ = json.Unmarshal(b, &s.Data)
+
+	// automated migrating
+	migrated := false
+	now := time.Now()
+
+	for chName, chData := range s.Data {
+		for username, stats := range chData.UserStats {
+			// check if contains legacy counter maps
+			if len(stats.BertCounts) > 0 {
+				if stats.BertRecords == nil {
+					stats.BertRecords = make(map[string]BertRecord)
+				}
+
+				for legacyBert, count := range stats.BertCounts {
+					stats.BertRecords[legacyBert] = BertRecord{
+						Count:     count,
+						ZazaCount: 0,
+						FirstSeen: now,
+						LastSeen:  now,
+					}
+				}
+
+				// nullify legacy fields
+				stats.BertCounts = nil
+				chData.UserStats[username] = stats
+				migrated = true
+			}
+		}
+		s.Data[chName] = chData
+	}
+
+	if migrated {
+		log.Println("[Bert] Legacy database records successfully transformed to new timeline format!")
+		s.save()
 	}
 }
