@@ -156,7 +156,28 @@ func init() {
 			{Input: "!bertstats", Output: "View all bert stats at https://bertstats.stumburs.id.lv"},
 		},
 		Handler: func(ctx bot.CommandContext) {
-			ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "View all bert stats at https://bertstats.stumburs.id.lv")
+			target := ctx.Message.User.Name
+			args := strings.Fields(ctx.Message.Text)
+			if len(args) > 1 {
+				target = strings.ToLower(strings.TrimPrefix(args[1], target))
+			}
+
+			stats := services.BertServiceInstance.GetUserStats(ctx.Message.Channel, target)
+			if stats.TotalBertchecks == 0 {
+				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, fmt.Sprintf("%s has never bertchecked smh based berters here: https://bertstats.stumburs.id.lv", target))
+				return
+			}
+
+			ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, fmt.Sprintf(
+				"%s: %d total berts. Most common: %s (%dx). %d/%d collected. %d berts by all chatters. View all bert stats at https://bertstats.stumburs.id.lv",
+				target,
+				stats.TotalBertchecks,
+				stats.MostCommonBert,
+				stats.MostCommonCount,
+				stats.BertsCollectedOutOfAll,
+				stats.TotalBerts,
+				stats.ChannelTotalBertchecks,
+			))
 		},
 	})
 
