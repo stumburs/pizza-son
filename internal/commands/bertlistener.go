@@ -2,6 +2,7 @@ package commands
 
 import (
 	"fmt"
+	"log"
 	"math/rand/v2"
 	"pizza-son/internal/bot"
 	"pizza-son/internal/models"
@@ -136,9 +137,21 @@ func init() {
 			case "add":
 				services.BertServiceInstance.AddBert(ctx.Message.Channel, name)
 				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, fmt.Sprintf("Added %s to the bert log", name))
+				emoteCount, err := services.SevenTVServiceInstance.Fetch(ctx.Message.Channel)
+				if err != nil {
+					log.Printf("[!bertcheck add] Failed to update emote set for %s: %s", ctx.Message.Channel, err)
+				} else {
+					log.Printf("[!bertcheck add] Updated emote set for %s: %d emotes", ctx.Message.Channel, emoteCount)
+				}
 			case "remove":
 				if services.BertServiceInstance.RemoveBert(ctx.Message.Channel, name) {
 					ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, fmt.Sprintf("Removed %s from the bert log", name))
+					emoteCount, err := services.SevenTVServiceInstance.Fetch(ctx.Message.Channel)
+					if err != nil {
+						log.Printf("[!bertcheck remove] Failed to update emote set for %s: %s", ctx.Message.Channel, err)
+					} else {
+						log.Printf("[!bertcheck remove] Updated emote set for %s: %d emotes", ctx.Message.Channel, emoteCount)
+					}
 				} else {
 					ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, fmt.Sprintf("Could not find %s in the bert log", name))
 				}
