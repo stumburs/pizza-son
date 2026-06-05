@@ -54,6 +54,23 @@ func (b *Bot) setupHandlers() {
 		msg := twitchMessageToMessage(message)
 		b.registry.Dispatch(&TwitchSender{bot: b}, msg)
 	})
+
+	// Auto raid shoutout (disabled for now to not take human jobs)
+	// b.client.OnUserNoticeMessage(func(message twitch.UserNoticeMessage) {
+	// 	if message.MsgID == "raid" {
+	// 		raiderUsername := message.MsgParams["msg-param-login"]
+	// 		if raiderUsername == "" {
+	// 			raiderUsername = message.User.Name // fallback
+	// 		}
+
+	// 		if raiderUsername != "" {
+	// 			log.Printf("[Bot] Channel #%s was raided by %s! Shouting out...", message.Channel, raiderUsername)
+
+	// 			go services.TwitchServiceInstance.Shoutout(message.Channel, raiderUsername)
+	// 		}
+	// 	}
+	// })
+
 	b.client.OnConnect(func() {
 		log.Println("[Bot] Connected")
 		for _, ch := range b.channels {

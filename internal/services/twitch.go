@@ -273,3 +273,36 @@ func (s *TwitchService) Ban(channel, userID string, reason string) {
 		log.Printf("[Twitch] Failed to ban %s: %v %s", userID, err, resp.ErrorMessage)
 	}
 }
+
+func (s *TwitchService) Shoutout(channel, raiderUsername string) {
+	broadcasterID, err := s.GetUserID(channel)
+	if err != nil {
+		log.Printf("[Twitch] Failed to resolve broadcaster ID for %s: %v", channel, err)
+		return
+	}
+
+	botID, err := s.GetUserID(config.Get().Twitch.User)
+	if err != nil {
+		log.Printf("[Twitch] Failed to resolve bot user ID: %v", err)
+		return
+	}
+
+	raiderID, err := s.GetUserID(raiderUsername)
+	if err != nil {
+		log.Printf("[Twitch] Failed to resolve raider ID for %s: %v", raiderUsername, err)
+		return
+	}
+
+	resp, err := s.client.SendShoutout(&helix.SendShoutoutParams{
+		FromBroadcasterID: broadcasterID,
+		ToBroadcasterID:   raiderID,
+		ModeratorID:       botID,
+	})
+
+	if err != nil || resp.ErrorMessage != "" {
+		log.Printf("[Twitch] Failed to execute shoutout for %s: %v %s", raiderUsername, err, resp.ErrorMessage)
+		return
+	}
+
+	log.Printf("[Twitch] Auto-shoutout successfully triggered for %s in channel #%s", raiderUsername, channel)
+}
