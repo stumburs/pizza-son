@@ -25,6 +25,7 @@ func (ws *WebService) Start() {
 	http.HandleFunc("/api/channel", ws.handleChannelStats)
 	http.HandleFunc("/api/user", ws.handleUserStats)
 	http.HandleFunc("/api/emotes", ws.handleChannelEmotes)
+	http.HandleFunc("/api/live", services.LiveFeedInstance.HandleLiveFeed)
 
 	log.Printf("[Web] Starting local dashboard on http://localhost%s/\n", ws.port)
 	go func() {

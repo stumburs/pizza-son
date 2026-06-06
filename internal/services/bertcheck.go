@@ -124,6 +124,14 @@ func (s *BertService) RegisterActivation(channel, user, bert string, isZaza bool
 	stats.HourlyActivations[hourStr]++
 
 	chData.UserStats[user] = stats
+
+	// look up emote ID and broadcast
+	var emoteID string
+	if SevenTVServiceInstance != nil {
+		emoteID = SevenTVServiceInstance.GetEmoteID(channel, bert)
+	}
+	LiveFeedInstance.Broadcast(user, channel, bert, emoteID)
+
 	s.save()
 }
 

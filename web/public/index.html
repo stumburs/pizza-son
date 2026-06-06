@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>bert stats</title>
+    <title>Bert Stats</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
       body {
@@ -11,11 +11,88 @@
         background: #0e0e10;
         color: #efeff1;
         padding: 20px;
+        margin: 0;
       }
-      .container {
-        max-width: 950px;
+
+      /* Main Layout Flexbox to account for the Sidebar */
+      .main-layout {
+        display: flex;
+        max-width: 1300px;
         margin: auto;
+        gap: 20px;
+        padding: 10px;
       }
+
+      .container {
+        flex: 1;
+        min-width: 0; /* Prevents chart blowout bugs inside flex containers */
+      }
+
+      /* ⚡ Live Ticker Sidebar Component Styles */
+      .sidebar {
+        width: 320px;
+        background: #18181b;
+        border: 1px solid #303032;
+        border-radius: 8px;
+        padding: 15px;
+        height: calc(100vh - 60px);
+        position: sticky;
+        top: 20px;
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+      }
+      .sidebar h3 {
+        margin-top: 0;
+        margin-bottom: 12px;
+        color: #bf94ff;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .feed-list {
+        overflow-y: auto;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding-right: 4px;
+      }
+      /* Custom Ticker Scrollbar styling */
+      .feed-list::-webkit-scrollbar {
+        width: 6px;
+      }
+      .feed-list::-webkit-scrollbar-thumb {
+        background: #3a3a3d;
+        border-radius: 3px;
+      }
+      .feed-empty {
+        color: #adadb8;
+        font-style: italic;
+        text-align: center;
+        margin-top: 20px;
+      }
+      .feed-item {
+        background: #1f1f23;
+        padding: 10px;
+        border-radius: 6px;
+        border-left: 4px solid #9146ff;
+        font-size: 0.9em;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        animation: slideInFromTop 0.25s ease-out forwards;
+      }
+
+      @keyframes slideInFromTop {
+        from {
+          opacity: 0;
+          transform: translateY(-12px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
       .tabs {
         display: flex;
         gap: 10px;
@@ -116,7 +193,6 @@
         border-color: #303032;
       }
 
-      /* Emote Layout wrapper */
       .emote-wrapper {
         position: relative;
         display: inline-block;
@@ -124,8 +200,6 @@
         vertical-align: middle;
         cursor: pointer;
       }
-
-      /* Emote Image */
       .twitch-emote {
         height: 32px;
         object-fit: contain;
@@ -135,8 +209,6 @@
       .emote-wrapper:hover .twitch-emote {
         transform: scale(1.15);
       }
-
-      /* Custom Tooltip */
       .emote-tooltip {
         visibility: hidden;
         position: absolute;
@@ -171,176 +243,217 @@
         visibility: visible;
         opacity: 1;
       }
+
+      /* Clickable name links */
+      .link-name {
+        cursor: pointer;
+        color: inherit;
+        text-decoration: none;
+        transition: color 0.15s ease;
+      }
+      .link-name:hover {
+        color: #bf94ff;
+        text-decoration: underline;
+      }
+      .link-channel {
+        cursor: pointer;
+        color: #adadb8;
+        font-size: 0.8em;
+        font-weight: bold;
+        text-decoration: none;
+        transition: color 0.15s ease;
+      }
+      .link-channel:hover {
+        color: #bf94ff;
+        text-decoration: underline;
+      }
+
+      /* Responsive adaptation for laptops/mobiles */
+      @media (max-width: 1024px) {
+        .main-layout {
+          flex-direction: column;
+        }
+        .sidebar {
+          width: 100%;
+          height: 350px;
+          position: relative;
+          top: 0;
+        }
+      }
     </style>
   </head>
   <body>
-    <div class="container">
-      <h1>Bert Analytics</h1>
+    <div class="main-layout">
+      <div class="container">
+        <h1>Bert Stats</h1>
 
-      <div class="tabs">
-        <button
-          class="tab active"
-          onclick="
-            switchTab('global', this);
-            loadGlobal();
-          "
-        >
-          🌎 Global
-        </button>
-        <button class="tab" onclick="switchTab('channel', this)">
-          📺 Channel
-        </button>
-        <button class="tab" onclick="switchTab('user', this)">👤 User</button>
-      </div>
-
-      <div id="global" class="panel active">
-        <h2>Global Stats</h2>
-        <p>
-          Total Berts Triggered: <strong id="gTotal">0</strong> across
-          <span id="gChans">0</span> channels.
-        </p>
-        <div class="grid">
-          <div class="box">
-            <h3>🏆 Top Users</h3>
-            <div id="gUsers">Loading...</div>
-          </div>
-          <div class="box">
-            <h3>🔥 Most Popular Berts</h3>
-            <div id="gBerts">Loading...</div>
-          </div>
-        </div>
-        <div class="chart-container">
-          <h3>📊 Global Metrics Distribution</h3>
-          <canvas
-            id="globalChart"
-            style="max-height: 280px; width: 100%"
-          ></canvas>
+        <div class="tabs">
+          <button
+            class="tab active"
+            onclick="
+              switchTab('global', this);
+              loadGlobal();
+            "
+          >
+            🌎 Global
+          </button>
+          <button class="tab" onclick="switchTab('channel', this)">
+            📺 Channel
+          </button>
+          <button class="tab" onclick="switchTab('user', this)">👤 User</button>
         </div>
 
-        <div class="full-width-chart">
-          <h3>📈 Total Global Progression (Hourly Grain)</h3>
-          <canvas
-            id="globalHourlyCumulativeChart"
-            style="max-height: 260px; width: 100%"
-          ></canvas>
-        </div>
-      </div>
-
-      <div id="channel" class="panel">
-        <h2>Channel Lookup</h2>
-        <input type="text" id="chInput" placeholder="Enter channel name..." />
-        <button onclick="loadChannel()">Search</button>
-
-        <div id="chResults" style="display: none; margin-top: 20px">
-          <h3 id="chTitle"></h3>
-          <p>Total Berts in channel: <strong id="chTotal">0</strong></p>
-          <div class="grid">
-            <div class="box">
-              <h3>🏆 Top Users Here</h3>
-              <div id="chUsers"></div>
-            </div>
-            <div class="box">
-              <h3>Active Berts List</h3>
-              <div id="chBertsList"></div>
-            </div>
-          </div>
-
-          <div class="grid" style="margin-top: 20px">
-            <div class="box" style="padding: 15px; background: #1f1f23">
-              <h3>📈 Channel Daily Timeline</h3>
-              <canvas
-                id="channelChart"
-                style="max-height: 220px; width: 100%"
-              ></canvas>
-            </div>
-            <div class="box" style="padding: 15px; background: #1f1f23">
-              <h3>🕒 Channel Recent Hourly Activity (Last 24h)</h3>
-              <canvas
-                id="channelHourlyChart"
-                style="max-height: 220px; width: 100%"
-              ></canvas>
-            </div>
-          </div>
-
-          <div class="full-width-chart">
-            <h3>📈 Total Channel Progression (Hourly Grain)</h3>
-            <canvas
-              id="channelHourlyCumulativeChart"
-              style="max-height: 260px; width: 100%"
-            ></canvas>
-          </div>
-        </div>
-      </div>
-
-      <div id="user" class="panel">
-        <h2>User Lookup</h2>
-        <input type="text" id="uInput" placeholder="Enter username..." />
-        <button onclick="loadUser()">Search</button>
-
-        <div id="uResults" style="display: none; margin-top: 20px">
-          <h3 id="uTitle"></h3>
+        <div id="global" class="panel active">
+          <h2>Global Stats</h2>
           <p>
-            Global Berts Collected (All Channels):
-            <strong id="uTotal">0</strong>
+            Total Berts Checked: <strong id="gTotal">0</strong> across
+            <span id="gChans">0</span> channels.
           </p>
-
-          <div style="margin: 15px 0">
-            <label
-              for="uChannelSelect"
-              style="color: #bf94ff; font-weight: bold"
-              >Select Channel:
-            </label>
-            <select
-              id="uChannelSelect"
-              onchange="updateUserChannelView()"
-              style="
-                padding: 8px;
-                border-radius: 5px;
-                background: #1f1f23;
-                color: white;
-                border: 1px solid #303032;
-                min-width: 150px;
-              "
-            ></select>
-            <span style="margin-left: 10px; color: #adadb8"
-              >Channel activations: <strong id="uChannelTotal">0</strong></span
-            >
-          </div>
-
           <div class="grid">
             <div class="box">
-              <h3>✅ Collected Here</h3>
-              <div id="uCollected"></div>
+              <h3>🏆 Top Berters</h3>
+              <div id="gUsers">Loading...</div>
             </div>
             <div class="box">
-              <h3>❌ Missing Here</h3>
-              <div id="uMissing"></div>
+              <h3>🔥 Most Popular Berts</h3>
+              <div id="gBerts">Loading...</div>
             </div>
           </div>
-
-          <div class="grid" style="margin-top: 20px">
-            <div class="box" style="padding: 15px; background: #1f1f23">
-              <h3>📈 Cumulative Collection Timeline (Daily)</h3>
-              <canvas
-                id="userChart"
-                style="max-height: 220px; width: 100%"
-              ></canvas>
-            </div>
-            <div class="box" style="padding: 15px; background: #1f1f23">
-              <h3>🕒 User Recent Hourly Activity (Last 24h)</h3>
-              <canvas
-                id="userHourlyChart"
-                style="max-height: 220px; width: 100%"
-              ></canvas>
-            </div>
-          </div>
-
-          <div class="full-width-chart">
-            <h3>📈 Total User Progression (Hourly Grain)</h3>
+          <div class="chart-container">
+            <h3>📊 Global Top Berts</h3>
             <canvas
-              id="userHourlyCumulativeChart"
+              id="globalChart"
+              style="max-height: 280px; width: 100%"
+            ></canvas>
+          </div>
+          <div class="full-width-chart">
+            <h3>📈 Total Berts Globally (hourly updates)</h3>
+            <canvas
+              id="globalHourlyCumulativeChart"
               style="max-height: 260px; width: 100%"
             ></canvas>
+          </div>
+        </div>
+
+        <div id="channel" class="panel">
+          <h2>Channel Lookup</h2>
+          <input type="text" id="chInput" placeholder="Enter channel name..." />
+          <button onclick="loadChannel()">Search</button>
+
+          <div id="chResults" style="display: none; margin-top: 20px">
+            <h3 id="chTitle"></h3>
+            <p>Total Berts in channel: <strong id="chTotal">0</strong></p>
+            <div class="grid">
+              <div class="box">
+                <h3>🏆 Top Berters Here</h3>
+                <div id="chUsers"></div>
+              </div>
+              <div class="box">
+                <h3>Channel Bert List</h3>
+                <div id="chBertsList"></div>
+              </div>
+            </div>
+            <div class="grid" style="margin-top: 20px">
+              <div class="box">
+                <h3>📈 Channel Daily Timeline</h3>
+                <canvas
+                  id="channelChart"
+                  style="max-height: 220px; width: 100%"
+                ></canvas>
+              </div>
+              <div class="box">
+                <h3>🕒 Last 24h Activity</h3>
+                <canvas
+                  id="channelHourlyChart"
+                  style="max-height: 220px; width: 100%"
+                ></canvas>
+              </div>
+            </div>
+            <div class="full-width-chart">
+              <h3>📈 Total Berts (hourly)</h3>
+              <canvas
+                id="channelHourlyCumulativeChart"
+                style="max-height: 260px; width: 100%"
+              ></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div id="user" class="panel">
+          <h2>User Lookup</h2>
+          <input type="text" id="uInput" placeholder="Enter username..." />
+          <button onclick="loadUser()">Search</button>
+
+          <div id="uResults" style="display: none; margin-top: 20px">
+            <h3 id="uTitle"></h3>
+            <p>
+              Global Berts Checked (All Channels):
+              <strong id="uTotal">0</strong>
+            </p>
+            <div style="margin: 15px 0">
+              <label
+                for="uChannelSelect"
+                style="color: #bf94ff; font-weight: bold"
+                >Select Channel:
+              </label>
+              <select
+                id="uChannelSelect"
+                onchange="updateUserChannelView()"
+                style="
+                  padding: 8px;
+                  border-radius: 5px;
+                  background: #1f1f23;
+                  color: white;
+                  border: 1px solid #303032;
+                  min-width: 150px;
+                "
+              ></select>
+              <span style="margin-left: 10px; color: #adadb8"
+                >Channel Checks: <strong id="uChannelTotal">0</strong></span
+              >
+            </div>
+            <div class="grid">
+              <div class="box">
+                <h3>✅ Collected Here</h3>
+                <div id="uCollected"></div>
+              </div>
+              <div class="box">
+                <h3>❌ Missing Here</h3>
+                <div id="uMissing"></div>
+              </div>
+            </div>
+            <div class="grid" style="margin-top: 20px">
+              <div class="box">
+                <h3>📈 Total Berts (daily)</h3>
+                <canvas
+                  id="userChart"
+                  style="max-height: 220px; width: 100%"
+                ></canvas>
+              </div>
+              <div class="box">
+                <h3>🕒 Last 24h Activity</h3>
+                <canvas
+                  id="userHourlyChart"
+                  style="max-height: 220px; width: 100%"
+                ></canvas>
+              </div>
+            </div>
+            <div class="full-width-chart">
+              <h3>📈 Total Berts (hourly)</h3>
+              <canvas
+                id="userHourlyCumulativeChart"
+                style="max-height: 260px; width: 100%"
+              ></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar">
+        <h3>⚡ Live Bert Feed</h3>
+        <div id="liveFeedList" class="feed-list">
+          <div class="feed-empty" id="feedEmptyText">
+            Waiting for bertchecks...
           </div>
         </div>
       </div>
@@ -355,6 +468,9 @@
       let userChartInstance = null;
       let userHourlyChartInstance = null;
       let userHourlyCumulativeChartInstance = null;
+
+      // Memory cache map across channel boundaries to dynamically populate sidebar images
+      window.globalEmoteMemoryCache = {};
 
       function switchTab(tabId, btn) {
         document
@@ -378,7 +494,26 @@
         return typeof value === "number" ? value : 0;
       }
 
-      function getTopHTML(obj, limit, isGold = false) {
+      // Navigate to a tab and auto-load a channel or user by name
+      function navigateTo(type, name) {
+        if (type === "channel") {
+          const tab = [...document.querySelectorAll(".tab")].find((t) =>
+            t.textContent.includes("Channel"),
+          );
+          switchTab("channel", tab);
+          document.getElementById("chInput").value = name;
+          loadChannel();
+        } else if (type === "user") {
+          const tab = [...document.querySelectorAll(".tab")].find((t) =>
+            t.textContent.includes("User"),
+          );
+          switchTab("user", tab);
+          document.getElementById("uInput").value = name;
+          loadUser();
+        }
+      }
+
+      function getTopHTML(obj, limit, isGold = false, nameType = "user") {
         if (!obj) return "<i>None</i>";
         let sorted = Object.entries(obj)
           .map(([name, val]) => [name, getCountValue(val)])
@@ -389,9 +524,72 @@
         return sorted
           .map(
             ([name, count], i) =>
-              `<span class="badge ${isGold && i === 0 ? "gold" : ""}">#${i + 1} ${name} <small>x${count}</small></span>`,
+              `<span class="badge ${isGold && i === 0 ? "gold" : ""}">#${i + 1} <span class="link-name" onclick="navigateTo('${nameType}', '${name}')">${name}</span> <small>x${count}</small></span>`,
           )
           .join("<br>");
+      }
+
+      // Initialize SSE listener pipeline natively
+      function connectLiveFeed() {
+        const eventSource = new EventSource("/api/live");
+
+        eventSource.onmessage = function (event) {
+          try {
+            const data = JSON.parse(event.data);
+
+            // Remove empty default state placeholder text
+            const emptyLabel = document.getElementById("feedEmptyText");
+            if (emptyLabel) emptyLabel.remove();
+
+            const feedList = document.getElementById("liveFeedList");
+            const item = document.createElement("div");
+            item.className = "feed-item";
+
+            // Resolve 7TV graphic dynamically (Uses event payload, fallback to memory cache lookup)
+            let emoteId =
+              data.emote_id || window.globalEmoteMemoryCache[data.bert];
+            let bertRender = `<span class="badge">${data.bert}</span>`;
+
+            if (emoteId) {
+              bertRender = `
+                <div class="emote-wrapper">
+                  <img src="https://cdn.7tv.app/emote/${emoteId}/2x.webp" alt="${data.bert}" class="twitch-emote" />
+                  <span class="emote-tooltip">${data.bert}</span>
+                </div>`;
+            }
+
+            const timestamp = new Date().toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+              second: "2-digit",
+            });
+
+            item.innerHTML = `
+              <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                <span class="link-channel" onclick="navigateTo('channel', '${data.channel.toLowerCase()}')">#${data.channel.toLowerCase()}</span>
+                <span style="color: #adadb8; font-size: 0.8em;">${timestamp}</span>
+              </div>
+              <div>
+                <strong style="color: #bf94ff;" class="link-name" onclick="navigateTo('user', '${data.username}')">${data.username}</strong> ${bertRender}
+              </div>
+            `;
+
+            feedList.insertBefore(item, feedList.firstChild);
+
+            // Ticker bounds protection: Keep only the 25 freshest events in memory buffer
+            while (feedList.children.length > 25) {
+              feedList.removeChild(feedList.lastChild);
+            }
+          } catch (e) {
+            console.error("Failed to digest live frame event payload:", e);
+          }
+        };
+
+        eventSource.onerror = function () {
+          console.warn(
+            "Live stream stream context disconnected. Reconnecting backend channel...",
+          );
+        };
       }
 
       async function loadGlobal() {
@@ -405,11 +603,13 @@
           data.users,
           10,
           true,
+          "user",
         );
         document.getElementById("gBerts").innerHTML = getTopHTML(
           data.berts,
           10,
           true,
+          "bert",
         );
 
         const sortedBerts = Object.entries(data.berts || {})
@@ -417,133 +617,88 @@
           .sort((a, b) => b[1] - a[1])
           .slice(0, 7);
 
-        const labels = sortedBerts.map((b) => b[0]);
-        const counts = sortedBerts.map((b) => b[1]);
-
         if (globalChartInstance) globalChartInstance.destroy();
 
-        const ctx = document.getElementById("globalChart").getContext("2d");
-        globalChartInstance = new Chart(ctx, {
-          type: "bar",
-          data: {
-            labels: labels,
-            datasets: [
-              {
-                label: "Total Drops Globally",
-                data: counts,
-                backgroundColor: "rgba(145, 70, 255, 0.6)",
-                borderColor: "#9146ff",
-                borderWidth: 1,
-                borderRadius: 4,
+        globalChartInstance = new Chart(
+          document.getElementById("globalChart").getContext("2d"),
+          {
+            type: "bar",
+            data: {
+              labels: sortedBerts.map((b) => b[0]),
+              datasets: [
+                {
+                  label: "Total Drops Globally",
+                  data: sortedBerts.map((b) => b[1]),
+                  backgroundColor: "rgba(145, 70, 255, 0.6)",
+                  borderColor: "#9146ff",
+                  borderWidth: 1,
+                  borderRadius: 4,
+                },
+              ],
+            },
+            options: {
+              indexAxis: "y",
+              responsive: true,
+              plugins: { legend: { display: false } },
+              scales: {
+                x: {
+                  grid: { color: "#303032" },
+                  ticks: { color: "#adadb8", stepSize: 1 },
+                },
+                y: { grid: { display: false }, ticks: { color: "#adadb8" } },
               },
-            ],
-          },
-          options: {
-            indexAxis: "y",
-            responsive: true,
-            plugins: { legend: { display: false } },
-            scales: {
-              x: {
-                grid: { color: "#303032" },
-                ticks: { color: "#adadb8", stepSize: 1 },
-              },
-              y: { grid: { display: false }, ticks: { color: "#adadb8" } },
             },
           },
-        });
+        );
 
-        // --- NEW: GLOBAL HOURLY CUMULATIVE PROGRESSION CHART ---
         const globalHourlyTimeline = data.hourly_timeline || {};
         const allGlobalSortedHours = Object.keys(globalHourlyTimeline).sort();
-
-        // Dynamically calculate the baseline offset for the global timeline
         const gHourlyTimelineSum = Object.values(globalHourlyTimeline).reduce(
           (sum, val) => sum + val,
           0,
         );
         let gRunningTotal = (data.total_activations || 0) - gHourlyTimelineSum;
 
-        const gCumulativeHourlyData = allGlobalSortedHours.map((hour) => {
-          gRunningTotal += globalHourlyTimeline[hour] || 0;
-          return gRunningTotal;
-        });
-
         if (globalHourlyCumulativeChartInstance)
           globalHourlyCumulativeChartInstance.destroy();
 
-        const ctxGlobalHourlyCum = document
-          .getElementById("globalHourlyCumulativeChart")
-          .getContext("2d");
-        globalHourlyCumulativeChartInstance = new Chart(ctxGlobalHourlyCum, {
-          type: "line",
-          data: {
-            labels: allGlobalSortedHours,
-            datasets: [
-              {
-                label: "Total Accumulated Berts",
-                data: gCumulativeHourlyData,
-                borderColor: "#9146ff",
-                backgroundColor: "rgba(145, 70, 255, 0.08)",
-                borderWidth: 2,
-                pointRadius: allGlobalSortedHours.length > 50 ? 0 : 2,
-                tension: 0.1,
-                fill: true,
-              },
-            ],
-          },
-          options: {
-            responsive: true,
-            plugins: { legend: { display: false } },
-            scales: {
-              x: {
-                grid: { color: "#222225" },
-                ticks: { color: "#adadb8", maxTicksLimit: 12 },
-              },
-              y: {
-                grid: { color: "#303032" },
-                ticks: { color: "#adadb8" },
+        globalHourlyCumulativeChartInstance = new Chart(
+          document
+            .getElementById("globalHourlyCumulativeChart")
+            .getContext("2d"),
+          {
+            type: "line",
+            data: {
+              labels: allGlobalSortedHours,
+              datasets: [
+                {
+                  label: "Total Accumulated Berts",
+                  data: allGlobalSortedHours.map((hour) => {
+                    gRunningTotal += globalHourlyTimeline[hour] || 0;
+                    return gRunningTotal;
+                  }),
+                  borderColor: "#9146ff",
+                  backgroundColor: "rgba(145, 70, 255, 0.08)",
+                  borderWidth: 2,
+                  pointRadius: allGlobalSortedHours.length > 50 ? 0 : 2,
+                  tension: 0.1,
+                  fill: true,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              plugins: { legend: { display: false } },
+              scales: {
+                x: {
+                  grid: { color: "#222225" },
+                  ticks: { color: "#adadb8", maxTicksLimit: 12 },
+                },
+                y: { grid: { color: "#303032" }, ticks: { color: "#adadb8" } },
               },
             },
           },
-        });
-      }
-
-      async function loadChannelEmotes(channelName) {
-        try {
-          const response = await fetch(`/api/emotes?channel=${channelName}`);
-
-          if (!response.ok) {
-            console.error("Failed to fetch emotes from server");
-            return;
-          }
-
-          const emotesData = await response.json();
-          const emotesContainer = document.getElementById("chBertsList");
-
-          if (!emotesData || emotesData.length === 0) {
-            emotesContainer.innerHTML =
-              "<i>No emotes found for this channel.</i>";
-            return;
-          }
-
-          emotesContainer.innerHTML = emotesData
-            .map((emote) => {
-              return `
-          <div class="emote-wrapper">
-            <img 
-              src="https://cdn.7tv.app/emote/${emote.id}/2x.webp" 
-              alt="${emote.name}" 
-              title="${emote.name}"
-              class="twitch-emote"
-            />
-            <span class="emote-tooltip">${emote.name}</span>
-          </div>
-        `;
-            })
-            .join(" ");
-        } catch (error) {
-          console.error("Network error fetching emotes:", error);
-        }
+        );
       }
 
       async function loadChannel() {
@@ -560,9 +715,9 @@
         try {
           const emoteRes = await fetch(`/api/emotes?channel=${name}`);
           if (emoteRes.ok) {
-            const emotesData = await emoteRes.json();
-            emotesData.forEach((emote) => {
-              emotesMap[emote.name] = emote.id;
+            (await emoteRes.json()).forEach((em) => {
+              emotesMap[em.name] = em.id;
+              window.globalEmoteMemoryCache[em.name] = em.id; // Store in universal global cache
             });
           }
         } catch (err) {
@@ -578,6 +733,7 @@
           data.users,
           10,
           true,
+          "user",
         );
 
         document.getElementById("chBertsList").innerHTML = (
@@ -585,97 +741,85 @@
         )
           .map((b) => {
             const emoteId = emotesMap[b];
-            if (emoteId) {
-              return `
-          <div class="emote-wrapper">
-            <img src="https://cdn.7tv.app/emote/${emoteId}/2x.webp" alt="${b}" class="twitch-emote" />
-            <span class="emote-tooltip">${b}</span>
-          </div>
-        `;
-            }
-            return `<span class="badge">${b}</span>`;
+            return emoteId
+              ? `<div class="emote-wrapper"><img src="https://cdn.7tv.app/emote/${emoteId}/2x.webp" alt="${b}" class="twitch-emote" /><span class="emote-tooltip">${b}</span></div>`
+              : `<span class="badge">${b}</span>`;
           })
           .join(" ");
 
-        // --- CHANNEL TIMELINE CHART ---
         const timeline = data.daily_activations || data.daily_timeline || {};
         const sortedDates = Object.keys(timeline).sort();
-        const counts = sortedDates.map((d) => timeline[d]);
 
         if (channelChartInstance) channelChartInstance.destroy();
-
-        const ctx = document.getElementById("channelChart").getContext("2d");
-        channelChartInstance = new Chart(ctx, {
-          type: "line",
-          data: {
-            labels: sortedDates,
-            datasets: [
-              {
-                label: "Daily Interactions",
-                data: counts,
-                borderColor: "#10b981",
-                backgroundColor: "rgba(16, 185, 129, 0.1)",
-                borderWidth: 2,
-                tension: 0.2,
-                fill: true,
-              },
-            ],
-          },
-          options: {
-            responsive: true,
-            plugins: { legend: { display: false } },
-            scales: {
-              x: { grid: { color: "#303032" }, ticks: { color: "#adadb8" } },
-              y: {
-                grid: { color: "#303032" },
-                ticks: { color: "#adadb8", stepSize: 1 },
+        channelChartInstance = new Chart(
+          document.getElementById("channelChart").getContext("2d"),
+          {
+            type: "line",
+            data: {
+              labels: sortedDates,
+              datasets: [
+                {
+                  label: "Daily Interactions",
+                  data: sortedDates.map((d) => timeline[d]),
+                  borderColor: "#10b981",
+                  backgroundColor: "rgba(16, 185, 129, 0.1)",
+                  borderWidth: 2,
+                  tension: 0.2,
+                  fill: true,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              plugins: { legend: { display: false } },
+              scales: {
+                x: { grid: { color: "#303032" }, ticks: { color: "#adadb8" } },
+                y: {
+                  grid: { color: "#303032" },
+                  ticks: { color: "#adadb8", stepSize: 1 },
+                },
               },
             },
           },
-        });
+        );
 
-        // --- CHANNEL HOURLY TIMELINE CHART (Last 24 Hours) ---
         const hourlyTimeline =
           data.hourly_activations || data.hourly_timeline || {};
         const allSortedHours = Object.keys(hourlyTimeline).sort();
         const sortedHours24 = allSortedHours.slice(-24);
-        const hourlyCounts = sortedHours24.map((h) => hourlyTimeline[h]);
 
         if (channelHourlyChartInstance) channelHourlyChartInstance.destroy();
-
-        const ctxHourly = document
-          .getElementById("channelHourlyChart")
-          .getContext("2d");
-        channelHourlyChartInstance = new Chart(ctxHourly, {
-          type: "bar",
-          data: {
-            labels: sortedHours24.map((h) => h.split(" ")[1] || h),
-            datasets: [
-              {
-                label: "Hourly Hits",
-                data: hourlyCounts,
-                backgroundColor: "rgba(59, 130, 246, 0.6)",
-                borderColor: "#3b82f6",
-                borderWidth: 1,
-                borderRadius: 3,
-              },
-            ],
-          },
-          options: {
-            responsive: true,
-            plugins: { legend: { display: false } },
-            scales: {
-              x: { grid: { display: false }, ticks: { color: "#adadb8" } },
-              y: {
-                grid: { color: "#303032" },
-                ticks: { color: "#adadb8", stepSize: 1 },
+        channelHourlyChartInstance = new Chart(
+          document.getElementById("channelHourlyChart").getContext("2d"),
+          {
+            type: "bar",
+            data: {
+              labels: sortedHours24.map((h) => h.split(" ")[1] || h),
+              datasets: [
+                {
+                  label: "Hourly Hits",
+                  data: sortedHours24.map((h) => hourlyTimeline[h]),
+                  backgroundColor: "rgba(59, 130, 246, 0.6)",
+                  borderColor: "#3b82f6",
+                  borderWidth: 1,
+                  borderRadius: 3,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              plugins: { legend: { display: false } },
+              scales: {
+                x: { grid: { display: false }, ticks: { color: "#adadb8" } },
+                y: {
+                  grid: { color: "#303032" },
+                  ticks: { color: "#adadb8", stepSize: 1 },
+                },
               },
             },
           },
-        });
+        );
 
-        // --- CHANNEL HOURLY CUMULATIVE PROGRESSION CHART ---
-        // Dynamically calculate baseline offset for the channel timeline
         const chHourlyTimelineSum = Object.values(hourlyTimeline).reduce(
           (sum, val) => sum + val,
           0,
@@ -683,49 +827,48 @@
         let chRunningTotal =
           (data.total_activations || 0) - chHourlyTimelineSum;
 
-        const chCumulativeHourlyData = allSortedHours.map((hour) => {
-          chRunningTotal += hourlyTimeline[hour];
-          return chRunningTotal;
-        });
-
         if (channelHourlyCumulativeChartInstance)
           channelHourlyCumulativeChartInstance.destroy();
-
-        const ctxHourlyCum = document
-          .getElementById("channelHourlyCumulativeChart")
-          .getContext("2d");
-        channelHourlyCumulativeChartInstance = new Chart(ctxHourlyCum, {
-          type: "line",
-          data: {
-            labels: allSortedHours,
-            datasets: [
-              {
-                label: "Total Historical Berts",
-                data: chCumulativeHourlyData,
-                borderColor: "#3b82f6",
-                backgroundColor: "rgba(59, 130, 246, 0.08)",
-                borderWidth: 2,
-                pointRadius: allSortedHours.length > 50 ? 0 : 2,
-                tension: 0.1,
-                fill: true,
-              },
-            ],
-          },
-          options: {
-            responsive: true,
-            plugins: { legend: { display: false } },
-            scales: {
-              x: {
-                grid: { color: "#222225" },
-                ticks: { color: "#adadb8", maxTicksLimit: 12 },
-              },
-              y: {
-                grid: { color: "#303032" },
-                ticks: { color: "#adadb8", stepSize: 1 },
+        channelHourlyCumulativeChartInstance = new Chart(
+          document
+            .getElementById("channelHourlyCumulativeChart")
+            .getContext("2d"),
+          {
+            type: "line",
+            data: {
+              labels: allSortedHours,
+              datasets: [
+                {
+                  label: "Total Historical Berts",
+                  data: allSortedHours.map((hour) => {
+                    chRunningTotal += hourlyTimeline[hour];
+                    return chRunningTotal;
+                  }),
+                  borderColor: "#3b82f6",
+                  backgroundColor: "rgba(59, 130, 246, 0.08)",
+                  borderWidth: 2,
+                  pointRadius: allSortedHours.length > 50 ? 0 : 2,
+                  tension: 0.1,
+                  fill: true,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              plugins: { legend: { display: false } },
+              scales: {
+                x: {
+                  grid: { color: "#222225" },
+                  ticks: { color: "#adadb8", maxTicksLimit: 12 },
+                },
+                y: {
+                  grid: { color: "#303032" },
+                  ticks: { color: "#adadb8", stepSize: 1 },
+                },
               },
             },
           },
-        });
+        );
       }
 
       let currentUserData = null;
@@ -733,14 +876,11 @@
       async function loadUser() {
         const name = document.getElementById("uInput").value;
         if (!name) return;
-
         const res = await fetch(`/api/user?name=${name}`);
         if (!res.ok) {
-          alert("User not found or has no active stats!");
-          document.getElementById("uResults").style.display = "none";
+          alert("User not found!");
           return;
         }
-
         currentUserData = await res.json();
 
         document.getElementById("uResults").style.display = "block";
@@ -751,228 +891,186 @@
 
         const select = document.getElementById("uChannelSelect");
         select.innerHTML = "";
-
-        const channels = Object.keys(currentUserData.channels);
-        channels.forEach((chName) => {
-          select.innerHTML += `<option value="${chName}">#${chName}</option>`;
+        Object.keys(currentUserData.channels).forEach((ch) => {
+          select.innerHTML += `<option value="${ch}">#${ch}</option>`;
         });
-
-        if (channels.length > 0) {
+        if (Object.keys(currentUserData.channels).length > 0)
           updateUserChannelView();
-        }
       }
 
       async function updateUserChannelView() {
         if (!currentUserData) return;
-
-        const selectedChan = document.getElementById("uChannelSelect").value;
-        const channelStats = currentUserData.channels[selectedChan];
-
+        const chan = document.getElementById("uChannelSelect").value;
+        const channelStats = currentUserData.channels[chan];
         if (!channelStats) return;
 
         document.getElementById("uChannelTotal").innerText = channelStats.total;
 
         let emotesMap = {};
         try {
-          const emoteRes = await fetch(`/api/emotes?channel=${selectedChan}`);
+          const emoteRes = await fetch(`/api/emotes?channel=${chan}`);
           if (emoteRes.ok) {
-            const emotesData = await emoteRes.json();
-            emotesData.forEach((emote) => {
-              emotesMap[emote.name] = emote.id;
+            (await emoteRes.json()).forEach((em) => {
+              emotesMap[em.name] = em.id;
+              window.globalEmoteMemoryCache[em.name] = em.id;
             });
           }
-        } catch (err) {
-          console.error(`Failed to load emotes map for #${selectedChan}:`, err);
-        }
+        } catch (err) {}
 
-        const cDiv = document.getElementById("uCollected");
-        const collectedEntries = Object.entries(channelStats.collected || {});
-
-        cDiv.innerHTML =
-          collectedEntries
+        document.getElementById("uCollected").innerHTML =
+          Object.entries(channelStats.collected || {})
             .map(([bert, info]) => {
               const count = getCountValue(info);
               const dateStr = info.first_seen
                 ? new Date(info.first_seen).toLocaleDateString()
                 : "Unknown";
-              const emoteId = emotesMap[bert];
-
-              if (emoteId) {
-                return `
-            <div class="emote-wrapper">
-              <img src="https://cdn.7tv.app/emote/${emoteId}/2x.webp" alt="${bert}" class="twitch-emote" />
-              <small style="color: #adadb8; font-weight: bold; margin-left: 2px;">x${count}</small>
-              <span class="emote-tooltip">${bert} (First: ${dateStr})</span>
-            </div>
-          `;
-              }
-              return `<span class="badge" title="First seen: ${dateStr}">${bert} <small>x${count}</small></span>`;
+              const emId = emotesMap[bert];
+              return emId
+                ? `<div class="emote-wrapper"><img src="https://cdn.7tv.app/emote/${emId}/2x.webp" alt="${bert}" class="twitch-emote" /><small style="color: #adadb8; font-weight: bold; margin-left: 2px;">x${count}</small><span class="emote-tooltip">${bert} (First: ${dateStr})</span></div>`
+                : `<span class="badge" title="First seen: ${dateStr}">${bert} <small>x${count}</small></span>`;
             })
-            .join(" ") || "<i>None yet! Keep bertchecking.</i>";
+            .join(" ") || "<i>None yet!</i>";
 
-        const mDiv = document.getElementById("uMissing");
-
-        mDiv.innerHTML =
+        document.getElementById("uMissing").innerHTML =
           (channelStats.missing || [])
             .map((bert) => {
-              const emoteId = emotesMap[bert];
-              if (emoteId) {
-                return `
-            <div class="emote-wrapper" style="opacity: 0.35; filter: grayscale(100%);">
-              <img src="https://cdn.7tv.app/emote/${emoteId}/2x.webp" alt="${bert}" class="twitch-emote" />
-              <span class="emote-tooltip">${bert} (Missing)</span>
-            </div>
-          `;
-              }
-              return `<span class="badge missing">${bert}</span>`;
+              const emId = emotesMap[bert];
+              return emId
+                ? `<div class="emote-wrapper" style="opacity: 0.35; filter: grayscale(100%);"><img src="https://cdn.7tv.app/emote/${emId}/2x.webp" alt="${bert}" class="twitch-emote" /><span class="emote-tooltip">${bert} (Missing)</span></div>`
+                : `<span class="badge missing">${bert}</span>`;
             })
-            .join(" ") || "<i>Got 'em all! Complete collection! 🎉</i>";
+            .join(" ") || "<i>Got 'em all! 🎉</i>";
 
-        // --- USER ACCUMULATED TIMELINE CHART (Daily) ---
         const userTimeline =
           channelStats.daily_timeline || channelStats.daily_activations || {};
         const sortedDates = Object.keys(userTimeline).sort();
-
-        // Calculate dynamic baseline for user daily cumulative tracker
         const dailyTimelineSum = Object.values(userTimeline).reduce(
           (sum, val) => sum + val,
           0,
         );
         let runningTotal = (channelStats.total || 0) - dailyTimelineSum;
 
-        const cumulativeData = sortedDates.map((date) => {
-          runningTotal += userTimeline[date];
-          return runningTotal;
-        });
-
         if (userChartInstance) userChartInstance.destroy();
-
-        const ctx = document.getElementById("userChart").getContext("2d");
-        userChartInstance = new Chart(ctx, {
-          type: "line",
-          data: {
-            labels: sortedDates,
-            datasets: [
-              {
-                label: "Total Collected Items",
-                data: cumulativeData,
-                borderColor: "#9146ff",
-                backgroundColor: "rgba(145, 70, 255, 0.1)",
-                borderWidth: 2,
-                tension: 0.3,
-                fill: true,
-              },
-            ],
-          },
-          options: {
-            responsive: true,
-            plugins: { legend: { display: false } },
-            scales: {
-              x: { grid: { color: "#303032" }, ticks: { color: "#adadb8" } },
-              y: {
-                grid: { color: "#303032" },
-                ticks: { color: "#adadb8", stepSize: 1 },
+        userChartInstance = new Chart(
+          document.getElementById("userChart").getContext("2d"),
+          {
+            type: "line",
+            data: {
+              labels: sortedDates,
+              datasets: [
+                {
+                  label: "Total Collected Items",
+                  data: sortedDates.map((d) => {
+                    runningTotal += userTimeline[d];
+                    return runningTotal;
+                  }),
+                  borderColor: "#9146ff",
+                  backgroundColor: "rgba(145, 70, 255, 0.1)",
+                  borderWidth: 2,
+                  tension: 0.3,
+                  fill: true,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              plugins: { legend: { display: false } },
+              scales: {
+                x: { grid: { color: "#303032" }, ticks: { color: "#adadb8" } },
+                y: {
+                  grid: { color: "#303032" },
+                  ticks: { color: "#adadb8", stepSize: 1 },
+                },
               },
             },
           },
-        });
+        );
 
-        // --- USER HOURLY TIMELINE CHART (Last 24 Hours) ---
         const userHourlyTimeline =
           channelStats.hourly_timeline || channelStats.hourly_activations || {};
         const allUserSortedHours = Object.keys(userHourlyTimeline).sort();
         const sortedUserHours24 = allUserSortedHours.slice(-24);
-        const userHourlyCounts = sortedUserHours24.map(
-          (h) => userHourlyTimeline[h],
-        );
 
         if (userHourlyChartInstance) userHourlyChartInstance.destroy();
-
-        const ctxUserHourly = document
-          .getElementById("userHourlyChart")
-          .getContext("2d");
-        userHourlyChartInstance = new Chart(ctxUserHourly, {
-          type: "bar",
-          data: {
-            labels: sortedUserHours24.map((h) => h.split(" ")[1] || h),
-            datasets: [
-              {
-                label: "User Hourly Counts",
-                data: userHourlyCounts,
-                backgroundColor: "rgba(236, 72, 153, 0.6)",
-                borderColor: "#ec4899",
-                borderWidth: 1,
-                borderRadius: 3,
-              },
-            ],
-          },
-          options: {
-            responsive: true,
-            plugins: { legend: { display: false } },
-            scales: {
-              x: { grid: { display: false }, ticks: { color: "#adadb8" } },
-              y: {
-                grid: { color: "#303032" },
-                ticks: { color: "#adadb8", stepSize: 1 },
+        userHourlyChartInstance = new Chart(
+          document.getElementById("userHourlyChart").getContext("2d"),
+          {
+            type: "bar",
+            data: {
+              labels: sortedUserHours24.map((h) => h.split(" ")[1] || h),
+              datasets: [
+                {
+                  label: "User Hourly Counts",
+                  data: sortedUserHours24.map((h) => userHourlyTimeline[h]),
+                  backgroundColor: "rgba(236, 72, 153, 0.6)",
+                  borderColor: "#ec4899",
+                  borderWidth: 1,
+                  borderRadius: 3,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              plugins: { legend: { display: false } },
+              scales: {
+                x: { grid: { display: false }, ticks: { color: "#adadb8" } },
+                y: {
+                  grid: { color: "#303032" },
+                  ticks: { color: "#adadb8", stepSize: 1 },
+                },
               },
             },
           },
-        });
+        );
 
-        // --- USER HOURLY CUMULATIVE PROGRESSION CHART ---
-        // Calculate dynamic baseline for user hourly cumulative tracker (e.g. 1298)
         const hourlyTimelineSum = Object.values(userHourlyTimeline).reduce(
           (sum, val) => sum + val,
           0,
         );
         let uRunningTotal = (channelStats.total || 0) - hourlyTimelineSum;
 
-        const uCumulativeHourlyData = allUserSortedHours.map((hour) => {
-          uRunningTotal += userHourlyTimeline[hour];
-          return uRunningTotal;
-        });
-
         if (userHourlyCumulativeChartInstance)
           userHourlyCumulativeChartInstance.destroy();
-
-        const ctxUserHourlyCum = document
-          .getElementById("userHourlyCumulativeChart")
-          .getContext("2d");
-        userHourlyCumulativeChartInstance = new Chart(ctxUserHourlyCum, {
-          type: "line",
-          data: {
-            labels: allUserSortedHours,
-            datasets: [
-              {
-                label: "Total Collection Progress",
-                data: uCumulativeHourlyData,
-                borderColor: "#ec4899",
-                backgroundColor: "rgba(236, 72, 153, 0.08)",
-                borderWidth: 2,
-                pointRadius: allUserSortedHours.length > 50 ? 0 : 2,
-                tension: 0.1,
-                fill: true,
-              },
-            ],
-          },
-          options: {
-            responsive: true,
-            plugins: { legend: { display: false } },
-            scales: {
-              x: {
-                grid: { color: "#222225" },
-                ticks: { color: "#adadb8", maxTicksLimit: 12 },
-              },
-              y: {
-                grid: { color: "#303032" },
-                ticks: { color: "#adadb8", stepSize: 1 },
+        userHourlyCumulativeChartInstance = new Chart(
+          document.getElementById("userHourlyCumulativeChart").getContext("2d"),
+          {
+            type: "line",
+            data: {
+              labels: allUserSortedHours,
+              datasets: [
+                {
+                  label: "Total Collection Progress",
+                  data: allUserSortedHours.map((hour) => {
+                    uRunningTotal += userHourlyTimeline[hour];
+                    return uRunningTotal;
+                  }),
+                  borderColor: "#ec4899",
+                  backgroundColor: "rgba(236, 72, 153, 0.08)",
+                  borderWidth: 2,
+                  pointRadius: allUserSortedHours.length > 50 ? 0 : 2,
+                  tension: 0.1,
+                  fill: true,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              plugins: { legend: { display: false } },
+              scales: {
+                x: {
+                  grid: { color: "#222225" },
+                  ticks: { color: "#adadb8", maxTicksLimit: 12 },
+                },
+                y: { grid: { color: "#303032" }, ticks: { color: "#adadb8" } },
               },
             },
           },
-        });
+        );
       }
 
+      // Bootstrap Page lifecycle endpoints
       loadGlobal();
+      connectLiveFeed();
     </script>
   </body>
 </html>

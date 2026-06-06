@@ -152,3 +152,15 @@ func (s *SevenTVService) HasEmote(channel, emote string) bool {
 	}
 	return false
 }
+
+func (s *SevenTVService) GetEmoteID(channel, emoteName string) string {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	for _, e := range s.emotes[channel] {
+		if e.Name == emoteName {
+			return e.ID
+		}
+	}
+	return ""
+}
