@@ -217,7 +217,6 @@
           ></canvas>
         </div>
 
-        <!-- NEW: Full-Width Global Cumulative Hourly Line Chart -->
         <div class="full-width-chart">
           <h3>📈 Total Global Progression (Hourly Grain)</h3>
           <canvas
@@ -349,7 +348,7 @@
 
     <script>
       let globalChartInstance = null;
-      let globalHourlyCumulativeChartInstance = null; // New global tracking pointer
+      let globalHourlyCumulativeChartInstance = null;
       let channelChartInstance = null;
       let channelHourlyChartInstance = null;
       let channelHourlyCumulativeChartInstance = null;
@@ -457,7 +456,13 @@
         const globalHourlyTimeline = data.hourly_timeline || {};
         const allGlobalSortedHours = Object.keys(globalHourlyTimeline).sort();
 
-        let gRunningTotal = 0;
+        // Dynamically calculate the baseline offset for the global timeline
+        const gHourlyTimelineSum = Object.values(globalHourlyTimeline).reduce(
+          (sum, val) => sum + val,
+          0,
+        );
+        let gRunningTotal = (data.total_activations || 0) - gHourlyTimelineSum;
+
         const gCumulativeHourlyData = allGlobalSortedHours.map((hour) => {
           gRunningTotal += globalHourlyTimeline[hour] || 0;
           return gRunningTotal;
@@ -505,7 +510,6 @@
 
       async function loadChannelEmotes(channelName) {
         try {
-          // 1. Request the data from your Go API endpoint
           const response = await fetch(`/api/emotes?channel=${channelName}`);
 
           if (!response.ok) {
@@ -513,20 +517,15 @@
             return;
           }
 
-          // 2. Parse the JSON payload back into a JavaScript array of objects
-          const emotesData = await response.json(); // Looks like: [{name: "BertW", id: "60b..."}, ...]
-
-          // 3. Target the HTML container where the images should live
+          const emotesData = await response.json();
           const emotesContainer = document.getElementById("chBertsList");
 
-          // Check if the Go backend sent an empty array or null
           if (!emotesData || emotesData.length === 0) {
             emotesContainer.innerHTML =
               "<i>No emotes found for this channel.</i>";
             return;
           }
 
-          // 4. Loop through the array, transform each object into our image HTML template, and inject it
           emotesContainer.innerHTML = emotesData
             .map((emote) => {
               return `
@@ -541,7 +540,7 @@
           </div>
         `;
             })
-            .join(" "); // Joins the array elements into one clean HTML string
+            .join(" ");
         } catch (error) {
           console.error("Network error fetching emotes:", error);
         }
@@ -557,7 +556,6 @@
         }
         const data = await res.json();
 
-        // \ud83d\udd25 NEW: Fetch 7TV emotes and build a lookup map (Name -> ID)
         let emotesMap = {};
         try {
           const emoteRes = await fetch(`/api/emotes?channel=${name}`);
@@ -570,7 +568,6 @@
         } catch (err) {
           console.error("Failed to load emotes map:", err);
         }
-        // Store globally so the User Tab can use it too!
         window.currentChannelEmotes = emotesMap;
 
         document.getElementById("chResults").style.display = "block";
@@ -583,7 +580,6 @@
           true,
         );
 
-        // \ud83d\udd25 UPDATED: Render images if found in 7TV map, otherwise fallback to text badge
         document.getElementById("chBertsList").innerHTML = (
           data.active_berts || []
         )
@@ -597,7 +593,7 @@
           </div>
         `;
             }
-            return `<span class="badge">${b}</span>`; // Fallback
+            return `<span class="badge">${b}</span>`;
           })
           .join(" ");
 
@@ -640,7 +636,7 @@
 
         // --- CHANNEL HOURLY TIMELINE CHART (Last 24 Hours) ---
         const hourlyTimeline =
-          data.hourly_activations || data.hourly_timeline || {}; // Adjusted to match your backend struct
+          data.hourly_activations || data.hourly_timeline || {};
         const allSortedHours = Object.keys(hourlyTimeline).sort();
         const sortedHours24 = allSortedHours.slice(-24);
         const hourlyCounts = sortedHours24.map((h) => hourlyTimeline[h]);
@@ -679,7 +675,14 @@
         });
 
         // --- CHANNEL HOURLY CUMULATIVE PROGRESSION CHART ---
-        let chRunningTotal = 0;
+        // Dynamically calculate baseline offset for the channel timeline
+        const chHourlyTimelineSum = Object.values(hourlyTimeline).reduce(
+          (sum, val) => sum + val,
+          0,
+        );
+        let chRunningTotal =
+          (data.total_activations || 0) - chHourlyTimelineSum;
+
         const chCumulativeHourlyData = allSortedHours.map((hour) => {
           chRunningTotal += hourlyTimeline[hour];
           return chRunningTotal;
@@ -769,7 +772,6 @@
 
         document.getElementById("uChannelTotal").innerText = channelStats.total;
 
-        // 🔥 FIX: Dynamically fetch the 7TV emotes map specifically for the selected dropdown channel
         let emotesMap = {};
         try {
           const emoteRes = await fetch(`/api/emotes?channel=${selectedChan}`);
@@ -831,7 +833,13 @@
           channelStats.daily_timeline || channelStats.daily_activations || {};
         const sortedDates = Object.keys(userTimeline).sort();
 
-        let runningTotal = 0;
+        // Calculate dynamic baseline for user daily cumulative tracker
+        const dailyTimelineSum = Object.values(userTimeline).reduce(
+          (sum, val) => sum + val,
+          0,
+        );
+        let runningTotal = (channelStats.total || 0) - dailyTimelineSum;
+
         const cumulativeData = sortedDates.map((date) => {
           runningTotal += userTimeline[date];
           return runningTotal;
@@ -912,7 +920,13 @@
         });
 
         // --- USER HOURLY CUMULATIVE PROGRESSION CHART ---
-        let uRunningTotal = 0;
+        // Calculate dynamic baseline for user hourly cumulative tracker (e.g. 1298)
+        const hourlyTimelineSum = Object.values(userHourlyTimeline).reduce(
+          (sum, val) => sum + val,
+          0,
+        );
+        let uRunningTotal = (channelStats.total || 0) - hourlyTimelineSum;
+
         const uCumulativeHourlyData = allUserSortedHours.map((hour) => {
           uRunningTotal += userHourlyTimeline[hour];
           return uRunningTotal;
