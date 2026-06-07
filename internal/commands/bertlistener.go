@@ -201,22 +201,27 @@ func init() {
 			if !ctx.Message.FirstMessage {
 				return false
 			}
+
 			msg := strings.ToLower(ctx.Message.Text)
+			matched := false
 
 			// separate bertcheck test so we don't add 'bertcheck' to the list of berts
 			if strings.Contains(msg, "bertcheck") {
-				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "firsttimeberter")
-				return true
-			}
-
-			availableBerts := services.BertServiceInstance.GetBerts(ctx.Message.Channel)
-
-			for _, bert := range availableBerts {
-				if strings.Contains(msg, strings.ToLower(bert)) {
-					ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "firsttimeberter")
-					return true
+				matched = true
+			} else {
+				availableBerts := services.BertServiceInstance.GetBerts(ctx.Message.Channel)
+				for _, bert := range availableBerts {
+					if strings.Contains(msg, strings.ToLower(bert)) {
+						matched = true
+						break
+					}
 				}
 			}
+
+			if matched {
+				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "firsttimeberter")
+			}
+
 			return false
 		},
 	})
