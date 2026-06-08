@@ -6,7 +6,12 @@ import (
 	"strings"
 )
 
-const odaListeningChance = 0.05
+const specialOdaChance = 0.05
+
+var odaVariants = []string{
+	"odaListening",
+	"odaer",
+}
 
 func init() {
 	RegisterListener(bot.ListenerEntry{
@@ -20,8 +25,8 @@ func init() {
 			}
 
 			emote := "oda"
-			if rand.Float64() < odaListeningChance {
-				emote = "odaListening"
+			if rand.Float64() < specialOdaChance {
+				emote = odaVariants[rand.IntN(len(odaVariants))]
 			}
 
 			finalMessage := emote
