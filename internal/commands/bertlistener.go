@@ -52,7 +52,7 @@ func init() {
 		Cooldown:    69 * time.Second,
 		Matcher: func(ctx bot.CommandContext) bool {
 			msg := strings.ToLower(ctx.Message.Text)
-			return !strings.HasPrefix(msg, "!") && strings.Contains(msg, "bertcheck")
+			return !strings.HasPrefix(msg, "!") && strings.Contains(msg, "bertcheck") && !strings.Contains(msg, "bertcheckcheck")
 		},
 		OnCooldown: func(ctx bot.CommandContext, remaining time.Duration) {
 			services.TwitchServiceInstance.Timeout(ctx.Message.Channel, ctx.Message.User.ID, 69, "overberting smh")
@@ -110,6 +110,22 @@ func init() {
 				}
 			}
 
+			return true
+		},
+	})
+	RegisterListener(bot.ListenerEntry{
+		Name:        "bertcheckcheck",
+		Description: "Responds with bertcheck",
+		Cooldown:    69 * time.Second,
+		Matcher: func(ctx bot.CommandContext) bool {
+			msg := strings.ToLower(ctx.Message.Text)
+			return !strings.HasPrefix(msg, "!") && strings.Contains(msg, "bertcheckcheck")
+		},
+		OnCooldown: func(ctx bot.CommandContext, remaining time.Duration) {
+			services.TwitchServiceInstance.Timeout(ctx.Message.Channel, ctx.Message.User.ID, 69, "overberting^2 smh")
+		},
+		Handler: func(ctx bot.CommandContext) bool {
+			ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "bertcheck")
 			return true
 		},
 	})
