@@ -21,11 +21,11 @@ func (ws *WebService) Start() {
 	http.Handle("/", fs)
 
 	// API endpoints
-	http.HandleFunc("/api/global", ws.handleGlobalStats)
-	http.HandleFunc("/api/channel", ws.handleChannelStats)
-	http.HandleFunc("/api/user", ws.handleUserStats)
-	http.HandleFunc("/api/emotes", ws.handleChannelEmotes)
-	http.HandleFunc("/api/live", services.LiveFeedInstance.HandleLiveFeed)
+	http.HandleFunc("/api/global", enableCORS(ws.handleGlobalStats))
+	http.HandleFunc("/api/channel", enableCORS(ws.handleChannelStats))
+	http.HandleFunc("/api/user", enableCORS(ws.handleUserStats))
+	http.HandleFunc("/api/emotes", enableCORS(ws.handleChannelEmotes))
+	http.HandleFunc("/api/live", enableCORS(services.LiveFeedInstance.HandleLiveFeed))
 
 	log.Printf("[Web] Starting local dashboard on http://localhost%s/\n", ws.port)
 	go func() {
@@ -188,4 +188,19 @@ func (ws *WebService) handleChannelEmotes(w http.ResponseWriter, r *http.Request
 
 	// encode the slice of SevenTVEmote structs directly into the HTTP response stream
 	json.NewEncoder(w).Encode(emotes)
+}
+
+func enableCORS(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
+		next(w, r)
+	}
 }
