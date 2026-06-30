@@ -93,6 +93,7 @@ func twitchMessageToMessage(m twitch.PrivateMessage) models.Message {
 			IsMod:         m.User.IsMod,
 			IsSubscriber:  m.User.Badges["subscriber"] > 0,
 		},
+		FirstMessage: m.FirstMessage,
 	}
 	if m.Reply != nil {
 		cleanBody := strings.ReplaceAll(m.Reply.ParentMsgBody, "\\s", " ")
