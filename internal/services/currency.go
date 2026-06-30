@@ -1,17 +1,15 @@
 package services
 
 import (
-	"encoding/json"
 	"log"
-	"os"
+	"pizza-son/internal/store"
 	"sort"
 	"sync"
 )
 
-const currencyFile = "data/currency/balances.json"
-
 type CurrencyService struct {
 	mu       sync.Mutex
+	store    *store.Store[map[string]int]
 	balances map[string]int // key - user ID
 }
 
@@ -23,40 +21,30 @@ type UserBalance struct {
 var CurrencyServiceInstance *CurrencyService
 
 func NewCurrencyService() {
-	if err := os.MkdirAll("data/currency", os.ModePerm); err != nil {
-		log.Fatal("[Currency] Failed to create directory:", err)
-	}
-
+	s := store.New("data/currency/balances.json", &map[string]int{})
+	s.EnsureDir()
 	svc := &CurrencyService{
-		balances: make(map[string]int),
+		store:    s,
+		balances: *s.Data(),
 	}
-
 	svc.load()
 	CurrencyServiceInstance = svc
 	log.Println("[Currency] Service initialized")
 }
 
 func (s *CurrencyService) load() {
-	data, err := os.ReadFile(currencyFile)
+	ok, err := s.store.LoadIfExists()
 	if err != nil {
-		if os.IsNotExist(err) {
-			return
-		}
 		log.Println("[Currency] Failed to load balances:", err)
+		return
 	}
-	if err := json.Unmarshal(data, &s.balances); err != nil {
-		log.Println("[Currency] Failed to parse balances:", err)
+	if ok {
+		log.Printf("[Currency] Loaded %d balances", len(s.balances))
 	}
-	log.Printf("[Currency] Loaded %d balances", len(s.balances))
 }
 
 func (s *CurrencyService) save() {
-	data, err := json.MarshalIndent(s.balances, "", "  ")
-	if err != nil {
-		log.Println("[Currency] Failed to marshal balances:", err)
-		return
-	}
-	if err := os.WriteFile(currencyFile, data, 0644); err != nil {
+	if err := s.store.Save(); err != nil {
 		log.Println("[Currency] Failed to save balances:", err)
 	}
 }

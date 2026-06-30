@@ -1,10 +1,8 @@
 package services
 
 import (
-	"encoding/json"
 	"log"
-	"os"
-	"path/filepath"
+	"pizza-son/internal/store"
 	"slices"
 	"sync"
 	"time"
@@ -34,9 +32,9 @@ type ChannelData struct {
 }
 
 type BertService struct {
-	Mu   sync.RWMutex
-	Data map[string]*ChannelData // channel name -> data
-	path string
+	Mu    sync.RWMutex
+	store *store.Store[map[string]*ChannelData]
+	Data  map[string]*ChannelData // channel name -> data
 }
 
 type BertStats struct {
@@ -51,14 +49,15 @@ type BertStats struct {
 var BertServiceInstance *BertService
 
 func NewBertService() {
+	s := store.New("data/bertcheck/stats.json", &map[string]*ChannelData{})
+	s.EnsureDir()
 	service := &BertService{
-		Data: make(map[string]*ChannelData),
-		path: "data/bertcheck/stats.json",
+		store: s,
+		Data:  *s.Data(),
 	}
 	service.load()
 	BertServiceInstance = service
 	log.Println("[Bert] Service initialized")
-
 }
 
 func (s *BertService) GetBerts(channel string) []string {
@@ -237,17 +236,13 @@ func (s *BertService) ensureChannel(channel string) {
 }
 
 func (s *BertService) save() {
-	_ = os.MkdirAll(filepath.Dir(s.path), 0755)
-	b, _ := json.MarshalIndent(s.Data, "", "  ")
-	_ = os.WriteFile(s.path, b, 0644)
+	_ = s.store.Save()
 }
 
 func (s *BertService) load() {
-	b, err := os.ReadFile(s.path)
-	if err != nil {
+	if _, err := s.store.LoadIfExists(); err != nil {
 		return
 	}
-	_ = json.Unmarshal(b, &s.Data)
 
 	// automated migrating
 	migrated := false

@@ -1,18 +1,15 @@
 package commands
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
-	"os"
 	"pizza-son/internal/bot"
 	"pizza-son/internal/models"
 	"pizza-son/internal/services"
+	"pizza-son/internal/store"
 	"strings"
 	"time"
 )
-
-const signupFile = "data/signups.json"
 
 type SignupEntry struct {
 	UserID              string `json:"user_id"`
@@ -25,27 +22,22 @@ type SignupEntry struct {
 	FirstMessage        bool   `json:"first_message"`
 }
 
+var signupStore = store.New("data/signups.json", &[]SignupEntry{})
+
 func loadSignups() ([]SignupEntry, error) {
-	data, err := os.ReadFile(signupFile)
+	ok, err := signupStore.LoadIfExists()
 	if err != nil {
-		if os.IsNotExist(err) {
-			return []SignupEntry{}, nil
-		}
 		return nil, err
 	}
-	var entries []SignupEntry
-	if err := json.Unmarshal(data, &entries); err != nil {
-		return nil, err
+	if !ok {
+		return []SignupEntry{}, nil
 	}
-	return entries, nil
+	return *signupStore.Data(), nil
 }
 
 func saveSignups(entries []SignupEntry) error {
-	data, err := json.MarshalIndent(entries, "", "  ")
-	if err != nil {
-		return err
-	}
-	return os.WriteFile(signupFile, data, 0644)
+	*signupStore.Data() = entries
+	return signupStore.Save()
 }
 
 func init() {

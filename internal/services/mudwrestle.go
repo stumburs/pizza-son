@@ -1,13 +1,10 @@
 package services
 
 import (
-	"encoding/json"
 	"log"
-	"os"
+	"pizza-son/internal/store"
 	"sync"
 )
-
-const mudwrestleFile = "data/mudwrestle/mudwrestle.json"
 
 type MudwrestleStats struct {
 	Wins       int `json:"wins"`
@@ -18,18 +15,18 @@ type MudwrestleStats struct {
 
 type MudwrestleService struct {
 	mu    sync.Mutex
+	store *store.Store[map[string]*MudwrestleStats]
 	stats map[string]*MudwrestleStats // key: userID
 }
 
 var MudwrestleServiceInstance *MudwrestleService
 
 func NewMudwrestleService() {
-	if err := os.MkdirAll("data/mudwrestle", os.ModePerm); err != nil {
-		log.Fatal("[Mudwrestle] Failed to create directory:", err)
-	}
-
+	s := store.New("data/mudwrestle/mudwrestle.json", &map[string]*MudwrestleStats{})
+	s.EnsureDir()
 	svc := &MudwrestleService{
-		stats: make(map[string]*MudwrestleStats),
+		store: s,
+		stats: *s.Data(),
 	}
 	svc.load()
 	MudwrestleServiceInstance = svc
@@ -37,26 +34,15 @@ func NewMudwrestleService() {
 }
 
 func (s *MudwrestleService) load() {
-	data, err := os.ReadFile(mudwrestleFile)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return
-		}
+	if _, err := s.store.LoadIfExists(); err != nil {
 		log.Println("[Mudwrestle] Failed to load:", err)
-		return
-	}
-	if err := json.Unmarshal(data, &s.stats); err != nil {
-		log.Println("[Mudwrestle] Failed to parse:", err)
 	}
 }
 
 func (s *MudwrestleService) save() {
-	data, err := json.MarshalIndent(s.stats, "", "  ")
-	if err != nil {
-		log.Println("[Mudwrestle] Failed to marshal:", err)
-		return
+	if err := s.store.Save(); err != nil {
+		log.Println("[Mudwrestle] Failed to save:", err)
 	}
-	os.WriteFile(mudwrestleFile, data, 0644)
 }
 
 func (s *MudwrestleService) getOrCreate(userID string) *MudwrestleStats {
