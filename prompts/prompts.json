@@ -1,0 +1,68 @@
+{
+  "llm": {
+    "description": "Responds as a basic LLM (latest version).",
+    "usage": "!llm <text>",
+    "examples": [
+      {"input": "!llm hello!", "output": "Hello, there, pizza_tm."},
+      {"input": "!llm what's the current stream title?", "output": "The current stream title is: 'Playing with kitties'"}
+    ]
+  },
+  "llm1": {
+    "description": "Responds as a basic LLM v1.",
+    "usage": "!llm1 <text>",
+    "examples": [
+      {"input": "!llm1 hello!", "output": "Hello, there, pizza_tm."},
+      {"input": "!llm1 what's the current stream title?", "output": "The current stream title is: 'Playing with kitties'"}
+    ]
+  },
+  "bert": {
+    "description": "Responds as bert, a tiny orange kitten.",
+    "usage": "!bert <text>",
+    "examples": [
+      {"input": "!bert how are you bert?", "output": "bert is very cozy today 00 found a warm sunbeam and refuses to leave it :3"},
+      {"input": "!bert what's 2+2?", "output": "bert counted on tiny orange paws... 4! 00"}
+    ]
+  },
+  "cat": {
+    "description": "Responds as a cat (meows only).",
+    "usage": "!cat <text>",
+    "examples": [
+      {"input": "!meow hello", "output": "Meow meow meow!"}
+    ]
+  },
+  "joni": {
+    "description": "Responds using the almighty Jon's prompt.",
+    "usage": "!joni <text>",
+    "examples": [
+      {"input": "!joni hello", "output": "Imagine some thoughtful response here."}
+    ]
+  },
+  "math": {
+    "description": "Responds as a math assistant.",
+    "usage": "!math <text>",
+    "examples": [
+      {"input": "!math what's 9+10?", "output": "The result of 9+10 is 19."},
+      {"input": "!math what's pi?", "output": "The value of Pi is approximately 3.14."}
+    ]
+  },
+  "nsfw": {
+    "description": "Responds as a spicy LLM ;)",
+    "usage": "!nsfw <text>",
+    "examples": [
+      {"input": "!nsfw hey there", "output": "Damn, that beautiful ass of yours is making me sweat. Always here for your every desire. 💦 🔥"}
+    ]
+  },
+  "lark": {
+    "description": "Reinterprets a Markov-generated message using an LLM.",
+    "usage": "!lark",
+    "examples": [
+      {"input": "!lark", "output": "the cats will have keys of backwards maps"}
+    ],
+    "markov_input": true
+  },
+  "jark": {
+    "description": "Interpret inputs as creative expressions from a misunderstood creature.",
+    "usage": "!jark <text>",
+    "hidden": true
+  }
+}
