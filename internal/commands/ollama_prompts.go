@@ -11,13 +11,13 @@ import (
 )
 
 type promptMeta struct {
-	Description string             `json:"description"`
-	Usage       string             `json:"usage"`
-	Permission  string             `json:"permission"`
-	Cooldown    string             `json:"cooldown"`
-	Category    string             `json:"category"`
-	MarkovInput bool               `json:"markov_input"`
-	Hidden      bool               `json:"hidden"`
+	Description string               `json:"description"`
+	Usage       string               `json:"usage"`
+	Permission  string               `json:"permission"`
+	Cooldown    string               `json:"cooldown"`
+	Category    string               `json:"category"`
+	MarkovInput bool                 `json:"markov_input"`
+	Hidden      bool                 `json:"hidden"`
 	Examples    []bot.CommandExample `json:"examples"`
 }
 
@@ -101,7 +101,7 @@ func buildCommand(name string, meta promptMeta) bot.Command {
 				prompt = strings.Join(ctx.Args, " ")
 			}
 
-			res, err := services.OllamaServiceInstance.GenerateChatResponse(ctx.Message, prompt)
+			res, err := services.OllamaServiceInstance.GenerateChatResponse(ctx.Message, services.WithPrompt(prompt), services.WithCommand(cmdName))
 			if err != nil {
 				log.Println("[Ollama]", cmdName, err)
 				return

@@ -14,22 +14,187 @@ import (
 	"github.com/JexSrs/go-ollama"
 )
 
+type chatOptions struct {
+	prompt  string
+	command string
+	model   string
+	options *ollama.Options
+}
+
+type ChatOption func(*chatOptions)
+
+func WithPrompt(p string) ChatOption {
+	return func(o *chatOptions) { o.prompt = p }
+}
+
+func WithCommand(name string) ChatOption {
+	return func(o *chatOptions) { o.command = name }
+}
+
+func WithModel(m string) ChatOption {
+	return func(o *chatOptions) { o.model = m }
+}
+
+func WithOptions(opts *ollama.Options) ChatOption {
+	return func(o *chatOptions) { o.options = opts }
+}
+
+type promptContext struct {
+	template string           // raw system prompt with {{placeholders}}
+	messages []ollama.Message // history for this context
+}
+
 type OllamaService struct {
-	Client *ollama.Ollama
-	mu     sync.Mutex
+	Client   *ollama.Ollama
+	mu       sync.Mutex
+	ambient  map[string][]ollama.Message // channel -> chat messages
+	contexts map[string]*promptContext   // "channel:command" -> prompt context
 }
 
 var OllamaServiceInstance *OllamaService
 
 func NewOllamaService() {
-	url, err := url.Parse(config.Get().Ollama.Host)
+	u, err := url.Parse(config.Get().Ollama.Host)
 	if err != nil {
 		panic(err)
 	}
 
 	OllamaServiceInstance = &OllamaService{
-		Client: ollama.New(*url),
+		Client:   ollama.New(*u),
+		ambient:  make(map[string][]ollama.Message),
+		contexts: make(map[string]*promptContext),
 	}
+}
+
+func (s *OllamaService) OnPrivateMessage(msg models.Message) {
+	role := "user"
+	content := fmt.Sprintf("%s chatted: %s", msg.User.DisplayName, msg.Text)
+	entry := ollama.Message{Role: &role, Content: &content}
+
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	ambient := s.ambient[msg.Channel]
+	ambient = append(ambient, entry)
+
+	maxAmbient := 40
+	if len(ambient) > maxAmbient {
+		ambient = ambient[len(ambient)-maxAmbient:]
+	}
+	s.ambient[msg.Channel] = ambient
+}
+
+func (s *OllamaService) GenerateChatResponse(msg models.Message, opts ...ChatOption) (*ollama.ChatResponse, error) {
+	cfg := chatOptions{
+		model: config.Get().Ollama.Model,
+	}
+	for _, opt := range opts {
+		opt(&cfg)
+	}
+
+	command := cfg.command
+	if command == "" {
+		command = ExtractCommand(msg.Text)
+	}
+
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	// build messages: [system] + [ambient] + [context history] + [current prompt]
+	chatMsgs := make([]ollama.Message, 0, 64)
+
+	// system prompt from per-command context
+	contextKey := msg.Channel + ":" + command
+	pc, exists := s.contexts[contextKey]
+	if !exists {
+		raw := s.GetPromptByCommand(command)
+		pc = &promptContext{template: raw}
+		s.contexts[contextKey] = pc
+	}
+	filled := FillPlaceholders(msg, pc.template)
+	sysRole := "system"
+	chatMsgs = append(chatMsgs, ollama.Message{Role: &sysRole, Content: &filled})
+
+	// ambient context (general chat messages)
+	if ambient, ok := s.ambient[msg.Channel]; ok {
+		chatMsgs = append(chatMsgs, ambient...)
+	}
+
+	// command history
+	chatMsgs = append(chatMsgs, pc.messages...)
+
+	// current user prompt
+	userRole := "user"
+	promptText := fmt.Sprintf("%s asked: %s", msg.User.DisplayName, cfg.prompt)
+	currentMsg := ollama.Message{Role: &userRole, Content: &promptText}
+	chatMsgs = append(chatMsgs, currentMsg)
+
+	// build options
+	genOpts := ollama.Options{}
+	if cfg.options != nil {
+		genOpts = *cfg.options
+	}
+	if genOpts.NumPredict == nil {
+		np := config.Get().Ollama.NumPredict
+		genOpts.NumPredict = &np
+	}
+
+	// pass all messages directly
+	builders := make([]func(*ollama.ChatRequestBuilder), 0, len(chatMsgs)+2)
+	builders = append(builders, s.Client.Chat.WithModel(cfg.model))
+	builders = append(builders, s.Client.Chat.WithOptions(genOpts))
+	for i := range chatMsgs {
+		m := chatMsgs[i]
+		builders = append(builders, s.Client.Chat.WithMessage(m))
+	}
+
+	res, err := s.Client.Chat(nil, builders...)
+	if err != nil {
+		return &ollama.ChatResponse{}, err
+	}
+
+	// store the exchange in command context history
+	pc.messages = append(pc.messages, currentMsg, res.Message)
+
+	// trim to max history (each entry is a 2 message)
+	maxHistory := config.Get().Ollama.MaxHistory
+	if maxHistory <= 0 {
+		maxHistory = 80
+	}
+	maxStored := maxHistory * 2
+	if len(pc.messages) > maxStored {
+		pc.messages = pc.messages[len(pc.messages)-maxStored:]
+	}
+
+	return res, nil
+}
+
+func (s *OllamaService) GenerateResponse(prompt string) string {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	res, err := s.Client.Generate(
+		s.Client.Generate.WithModel(config.Get().Ollama.Model),
+		s.Client.Generate.WithPrompt(prompt),
+	)
+	if err != nil {
+		panic(err)
+	}
+	return res.Response
+}
+
+func (s *OllamaService) Lobotomize(channel string) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	delete(s.ambient, channel)
+
+	prefix := channel + ":"
+	for key := range s.contexts {
+		if strings.HasPrefix(key, prefix) {
+			delete(s.contexts, key)
+		}
+	}
+	log.Println("[Ollama] Lobotomized", channel)
 }
 
 func (s *OllamaService) GetPromptByCommand(command string) string {
@@ -40,7 +205,6 @@ func (s *OllamaService) GetPromptByCommand(command string) string {
 	content, err := os.ReadFile(promptFile)
 	if err != nil {
 		log.Printf("[Ollama] Failed to load prompt for command %s: %v", command, err)
-		// Fallback to default prompt
 		content, _ = os.ReadFile("prompts/llm.txt")
 	}
 
@@ -55,7 +219,6 @@ func ExtractCommand(message string) string {
 
 	first := parts[0]
 
-	// !speak <command>
 	if first == "!speak" {
 		if len(parts) > 1 {
 			return parts[1]
@@ -63,128 +226,9 @@ func ExtractCommand(message string) string {
 		return ""
 	}
 
-	// other commands
-	if strings.HasPrefix(first, "!") {
-		return strings.TrimPrefix(first, "!")
+	if after, ok := strings.CutPrefix(first, "!"); ok {
+		return after
 	}
 
 	return ""
-}
-
-func (s *OllamaService) GenerateResponse(prompt string) string {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	res, err := s.Client.Generate(
-		s.Client.Generate.WithModel(config.Get().Ollama.Model),
-		s.Client.Generate.WithPrompt(prompt),
-	)
-	if err != nil {
-		panic(err)
-	}
-
-	return res.Response
-}
-
-func (s *OllamaService) OnPrivateMessage(msg models.Message) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	chat := s.Client.GetChat(msg.Channel)
-	// Create a new chat instance if it doesn't exist yet on this channel
-	if chat == nil {
-		newChat := newChat(msg.Channel)
-		s.Client.PreloadChat(newChat)
-		chat = s.Client.GetChat(msg.Channel)
-		log.Println("[Ollama] Preloaded chat in", msg.Channel)
-	}
-
-	role := "user"
-	content := fmt.Sprintf("%s chatted: %s", msg.User.DisplayName, msg.Text)
-
-	message := ollama.Message{
-		Role:    &role,
-		Content: &content,
-		Images:  nil,
-	}
-	chat.AddMessage(message)
-}
-
-func (s *OllamaService) GenerateChatResponse(msg models.Message, prompt string) (*ollama.ChatResponse, error) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	chatID := msg.Channel
-
-	// Get command from original message and load corresponding system prompt FIRST
-	command := ExtractCommand(msg.Text)
-	systemPrompt := s.GetPromptByCommand(command)
-
-	// Update the system prompt in the chat before generating response
-	chat := s.Client.GetChat(chatID)
-	if chat == nil {
-		newChat := newChat(chatID)
-		s.Client.PreloadChat(newChat)
-		chat = s.Client.GetChat(chatID)
-	}
-
-	// Set system prompt
-	readdSystemPrompt(msg, chat, systemPrompt)
-
-	role := "user"
-	prompt = fmt.Sprintf("%s asked: %s", msg.User.DisplayName, prompt)
-
-	message := ollama.Message{
-		Role:    &role,
-		Content: &prompt,
-		Images:  nil,
-	}
-
-	res, err := s.Client.Chat(
-		&chatID,
-		s.Client.Chat.WithModel(config.Get().Ollama.Model),
-		s.Client.Chat.WithMessage(message),
-		s.Client.Chat.WithOptions(ollama.Options{
-			NumPredict: &config.Get().Ollama.NumPredict,
-		}),
-	)
-	if err != nil {
-		return &ollama.ChatResponse{}, err
-	}
-
-	return res, nil
-}
-
-func (s *OllamaService) Lobotomize(channel string) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	s.Client.DeleteChat(channel)
-	log.Println("[Ollama] Bot Lobotomized in", channel)
-}
-
-func newChat(channel string) ollama.Chat {
-	newChat := ollama.Chat{
-		ID:       channel,
-		Messages: []ollama.Message{},
-	}
-	role := "system"
-	content := "You are a Twitch chat bot."
-	systemPrompt := ollama.Message{
-		Role:    &role,
-		Content: &content,
-		Images:  nil,
-	}
-	newChat.Messages = append(newChat.Messages, systemPrompt)
-
-	return newChat
-}
-
-// Clears and adds new system prompt to the beginning
-func readdSystemPrompt(msg models.Message, chat *ollama.Chat, prompt string) {
-	chat.DeleteMessage(0)
-	role := "system"
-	prompt = FillPlaceholders(msg, prompt)
-	promptMessage := &ollama.Message{
-		Role:    &role,
-		Content: &prompt,
-		Images:  nil,
-	}
-	chat.AddMessageTo(0, *promptMessage)
 }
