@@ -146,18 +146,15 @@ func (ws *WebService) handleAuthCallback(w http.ResponseWriter, r *http.Request)
 	if isConfigMod {
 		manageable = chanList
 	} else {
-		// Check each channel: broadcaster or Twitch moderator
+		// Non-config-mods only get their own broadcaster channel
 		for _, ch := range chanList {
 			if strings.ToLower(ch) == login {
-				manageable = append(manageable, ch)
-			} else if checkIsTwitchMod(body.Token, userID, ch) {
 				manageable = append(manageable, ch)
 			}
 		}
 	}
 
 	if len(manageable) == 0 {
-		log.Printf("[Panel] User %s (%s) has no manageable channels", login, userID)
 		http.Error(w, "Not a moderator of any bot channel", http.StatusForbidden)
 		return
 	}

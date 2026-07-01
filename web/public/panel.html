@@ -488,7 +488,7 @@
               '?client_id=' + data.client_id +
               '&redirect_uri=' + redirect +
               '&response_type=token' +
-              '&scope=user:read:email+moderation:read';
+              '&scope=user:read:email';
           })
           .catch(() => { setLoggingIn(false); });
       }
