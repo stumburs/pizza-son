@@ -35,6 +35,10 @@ func New(username string, channels []string, registry *Registry) *Bot {
 	}
 }
 
+func (b *Bot) Say(channel, message string) {
+	b.client.Say(channel, message)
+}
+
 func (b *Bot) Start() error {
 	token := "oauth:" + services.TwitchServiceInstance.GetAccessToken()
 	b.client = twitch.NewClient(config.Get().Twitch.User, token)

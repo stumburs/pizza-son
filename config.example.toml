@@ -29,6 +29,21 @@ length_to_generate = 200
 # discord_webhook = "https://discord.com/api/webhooks/..."
 # message = "{{channel}} is now live playing {{game}}! https://twitch.tv/{{channel}}"
 
+[stt]
+# Master switch - disabled by default
+enabled = false
+# Path to whisper.cpp CLI binary (usually just "whisper" or "main" if in PATH)
+whisper_path = "whisper"
+# Path to whisper.cpp model file (e.g. ggml-tiny.bin)
+# Download from: https://huggingface.co/ggerganov/whisper.cpp
+whisper_model = "/home/user/models/ggml-tiny.bin"
+# Path to streamlink binary
+streamlink_path = "streamlink"
+# Path to ffmpeg binary
+ffmpeg_path = "ffmpeg"
+# Seconds between capture+transcribe cycles
+capture_interval = 30
+
 [discord]
 token = "bot_token"
 channels = ["channel_id"]

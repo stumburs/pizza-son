@@ -62,6 +62,11 @@ func main() {
 	webServer := web.NewWebService(":8080")
 	webServer.Start()
 
+	// STT stream listening (disabled by default)
+	services.NewSTTService(func(channel, message string) {
+		twitchBot.Say(channel, message)
+	})
+
 	// Run twitch in background
 	go func() {
 		for {
