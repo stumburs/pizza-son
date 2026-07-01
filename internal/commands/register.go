@@ -37,3 +37,7 @@ func RegisterListener(l bot.ListenerEntry) {
 	}
 	globalRegistry.RegisterListener(l)
 }
+
+func GetRegistry() *bot.Registry {
+	return globalRegistry
+}

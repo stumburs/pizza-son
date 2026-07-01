@@ -8,13 +8,13 @@ import (
 )
 
 // These commands can never be disabled
-var protectedCommands = map[string]bool{
+var ProtectedCommands = map[string]bool{
 	"command": true,
 	"ping":    true,
 }
 
 // These listeners can never be disabled
-var protectedListeners = map[string]bool{
+var ProtectedListeners = map[string]bool{
 	"log": true,
 }
 
@@ -52,7 +52,7 @@ func init() {
 					return
 				}
 				cmd := strings.ToLower(ctx.Args[1])
-				if protectedCommands[cmd] {
+				if ProtectedCommands[cmd] {
 					ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, fmt.Sprintf("Command !%s cannot be disabled.", cmd))
 					return
 				}
@@ -106,7 +106,7 @@ func init() {
 					return
 				}
 				cmd := strings.ToLower(ctx.Args[1])
-				if protectedListeners[cmd] {
+				if ProtectedListeners[cmd] {
 					ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, fmt.Sprintf("Listener !%s cannot be disabled.", cmd))
 					return
 				}
