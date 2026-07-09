@@ -47,6 +47,15 @@ type Config struct {
 		DiscordWebhook string `toml:"discord_webhook"`
 	} `toml:"notifications"`
 
+	STT struct {
+		Enabled         bool   `toml:"enabled"`
+		WhisperPath     string `toml:"whisper_path"`
+		WhisperModel    string `toml:"whisper_model"`
+		StreamlinkPath  string `toml:"streamlink_path"`
+		FFmpegPath      string `toml:"ffmpeg_path"`
+		CaptureInterval int    `toml:"capture_interval"`
+	} `toml:"stt"`
+
 	Discord struct {
 		Token    string         `toml:"token"`
 		Channels []string       `toml:"channels"` // List of channels IDs the bot is allowed to participate in

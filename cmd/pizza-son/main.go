@@ -58,9 +58,19 @@ func main() {
 		log.Fatalf("[Main] Failed to initialize Discord bot: %v", err)
 	}
 
+	// Web panel (Twitch OAuth control panel) - must be before server start
+	web.NewPanelService(func(channel, message string) {
+		twitchBot.Say(channel, message)
+	})
+
 	// bertstats
 	webServer := web.NewWebService(":8080")
 	webServer.Start()
+
+	// STT stream listening (disabled by default)
+	services.NewSTTService(func(channel, message string) {
+		twitchBot.Say(channel, message)
+	})
 
 	// Run twitch in background
 	go func() {

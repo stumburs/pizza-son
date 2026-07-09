@@ -185,6 +185,20 @@ func (s *TwitchService) GetUserID(username string) (string, error) {
 	return resp.Data.Users[0].ID, nil
 }
 
+func (s *TwitchService) GetModerators(broadcasterID, userID string) (bool, error) {
+	resp, err := s.client.GetModerators(&helix.GetModeratorsParams{
+		BroadcasterID: broadcasterID,
+		UserIDs:       []string{userID},
+	})
+	if err != nil {
+		return false, err
+	}
+	if resp.ErrorMessage != "" {
+		return false, fmt.Errorf(resp.ErrorMessage)
+	}
+	return len(resp.Data.Moderators) > 0, nil
+}
+
 func (s *TwitchService) GetUsername(userID string) (string, error) {
 	resp, err := s.client.GetUsers(&helix.UsersParams{
 		IDs: []string{userID},

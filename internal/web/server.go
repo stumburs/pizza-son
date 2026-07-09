@@ -20,12 +20,26 @@ func (ws *WebService) Start() {
 	fs := http.FileServer(http.Dir("./web/public"))
 	http.Handle("/", fs)
 
+	// Clean URLs for panel
+	http.HandleFunc("/panel", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./web/public/panel.html")
+	})
+
 	// API endpoints
 	http.HandleFunc("/api/global", enableCORS(ws.handleGlobalStats))
 	http.HandleFunc("/api/channel", enableCORS(ws.handleChannelStats))
 	http.HandleFunc("/api/user", enableCORS(ws.handleUserStats))
 	http.HandleFunc("/api/emotes", enableCORS(ws.handleChannelEmotes))
 	http.HandleFunc("/api/live", enableCORS(services.LiveFeedInstance.HandleLiveFeed))
+
+	// Panel API (auth + settings control)
+	http.HandleFunc("/api/auth/login", enableCORS(ws.handleAuthLogin))
+	http.HandleFunc("/api/auth/callback", enableCORS(ws.handleAuthCallback))
+	http.HandleFunc("/api/auth/logout", enableCORS(requireSession(ws.handleAuthLogout)))
+	http.HandleFunc("/api/auth/me", enableCORS(requireSession(ws.handleAuthMe)))
+	http.HandleFunc("/api/panel/commands", enableCORS(requireSession(ws.handlePanelCommands)))
+	http.HandleFunc("/api/panel/listeners", enableCORS(requireSession(ws.handlePanelListeners)))
+	http.HandleFunc("/api/panel/save", enableCORS(requireSession(ws.handlePanelSave)))
 
 	log.Printf("[Web] Starting local dashboard on http://localhost%s/\n", ws.port)
 	go func() {
@@ -193,7 +207,7 @@ func (ws *WebService) handleChannelEmotes(w http.ResponseWriter, r *http.Request
 func enableCORS(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 
 		if r.Method == http.MethodOptions {

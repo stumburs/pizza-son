@@ -197,6 +197,29 @@ func (s *OllamaService) Lobotomize(channel string) {
 	log.Println("[Ollama] Lobotomized", channel)
 }
 
+func (s *OllamaService) GetRecentAmbient(channel string, count int) string {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	msgs, ok := s.ambient[channel]
+	if !ok || len(msgs) == 0 {
+		return "(no recent chat)"
+	}
+
+	start := 0
+	if len(msgs) > count {
+		start = len(msgs) - count
+	}
+
+	var lines []string
+	for _, m := range msgs[start:] {
+		if m.Content != nil {
+			lines = append(lines, *m.Content)
+		}
+	}
+	return strings.Join(lines, "\n")
+}
+
 func (s *OllamaService) GetPromptByCommand(command string) string {
 	command = strings.TrimPrefix(command, "!")
 
