@@ -99,4 +99,21 @@
 | 95 | <img src="https://cdn.7tv.app/emote/01GMKRKZF80006JB07GQ8VVGGG/1x.webp" alt="hey" title="hey" style="height:1.5em;vertical-align:middle;"> wtf | baconpatroller | 2026-05-22 |
 | 96 | but as it turns out, it might be what you geeeeet | onion_tm | 2026-05-30 |
 | 97 | you can count your grandma as a bicycle but she aint gonna be happy when you try to ride her | baconpatroller | 2026-06-01 |
+| 98 | me if i was the Titanic: D: | Sander17_ | 2026-06-02 |
+| 99 | all this talk makes me wanna hit that bell | stistrup | 2026-06-05 |
+| 100 | number 15 by deez nuts | SweatySando | 2026-06-08 |
+| 101 | youre telling me a gar licked this bread? | WagyuPatties | 2026-06-08 |
+| 102 | Nineteen Eighty Fouuuurrr!!! | RobynLTW | 2026-06-11 |
+| 103 | ͏ | Sir_Lysergium | 2026-06-11 |
+| 104 | more releases than motown records | Slodderhaai | 2026-06-11 |
+| 105 | baby got <img src="https://cdn.7tv.app/emote/01K6B3Y3SG5ZBAWXXVKX7BKBE5/1x.webp" alt="bert" title="bert" style="height:1.5em;vertical-align:middle;"> | pizza_tm | 2026-06-13 |
+| 106 | does Bob count as ice cream | notnope111 | 2026-06-14 |
+| 107 | brtfeck | notnope111 | 2026-06-15 |
+| 108 | The Door featuring famous singer Jim Morris | baconpatroller | 2026-06-17 |
+| 109 | i survive off chicken nuggets | itzkxtee | 2026-06-23 |
+| 110 | he only killed a few people | baconpatroller | 2026-06-29 |
+| 111 | this map raises more questions than it answers | baconpatroller | 2026-06-30 |
+| 112 | I think you need to use the mini gorilla grip chimpanzee style banked speedslide inversion reversal hyperprecision gorilla orangutan glue technique for this map. just a thought | kenny2crazy | 2026-07-01 |
+| 113 | rythim is a lyser | Clems_88 | 2026-07-05 |
+| 114 | Lease and a key | robert_paul_champagne | 2026-07-09 |
 
