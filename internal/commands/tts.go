@@ -10,7 +10,7 @@ import (
 var (
 	ttsVoices    = map[string]string{}
 	ttsVoicesMu  sync.RWMutex
-	defaultVoice = "bestie"
+	defaultVoice = "tiktok_bestie"
 )
 
 func getTTSVoice(userID string) string {
