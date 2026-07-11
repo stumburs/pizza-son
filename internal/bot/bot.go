@@ -96,6 +96,7 @@ func twitchMessageToMessage(m twitch.PrivateMessage) models.Message {
 			IsBroadcaster: m.User.IsBroadcaster,
 			IsMod:         m.User.IsMod,
 			IsSubscriber:  m.User.Badges["subscriber"] > 0,
+			IsVIP:         m.User.IsVip,
 		},
 		FirstMessage: m.FirstMessage,
 	}
