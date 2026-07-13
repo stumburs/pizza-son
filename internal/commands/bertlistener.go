@@ -267,7 +267,7 @@ func init() {
 			if msg == "!bertcheck" {
 				// Only timeout on Twitch
 				if ctx.Message.Platform == models.PlatformTwitch {
-					services.TwitchServiceInstance.Timeout(ctx.Message.Channel, ctx.Message.User.ID, 21, "not using emote smh")
+					services.TwitchServiceInstance.Timeout(ctx.Message.Channel, ctx.Message.User.ID, 1, "not using emote smh")
 				}
 				ctx.Client.Say(ctx.Message.Channel, "smh !bertcheck isn't a command")
 				return true
