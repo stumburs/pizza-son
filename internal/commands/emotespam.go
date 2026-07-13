@@ -64,8 +64,8 @@ func init() {
 			}
 
 			seconds, err := strconv.ParseFloat(ctx.Args[0], 64)
-			if err != nil || seconds < 0.1 {
-				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "Interval must be at least 0.1 seconds.")
+			if err != nil || seconds < 0.2 {
+				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "Interval must be at least 0.2 seconds.")
 				return
 			}
 
