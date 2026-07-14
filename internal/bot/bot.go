@@ -1,6 +1,7 @@
 package bot
 
 import (
+	"fmt"
 	"log"
 	"pizza-son/internal/config"
 	"pizza-son/internal/models"
@@ -59,21 +60,21 @@ func (b *Bot) setupHandlers() {
 		b.registry.Dispatch(&TwitchSender{bot: b}, msg)
 	})
 
-	// Auto raid shoutout (disabled for now to not take human jobs)
-	// b.client.OnUserNoticeMessage(func(message twitch.UserNoticeMessage) {
-	// 	if message.MsgID == "raid" {
-	// 		raiderUsername := message.MsgParams["msg-param-login"]
-	// 		if raiderUsername == "" {
-	// 			raiderUsername = message.User.Name // fallback
-	// 		}
+	b.client.OnUserNoticeMessage(func(message twitch.UserNoticeMessage) {
+		if message.MsgID == "raid" {
+			raiderUsername := message.MsgParams["msg-param-login"]
+			if raiderUsername == "" {
+				raiderUsername = message.User.Name // fallback
+			}
 
-	// 		if raiderUsername != "" {
-	// 			log.Printf("[Bot] Channel #%s was raided by %s! Shouting out...", message.Channel, raiderUsername)
-
-	// 			go services.TwitchServiceInstance.Shoutout(message.Channel, raiderUsername)
-	// 		}
-	// 	}
-	// })
+			if raiderUsername != "" {
+				b.client.Say(message.Channel, fmt.Sprintf("hibert %s and raiders", raiderUsername))
+				// Auto raid shoutout (disabled for now to not take human jobs)
+				// log.Printf("[Bot] Channel #%s was raided by %s! Shouting out...", message.Channel, raiderUsername)
+				// go services.TwitchServiceInstance.Shoutout(message.Channel, raiderUsername)
+			}
+		}
+	})
 
 	b.client.OnConnect(func() {
 		log.Println("[Bot] Connected")
