@@ -830,6 +830,53 @@
         }
       }
 
+      function pad2(n) { return String(n).padStart(2, '0'); }
+
+      function fillHourlyTimeline(timeline) {
+        const keys = Object.keys(timeline);
+        if (keys.length === 0) return {};
+        const sorted = keys.sort();
+        const start = new Date(sorted[0]);
+        const end = new Date(sorted[sorted.length - 1]);
+        const result = {};
+        const cur = new Date(start);
+        while (cur <= end) {
+          const key = cur.getFullYear() + '-' + pad2(cur.getMonth() + 1) + '-' + pad2(cur.getDate()) + ' ' + pad2(cur.getHours()) + ':00';
+          result[key] = key in timeline ? timeline[key] : 0;
+          cur.setHours(cur.getHours() + 1);
+        }
+        return result;
+      }
+
+      function fillDailyTimeline(timeline) {
+        const keys = Object.keys(timeline);
+        if (keys.length === 0) return {};
+        const sorted = keys.sort();
+        const start = new Date(sorted[0]);
+        const end = new Date(sorted[sorted.length - 1]);
+        const result = {};
+        const cur = new Date(start);
+        while (cur <= end) {
+          const key = cur.getFullYear() + '-' + pad2(cur.getMonth() + 1) + '-' + pad2(cur.getDate());
+          result[key] = key in timeline ? timeline[key] : 0;
+          cur.setDate(cur.getDate() + 1);
+        }
+        return result;
+      }
+
+      function getLast24Hours(timeline) {
+        const result = {};
+        const now = new Date();
+        now.setMinutes(0, 0, 0);
+        for (let i = 23; i >= 0; i--) {
+          const d = new Date(now);
+          d.setHours(d.getHours() - i);
+          const key = d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()) + ' ' + pad2(d.getHours()) + ':00';
+          result[key] = key in timeline ? timeline[key] : 0;
+        }
+        return result;
+      }
+
       function getTopHTML(obj, limit, isGold = false, nameType = "user") {
         if (!obj) return "<i>None</i>";
         let sorted = Object.entries(obj)
@@ -968,8 +1015,8 @@
           },
         );
 
-        const globalHourlyTimeline = data.hourly_timeline || {};
-        const allGlobalSortedHours = Object.keys(globalHourlyTimeline).sort();
+        const globalHourlyTimeline = fillHourlyTimeline(data.hourly_timeline || {});
+        const allGlobalSortedHours = Object.keys(globalHourlyTimeline);
         const gHourlyTimelineSum = Object.values(globalHourlyTimeline).reduce(
           (sum, val) => sum + val,
           0,
@@ -991,7 +1038,7 @@
                 {
                   label: "Total Accumulated Berts",
                   data: allGlobalSortedHours.map((hour) => {
-                    gRunningTotal += globalHourlyTimeline[hour] || 0;
+                    gRunningTotal += globalHourlyTimeline[hour];
                     return gRunningTotal;
                   }),
                   borderColor: "#9146ff",
@@ -1064,8 +1111,8 @@
           })
           .join(" ");
 
-        const timeline = data.daily_activations || data.daily_timeline || {};
-        const sortedDates = Object.keys(timeline).sort();
+        const timeline = fillDailyTimeline(data.daily_activations || data.daily_timeline || {});
+        const sortedDates = Object.keys(timeline);
 
         if (channelChartInstance) channelChartInstance.destroy();
         channelChartInstance = new Chart(
@@ -1102,8 +1149,8 @@
 
         const hourlyTimeline =
           data.hourly_activations || data.hourly_timeline || {};
-        const allSortedHours = Object.keys(hourlyTimeline).sort();
-        const sortedHours24 = allSortedHours.slice(-24);
+        const last24Data = getLast24Hours(hourlyTimeline);
+        const last24HoursLabels = Object.keys(last24Data);
 
         if (channelHourlyChartInstance) channelHourlyChartInstance.destroy();
         channelHourlyChartInstance = new Chart(
@@ -1111,11 +1158,11 @@
           {
             type: "bar",
             data: {
-              labels: sortedHours24.map((h) => h.split(" ")[1] || h),
+              labels: last24HoursLabels.map((h) => h.split(" ")[1] || h),
               datasets: [
                 {
                   label: "Hourly Hits",
-                  data: sortedHours24.map((h) => hourlyTimeline[h]),
+                  data: last24HoursLabels.map((h) => last24Data[h]),
                   backgroundColor: "rgba(59, 130, 246, 0.6)",
                   borderColor: "#3b82f6",
                   borderWidth: 1,
@@ -1137,7 +1184,9 @@
           },
         );
 
-        const chHourlyTimelineSum = Object.values(hourlyTimeline).reduce(
+        const filledHourlyTimeline = fillHourlyTimeline(hourlyTimeline);
+        const allFilledHours = Object.keys(filledHourlyTimeline);
+        const chHourlyTimelineSum = Object.values(filledHourlyTimeline).reduce(
           (sum, val) => sum + val,
           0,
         );
@@ -1153,18 +1202,18 @@
           {
             type: "line",
             data: {
-              labels: allSortedHours,
+              labels: allFilledHours,
               datasets: [
                 {
                   label: "Total Historical Berts",
-                  data: allSortedHours.map((hour) => {
-                    chRunningTotal += hourlyTimeline[hour];
+                  data: allFilledHours.map((hour) => {
+                    chRunningTotal += filledHourlyTimeline[hour];
                     return chRunningTotal;
                   }),
                   borderColor: "#3b82f6",
                   backgroundColor: "rgba(59, 130, 246, 0.08)",
                   borderWidth: 2,
-                  pointRadius: allSortedHours.length > 50 ? 0 : 2,
+                  pointRadius: allFilledHours.length > 50 ? 0 : 2,
                   tension: 0.1,
                   fill: true,
                 },
@@ -1258,9 +1307,8 @@
             })
             .join(" ") || "<i>Got 'em all! 🎉</i>";
 
-        const userTimeline =
-          channelStats.daily_timeline || channelStats.daily_activations || {};
-        const sortedDates = Object.keys(userTimeline).sort();
+        const userTimeline = fillDailyTimeline(channelStats.daily_timeline || channelStats.daily_activations || {});
+        const sortedDates = Object.keys(userTimeline);
         const dailyTimelineSum = Object.values(userTimeline).reduce(
           (sum, val) => sum + val,
           0,
@@ -1305,8 +1353,8 @@
 
         const userHourlyTimeline =
           channelStats.hourly_timeline || channelStats.hourly_activations || {};
-        const allUserSortedHours = Object.keys(userHourlyTimeline).sort();
-        const sortedUserHours24 = allUserSortedHours.slice(-24);
+        const userLast24Data = getLast24Hours(userHourlyTimeline);
+        const userLast24Labels = Object.keys(userLast24Data);
 
         if (userHourlyChartInstance) userHourlyChartInstance.destroy();
         userHourlyChartInstance = new Chart(
@@ -1314,11 +1362,11 @@
           {
             type: "bar",
             data: {
-              labels: sortedUserHours24.map((h) => h.split(" ")[1] || h),
+              labels: userLast24Labels.map((h) => h.split(" ")[1] || h),
               datasets: [
                 {
                   label: "User Hourly Counts",
-                  data: sortedUserHours24.map((h) => userHourlyTimeline[h]),
+                  data: userLast24Labels.map((h) => userLast24Data[h]),
                   backgroundColor: "rgba(236, 72, 153, 0.6)",
                   borderColor: "#ec4899",
                   borderWidth: 1,
@@ -1340,7 +1388,9 @@
           },
         );
 
-        const hourlyTimelineSum = Object.values(userHourlyTimeline).reduce(
+        const filledUserHourlyTimeline = fillHourlyTimeline(userHourlyTimeline);
+        const allFilledUserHours = Object.keys(filledUserHourlyTimeline);
+        const hourlyTimelineSum = Object.values(filledUserHourlyTimeline).reduce(
           (sum, val) => sum + val,
           0,
         );
@@ -1353,18 +1403,18 @@
           {
             type: "line",
             data: {
-              labels: allUserSortedHours,
+              labels: allFilledUserHours,
               datasets: [
                 {
                   label: "Total Collection Progress",
-                  data: allUserSortedHours.map((hour) => {
-                    uRunningTotal += userHourlyTimeline[hour];
+                  data: allFilledUserHours.map((hour) => {
+                    uRunningTotal += filledUserHourlyTimeline[hour];
                     return uRunningTotal;
                   }),
                   borderColor: "#ec4899",
                   backgroundColor: "rgba(236, 72, 153, 0.08)",
                   borderWidth: 2,
-                  pointRadius: allUserSortedHours.length > 50 ? 0 : 2,
+                  pointRadius: allFilledUserHours.length > 50 ? 0 : 2,
                   tension: 0.1,
                   fill: true,
                 },
