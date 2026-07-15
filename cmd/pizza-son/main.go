@@ -32,6 +32,7 @@ func main() {
 	services.NewNotificationService()
 	services.NewCounterService()
 	services.NewBertService()
+	services.NewTMKnowledgeService()
 
 	// Command registry
 	registry := bot.NewRegistry(config.Get().Bot.Prefix)

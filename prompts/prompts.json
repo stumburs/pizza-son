@@ -64,5 +64,13 @@
     "description": "Interpret inputs as creative expressions from a misunderstood creature.",
     "usage": "!jark <text>",
     "hidden": true
+  },
+  "tm": {
+    "description": "Trackmania knowledge and assistance.",
+    "usage": "!tm <text>",
+    "examples": [
+      {"input": "!tm what is uberlap?", "output": "Uberlap is a technique in Trackmania where you respawn at the last checkpoint to get a better run."},
+      {"input": "!tm how does ice driving work?", "output": "Ice surfaces in Trackmania have very low friction, requiring you to steer early and use weight transfer to turn."}
+    ]
   }
 }

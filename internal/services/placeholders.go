@@ -31,6 +31,12 @@ func FillPlaceholders(msg models.Message, prompt string) string {
 			loc, _ := time.LoadLocation("Europe/Paris") // CEST
 			return time.Now().In(loc).Format("2006-01-02 15:04")
 		}(),
+		"{{tminfo}}", func() string {
+			if TMKnowledgeServiceInstance == nil {
+				return ""
+			}
+			return TMKnowledgeServiceInstance.GetKnowledgeText()
+		}(),
 	)
 
 	result := replacer.Replace(prompt)
