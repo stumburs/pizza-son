@@ -32,9 +32,10 @@ type ChannelData struct {
 }
 
 type BertService struct {
-	Mu    sync.RWMutex
-	store *store.Store[map[string]*ChannelData]
-	Data  map[string]*ChannelData // channel name -> data
+	Mu          sync.RWMutex
+	store       *store.Store[map[string]*ChannelData]
+	Data        map[string]*ChannelData // channel name -> data
+	globalTotal int
 }
 
 type BertStats struct {
@@ -70,7 +71,7 @@ func (s *BertService) GetBerts(channel string) []string {
 	return []string{}
 }
 
-func (s *BertService) RegisterActivation(channel, user, bert string, isZaza bool) {
+func (s *BertService) RegisterActivation(channel, user, bert string, isZaza bool) int {
 	s.Mu.Lock()
 	defer s.Mu.Unlock()
 	s.ensureChannel(channel)
@@ -124,6 +125,9 @@ func (s *BertService) RegisterActivation(channel, user, bert string, isZaza bool
 
 	chData.UserStats[user] = stats
 
+	// update global total
+	s.globalTotal++
+
 	// look up emote ID and broadcast
 	var emoteID string
 	if SevenTVServiceInstance != nil {
@@ -132,6 +136,7 @@ func (s *BertService) RegisterActivation(channel, user, bert string, isZaza bool
 	LiveFeedInstance.Broadcast(user, channel, bert, emoteID)
 
 	s.save()
+	return s.globalTotal
 }
 
 func (s *BertService) AddBert(channel, name string) {
@@ -277,5 +282,12 @@ func (s *BertService) load() {
 	if migrated {
 		log.Println("[Bert] Legacy database records successfully transformed to new timeline format!")
 		s.save()
+	}
+
+	// compute global total from loaded data
+	for _, chData := range s.Data {
+		for _, uStats := range chData.UserStats {
+			s.globalTotal += uStats.TotalActivations
+		}
 	}
 }

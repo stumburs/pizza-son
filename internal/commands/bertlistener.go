@@ -94,9 +94,18 @@ func init() {
 				isZazaRoll = true
 			}
 
-			services.BertServiceInstance.RegisterActivation(ctx.Message.Channel, ctx.Message.User.Name, baseResponse, isZazaRoll)
+			newTotal := services.BertServiceInstance.RegisterActivation(ctx.Message.Channel, ctx.Message.User.Name, baseResponse, isZazaRoll)
 
 			ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, finalMessage)
+
+			// global milestone
+			if newTotal%1000 == 0 {
+				displayName := ctx.Message.User.DisplayName
+				if displayName == "" {
+					displayName = ctx.Message.User.Name
+				}
+				ctx.Client.Say(ctx.Message.Channel, fmt.Sprintf("%s just checked the %dth global bert!", displayName, newTotal))
+			}
 
 			// lyser
 			if ctx.Message.Channel == "sir_lysergium" {
