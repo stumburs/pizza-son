@@ -194,7 +194,7 @@ func (s *TwitchService) GetModerators(broadcasterID, userID string) (bool, error
 		return false, err
 	}
 	if resp.ErrorMessage != "" {
-		return false, fmt.Errorf(resp.ErrorMessage)
+		return false, fmt.Errorf("%s", resp.ErrorMessage)
 	}
 	return len(resp.Data.Moderators) > 0, nil
 }

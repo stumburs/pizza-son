@@ -14,11 +14,13 @@ func init() {
 	Register(bot.Command{
 		Name:        "quote",
 		Description: "Manage and retrieve quotes. Only VIP's can add new quotes.",
-		Usage:       "!quote | !quote <number> | !quote add <text> | !quote list",
+		Usage:       "!quote | !quote <number> | !quote <username> | !quote add <text> | !quote list",
 		Category:    bot.CategoryQuotes,
 		Examples: []bot.CommandExample{
 			{Input: "!quote", Output: "#4: \" I love cats \" - added by pizza_tm on 2026-03-05"},
 			{Input: "!quote 2", Output: "#2: \" Dogs are alright too \" - added by meowercat on 2026-03-02"},
+			{Input: "!quote pizza_tm", Output: "#1: \" banger quote \" - added by pizza_tm on 2026-04-19"},
+			{Input: "!quote @pizza_tm", Output: "#1: \" banger quote \" - added by pizza_tm on 2026-04-19"},
 			{Input: "!quote add this is a quote", Output: "Quote #5 added!"},
 			{Input: "!quote list", Output: "All quotes for {insert name here meow}: https://stumburs.github.io/pizza-son/quotes/"},
 		},
@@ -74,13 +76,19 @@ func init() {
 				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID,
 					fmt.Sprintf("All quotes for %s: %s/%s", ctx.Message.Channel, quotesBaseURL, ctx.Message.Channel))
 				return
-			default:
-				// Specific quote by number
-				number, err := strconv.Atoi(ctx.Args[0])
-				if err != nil {
-					ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "Usage: !quote | !quote <number> | !quote add <text> | !quote list")
+		default:
+			// Specific quote by number or random quote by user
+			number, err := strconv.Atoi(ctx.Args[0])
+			if err != nil {
+				quote, number, ok := services.QuoteServiceInstance.RandomByUser(ctx.Message.Channel, ctx.Args[0])
+				if !ok {
+					ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID,
+						fmt.Sprintf("No quotes found for %s.", ctx.Args[0]))
 					return
 				}
+				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, formatQuote(quote, number))
+				return
+			}
 				// funny number
 				if number == 67 && ctx.Message.Channel == "sir_lysergium" {
 					ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, fmt.Sprintf("Quote #%d not found.", number))

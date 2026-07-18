@@ -6,6 +6,7 @@ import (
 	"log"
 	"math/rand/v2"
 	"os"
+	"strings"
 	"sync"
 	"time"
 )
@@ -105,6 +106,30 @@ func (s *QuoteService) Random(channel string) (Quote, int, bool) {
 	}
 	idx := rand.IntN(len(quotes))
 	return quotes[idx], idx + 1, true
+}
+
+func (s *QuoteService) RandomByUser(channel, username string) (Quote, int, bool) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	quotes := s.getOrLoad(channel)
+	username = strings.TrimPrefix(username, "@")
+
+	var filtered []Quote
+	var indices []int
+	for i, q := range quotes {
+		if strings.EqualFold(q.AddedBy, username) {
+			filtered = append(filtered, q)
+			indices = append(indices, i+1)
+		}
+	}
+
+	if len(filtered) == 0 {
+		return Quote{}, 0, false
+	}
+
+	idx := rand.IntN(len(filtered))
+	return filtered[idx], indices[idx], true
 }
 
 func (s *QuoteService) Get(channel string, number int) (Quote, bool) {
