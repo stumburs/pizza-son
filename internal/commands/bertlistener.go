@@ -38,7 +38,7 @@ var trollRulesEnabled = make(map[string]bool) // channel -> enabled/disabled
 func isTrollEnabled(channel string) bool {
 	enabled, exists := trollRulesEnabled[channel]
 	if !exists {
-		return true
+		return false // disabled by default
 	}
 	return enabled
 }
@@ -298,9 +298,9 @@ func init() {
 			current := isTrollEnabled(ctx.Message.Channel)
 			trollRulesEnabled[ctx.Message.Channel] = !current
 			if !current {
-				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "bertcheck rigging enabled")
+				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "bertcheck rigging has been enabled")
 			} else {
-				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "bertcheck rigging disabled")
+				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "bertcheck rigging has been disabled")
 			}
 		},
 	})
