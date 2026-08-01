@@ -42,11 +42,8 @@ func init() {
 			if !sixSevenRegex.MatchString(msg) {
 				return false
 			}
-			if ctx.Message.Channel == "frytek2k" {
-				ctx.Client.Say(ctx.Message.Channel, "!ben")
-			} else {
-				ctx.Client.Say(ctx.Message.Channel, "ben")
-			}
+
+			ctx.Client.Say(ctx.Message.Channel, "ben")
 
 			// Only timeout on Twitch
 			if ctx.Message.Platform == models.PlatformTwitch {
