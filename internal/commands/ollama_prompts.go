@@ -107,6 +107,8 @@ func buildCommand(name string, meta promptMeta) bot.Command {
 				return
 			}
 			content := strings.Join(strings.Fields(*res.Message.Content), " ")
+			// temp fix to avoid exploiting mod status
+			content = strings.TrimLeft(content, "/")
 			ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, content)
 		},
 	}
