@@ -52,7 +52,7 @@ func (s *NotificationService) check() {
 			streamAge := time.Since(info.StartedAt)
 			if streamAge <= 5*time.Minute {
 				log.Printf("[Notifications] %s went live (%s ago), sending Discord notification", n.TwitchChannel, streamAge.Round(time.Second))
-				go s.handleLiveSession(n.DiscordWebhook, info)
+				go s.handleLiveSession(n.DiscordWebhook, n.Message, info)
 			} else {
 				log.Printf("[Notifications] %s is live but started %s ago, skipping notification", n.TwitchChannel, streamAge.Round(time.Second))
 			}
@@ -60,9 +60,9 @@ func (s *NotificationService) check() {
 	}
 }
 
-func (s *NotificationService) handleLiveSession(webhookURL string, info StreamInfo) {
+func (s *NotificationService) handleLiveSession(webhookURL, message string, info StreamInfo) {
 	// Initial message
-	payload := s.buildPayload(info, false)
+	payload := s.buildPayload(info, false, message)
 	messageID, err := s.executeRequest(http.MethodPost, webhookURL+"?wait=true", payload)
 	if err != nil {
 		log.Println("[Notifications] Initial send failed:", err)
@@ -83,7 +83,7 @@ func (s *NotificationService) handleLiveSession(webhookURL string, info StreamIn
 			return
 		}
 
-		updatePayload := s.buildPayload(current, true)
+		updatePayload := s.buildPayload(current, true, message)
 
 		_, err := s.executeRequest(http.MethodPatch, editURL, updatePayload)
 		if err != nil {
@@ -94,8 +94,8 @@ func (s *NotificationService) handleLiveSession(webhookURL string, info StreamIn
 	}
 }
 
-func (s *NotificationService) buildPayload(info StreamInfo, isUpdate bool) map[string]any {
-	content := "@everyone"
+func (s *NotificationService) buildPayload(info StreamInfo, isUpdate bool, message string) map[string]any {
+	content := s.renderMessage(message, info)
 
 	fields := []map[string]any{
 		{"name": "Game", "value": info.GameName, "inline": true},
@@ -126,6 +126,18 @@ func (s *NotificationService) buildPayload(info StreamInfo, isUpdate bool) map[s
 			},
 		},
 	}
+}
+
+func (s *NotificationService) renderMessage(message string, info StreamInfo) string {
+	if message == "" {
+		message = "@everyone"
+	}
+	r := strings.NewReplacer(
+		"{{channel}}", info.ChannelName,
+		"{{game}}", info.GameName,
+		"{{title}}", info.StreamTitle,
+	)
+	return r.Replace(message)
 }
 
 func (s *NotificationService) executeRequest(method, url string, payload map[string]any) (string, error) {

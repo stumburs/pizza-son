@@ -45,6 +45,7 @@ type Config struct {
 	Notifications []struct {
 		TwitchChannel  string `toml:"twitch_channel"`
 		DiscordWebhook string `toml:"discord_webhook"`
+		Message        string `toml:"message"` // Custom ping message, supports {{channel}}, {{game}}, {{title}}. Defaults to "@everyone"
 	} `toml:"notifications"`
 
 	STT struct {
