@@ -14,18 +14,13 @@ var (
 
 	// AI save us (TODO: Improve and de-jankify)
 	sixSevenRegex = regexp.MustCompile(`(?i)` +
-		// Numeric: 67, 6-7, 6 uh 7, 67cat, 67676767, etc.
-		`(?:^|[\s,!?(])[6б].{0,20}7` +
-		`|` +
-		// Mixed: six...7, 6...seven
-		`(?:^|[\s,!?(])six.{0,20}7` +
-		`|` +
-		`(?:^|[\s,!?(])[6б].{0,20}seven` +
-		`|` +
-		// Written: six...seven, sixty...seven
-		`six.{0,20}seven` +
-		`|` +
-		`sixty.{0,20}seven`,
+		// "six" in any form: numeric (6/б), roman (VI), written (six/sick/sex/sicks), tens (sixty/sicksty)
+		`(?:^|[\s,!?(])` +
+		`(?:[6б]|VI|six|sick|sex|sicks|sixty|sicksty)` +
+		// loose distance so 6 and 7 in the same sentence still count
+		`.{0,50}` +
+		// then "seven" in any form: 7, VII, seven
+		`(?:7|VII|seven)`,
 	)
 )
 
