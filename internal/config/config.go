@@ -9,8 +9,9 @@ import (
 type Config struct {
 	Auth struct {
 		Twitch struct {
-			Username string `toml:"username"`
-			OAuth    string `toml:"oauth"`
+			Username     string `toml:"username"`
+			ClientID     string `toml:"client_id"`
+			ClientSecret string `toml:"client_secret"`
 		} `toml:"twitch"`
 		Discord struct {
 			Token string `toml:"token"`

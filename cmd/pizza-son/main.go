@@ -14,7 +14,12 @@ func main() {
 		panic(err)
 	}
 
-	twitchClient := twitch.New(config)
+	twitchClient, err := twitch.New(config)
+	if err != nil {
+		panic(err)
+	}
+
+	// run twitch client
 	go func() {
 		if err := twitchClient.Run(); err != nil {
 			fmt.Println("twitch error:", err)
@@ -22,6 +27,8 @@ func main() {
 	}()
 
 	discordClient := discord.New(config)
+
+	// run discord client
 	go func() {
 		if err := discordClient.Run(); err != nil {
 			fmt.Println("discord error:", err)
