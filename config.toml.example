@@ -1,0 +1,3 @@
+[auth.twitch]
+username = "bot_username"
+oauth = "oauth:123abc"
