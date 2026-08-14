@@ -12,6 +12,9 @@ type Config struct {
 			Username string `toml:"username"`
 			OAuth    string `toml:"oauth"`
 		} `toml:"twitch"`
+		Discord struct {
+			Token string `toml:"token"`
+		} `toml:"discord"`
 	} `toml:"auth"`
 }
 

@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	"pizza-son/internal/config"
-
-	"github.com/gempir/go-twitch-irc/v4"
+	"pizza-son/internal/discord"
+	"pizza-son/internal/twitch"
 )
 
 func main() {
@@ -14,16 +14,19 @@ func main() {
 		panic(err)
 	}
 
-	client := twitch.NewClient(config.Auth.Twitch.Username, config.Auth.Twitch.OAuth)
+	twitchClient := twitch.New(config)
+	go func() {
+		if err := twitchClient.Run(); err != nil {
+			fmt.Println("twitch error:", err)
+		}
+	}()
 
-	client.OnPrivateMessage(func(message twitch.PrivateMessage) {
-		fmt.Println(message.Message)
-	})
+	discordClient := discord.New(config)
+	go func() {
+		if err := discordClient.Run(); err != nil {
+			fmt.Println("discord error:", err)
+		}
+	}()
 
-	client.Join("pizza_tm")
-
-	err = client.Connect()
-	if err != nil {
-		panic(err)
-	}
+	select {}
 }
