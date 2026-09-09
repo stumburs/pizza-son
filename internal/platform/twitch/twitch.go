@@ -1,8 +1,9 @@
-package bot
+package twitch
 
 import (
 	"fmt"
 	"log"
+	"pizza-son/internal/bot"
 	"pizza-son/internal/config"
 	"pizza-son/internal/models"
 	"pizza-son/internal/services"
@@ -13,23 +14,23 @@ import (
 
 type Bot struct {
 	client   *twitch.Client
-	registry *Registry
+	registry *bot.Registry
 	channels []string
 }
 
-type TwitchSender struct {
+type Sender struct {
 	bot *Bot
 }
 
-func (t *TwitchSender) Say(channel, message string) {
+func (t *Sender) Say(channel, message string) {
 	t.bot.client.Say(channel, message)
 }
 
-func (t *TwitchSender) Reply(channel, msgID, message string) {
+func (t *Sender) Reply(channel, msgID, message string) {
 	t.bot.client.Reply(channel, msgID, message)
 }
 
-func New(username string, channels []string, registry *Registry) *Bot {
+func New(channels []string, registry *bot.Registry) *Bot {
 	return &Bot{
 		registry: registry,
 		channels: channels,
@@ -44,20 +45,20 @@ func (b *Bot) Start() error {
 	token := "oauth:" + services.TwitchServiceInstance.GetAccessToken()
 	b.client = twitch.NewClient(config.Get().Twitch.User, token)
 	b.setupHandlers()
-	log.Println("[Bot] Bot connecting to:", b.channels)
+	log.Println("[Twitch] Bot connecting to:", b.channels)
 	return b.client.Connect()
 }
 
 func (b *Bot) Reconnect(newToken string) {
-	log.Println("[Bot] Token refreshed, disconnecting...")
+	log.Println("[Twitch] Token refreshed, disconnecting...")
 	b.client.Disconnect()
 	// Start() loop will reconnect automatically
 }
 
 func (b *Bot) setupHandlers() {
 	b.client.OnPrivateMessage(func(message twitch.PrivateMessage) {
-		msg := twitchMessageToMessage(message)
-		b.registry.Dispatch(&TwitchSender{bot: b}, msg)
+		msg := messageToMessage(message)
+		b.registry.Dispatch(&Sender{bot: b}, msg)
 	})
 
 	b.client.OnUserNoticeMessage(func(message twitch.UserNoticeMessage) {
@@ -70,21 +71,21 @@ func (b *Bot) setupHandlers() {
 			if raiderUsername != "" {
 				b.client.Say(message.Channel, fmt.Sprintf("hibert %s and raiders", raiderUsername))
 				// Auto raid shoutout (disabled for now to not take human jobs)
-				// log.Printf("[Bot] Channel #%s was raided by %s! Shouting out...", message.Channel, raiderUsername)
+				// log.Printf("[Twitch] Channel #%s was raided by %s! Shouting out...", message.Channel, raiderUsername)
 				// go services.TwitchServiceInstance.Shoutout(message.Channel, raiderUsername)
 			}
 		}
 	})
 
 	b.client.OnConnect(func() {
-		log.Println("[Bot] Connected")
+		log.Println("[Twitch] Connected")
 		for _, ch := range b.channels {
 			b.client.Join(ch)
 		}
 	})
 }
 
-func twitchMessageToMessage(m twitch.PrivateMessage) models.Message {
+func messageToMessage(m twitch.PrivateMessage) models.Message {
 	msg := models.Message{
 		ID:       m.ID,
 		Channel:  m.Channel,

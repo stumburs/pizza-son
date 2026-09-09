@@ -7,6 +7,8 @@ import (
 	"pizza-son/internal/bot"
 	"pizza-son/internal/commands"
 	"pizza-son/internal/config"
+	"pizza-son/internal/platform/discord"
+	"pizza-son/internal/platform/twitch"
 	"pizza-son/internal/services"
 	"pizza-son/internal/web"
 	"syscall"
@@ -39,8 +41,7 @@ func main() {
 	commands.SetRegistry(registry)
 
 	// Twitch bot
-	twitchBot := bot.New(
-		config.Get().Twitch.User,
+	twitchBot := twitch.New(
 		config.Get().Bot.Channels,
 		registry,
 	)
@@ -50,7 +51,7 @@ func main() {
 	})
 
 	// Discord bot
-	discordBot, err := bot.NewDiscordBot(
+	discordBot, err := discord.New(
 		config.Get().Discord.Token,
 		config.Get().Discord.Channels,
 		registry,

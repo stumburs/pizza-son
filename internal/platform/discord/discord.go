@@ -1,36 +1,37 @@
-package bot
+package discord
 
 import (
 	"log"
+	"pizza-son/internal/bot"
 	"pizza-son/internal/models"
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
 )
 
-type DiscordBot struct {
+type Bot struct {
 	session         *discordgo.Session
-	registry        *Registry
+	registry        *bot.Registry
 	allowedChannels map[string]bool
 }
 
-type DiscordSender struct {
+type Sender struct {
 	session   *discordgo.Session
 	channelID string
 }
 
-func (d *DiscordSender) Say(channel, message string) {
+func (d *Sender) Say(channel, message string) {
 	d.session.ChannelMessageSend(channel, message)
 }
 
-func (d *DiscordSender) Reply(channel, msgID, message string) {
+func (d *Sender) Reply(channel, msgID, message string) {
 	d.session.ChannelMessageSendReply(channel, message, &discordgo.MessageReference{
 		MessageID: msgID,
 		ChannelID: channel,
 	})
 }
 
-func NewDiscordBot(token string, allowedChannelIDs []string, registry *Registry) (*DiscordBot, error) {
+func New(token string, allowedChannelIDs []string, registry *bot.Registry) (*Bot, error) {
 	session, err := discordgo.New("Bot " + token)
 	if err != nil {
 		return nil, err
@@ -41,14 +42,14 @@ func NewDiscordBot(token string, allowedChannelIDs []string, registry *Registry)
 		allowed[id] = true
 	}
 
-	return &DiscordBot{
+	return &Bot{
 		session:         session,
 		registry:        registry,
 		allowedChannels: allowed,
 	}, nil
 }
 
-func (b *DiscordBot) Start() error {
+func (b *Bot) Start() error {
 	b.session.AddHandler(b.onMessage)
 	b.session.Identify.Intents = discordgo.IntentGuildMessages |
 		discordgo.IntentDirectMessages |
@@ -61,11 +62,11 @@ func (b *DiscordBot) Start() error {
 	return nil
 }
 
-func (b *DiscordBot) Stop() {
+func (b *Bot) Stop() {
 	b.session.Close()
 }
 
-func (b *DiscordBot) onMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
+func (b *Bot) onMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Author.Bot {
 		return
 	}
@@ -73,12 +74,12 @@ func (b *DiscordBot) onMessage(s *discordgo.Session, m *discordgo.MessageCreate)
 		return
 	}
 
-	msg := discordMessageToMessage(s, m)
-	sender := &DiscordSender{session: s, channelID: m.ChannelID}
+	msg := messageToMessage(s, m)
+	sender := &Sender{session: s, channelID: m.ChannelID}
 	b.registry.Dispatch(sender, msg)
 }
 
-func discordMessageToMessage(s *discordgo.Session, m *discordgo.MessageCreate) models.Message {
+func messageToMessage(s *discordgo.Session, m *discordgo.MessageCreate) models.Message {
 	author := m.Author
 	displayName := author.GlobalName
 	if displayName == "" {
@@ -135,11 +136,6 @@ func discordMessageToMessage(s *discordgo.Session, m *discordgo.MessageCreate) m
 	return msg
 }
 
-func hasDiscordModPerms(m *discordgo.Member) bool {
-	return m.Permissions&discordgo.PermissionAdministrator != 0 ||
-		m.Permissions&discordgo.PermissionManageMessages != 0
-}
-
-func (b *DiscordBot) SendGlobalMessage(channelID, message string) {
+func (b *Bot) SendGlobalMessage(channelID, message string) {
 	b.session.ChannelMessageSend(channelID, message)
 }

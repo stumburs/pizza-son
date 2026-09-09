@@ -14,18 +14,6 @@ type Sender interface {
 	Reply(channel, msgID, message string)
 }
 
-// type TwitchSender struct {
-// 	client *twitch.Client
-// }
-
-// func (t *TwitchSender) Say(channel, message string) {
-// 	t.client.Say(channel, message)
-// }
-
-// func (t *TwitchSender) Reply(channel, msgID, message string) {
-// 	t.client.Reply(channel, msgID, message)
-// }
-
 type CommandContext struct {
 	Client   Sender
 	Message  models.Message
