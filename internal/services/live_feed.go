@@ -12,7 +12,9 @@ type BertUnlockEvent struct {
 	Username string `json:"username"`
 	Channel  string `json:"channel"`
 	Bert     string `json:"bert"`
-	EmoteID  string `json:"emote_id,omitempty"` // optional
+	EmoteID  string `json:"emote_id,omitempty"`
+	IsZaza   bool   `json:"is_zaza"`
+	IsZazaL  bool   `json:"is_zaza_l"`
 }
 
 type LiveFeedHub struct {
@@ -43,12 +45,14 @@ func (h *LiveFeedHub) run() {
 	}
 }
 
-func (h *LiveFeedHub) Broadcast(username, channel, bert, emoteID string) {
+func (h *LiveFeedHub) Broadcast(username, channel, bert, emoteID string, isZaza, isZazaL bool) {
 	h.broadcastCh <- BertUnlockEvent{
 		Username: username,
 		Channel:  channel,
 		Bert:     bert,
 		EmoteID:  emoteID,
+		IsZaza:   isZaza,
+		IsZazaL:  isZazaL,
 	}
 }
 

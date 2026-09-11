@@ -162,7 +162,7 @@ func (s *BertService) RegisterActivation(channel, user, bert string, isZaza, isZ
 	if SevenTVServiceInstance != nil {
 		emoteID = SevenTVServiceInstance.GetEmoteID(channel, bert)
 	}
-	LiveFeedInstance.Broadcast(user, channel, bert, emoteID)
+	LiveFeedInstance.Broadcast(user, channel, bert, emoteID, isZaza, isZazaL)
 
 	s.save()
 	return s.globalTotal

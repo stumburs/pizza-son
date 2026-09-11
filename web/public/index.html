@@ -207,9 +207,6 @@
       }
       .stat-line strong { color: var(--text-primary); font-weight: 600; font-variant-numeric: tabular-nums; }
       .stat-sep { color: var(--text-muted); }
-      .stat-zaza { color: var(--green); }
-      .stat-zaza-l { color: var(--blue); }
-      .stat-double { color: var(--yellow); }
 
       .search-row { display: flex; gap: 8px; margin-bottom: 24px; align-items: center; position: relative; }
       input[type="text"] {
@@ -227,20 +224,24 @@
       }
       input[type="text"]:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
       input[type="text"]::placeholder { color: var(--text-muted); }
-      button.search-btn {
-        padding: 9px 20px;
+      button.clear-btn {
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         cursor: pointer;
-        background: var(--accent-dim);
-        color: var(--accent);
-        border: 1px solid rgba(167, 139, 250, 0.25);
+        background: transparent;
+        color: var(--text-muted);
+        border: 1px solid var(--border);
         border-radius: var(--radius-sm);
-        font-family: "DM Sans", sans-serif;
-        font-size: 0.95rem;
-        font-weight: 600;
-        transition: background 0.18s, border-color 0.18s;
-        white-space: nowrap;
+        font-size: 1.1rem;
+        line-height: 1;
+        padding: 0;
+        transition: color 0.18s, border-color 0.18s;
+        flex-shrink: 0;
       }
-      button.search-btn:hover { background: rgba(167, 139, 250, 0.2); border-color: rgba(167, 139, 250, 0.4); }
+      button.clear-btn:hover { color: var(--text-primary); border-color: var(--accent); }
 
       .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; }
       .box {
@@ -383,7 +384,7 @@
       .channel-select-row { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
       .channel-select-row label { font-size: 0.8rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
       select {
-        padding: 7px 12px;
+        padding: 9px 14px;
         border-radius: var(--radius-sm);
         background: var(--surface-2);
         color: var(--text-primary);
@@ -391,11 +392,11 @@
         font-family: "DM Sans", sans-serif;
         font-size: 0.95rem;
         outline: none;
-        transition: border-color 0.18s;
+        transition: border-color 0.18s, box-shadow 0.18s;
         min-width: 140px;
         cursor: pointer;
       }
-      select:focus { border-color: var(--accent); }
+      select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
       .channel-count { font-size: 0.9rem; color: var(--text-muted); }
       .channel-count strong { color: var(--text-primary); font-variant-numeric: tabular-nums; }
 
@@ -502,11 +503,11 @@
             <span class="stat-sep">·</span>
             <span id="gChans">0</span> channels
             <span class="stat-sep">·</span>
-            <span class="stat-zaza">zaza: <strong id="gZazas">0</strong></span>
+            <span id="gZazas"></span>
             <span class="stat-sep">·</span>
-            <span class="stat-zaza-l">zazaL: <strong id="gZazaLs">0</strong></span>
+            <span id="gZazaLs"></span>
             <span class="stat-sep">·</span>
-            <span class="stat-double">double: <strong id="gDoubleZazas">0</strong></span>
+            <span id="gDoubleZazas"></span>
           </p>
           <div class="grid">
             <div class="box">
@@ -537,7 +538,7 @@
           <h2>Channel Lookup</h2>
           <div class="search-row">
             <input type="text" id="chInput" placeholder="channel name…" autocomplete="off" oninput="filterChannelAutocomplete()" onfocus="filterChannelAutocomplete()" onkeydown="handleChannelKeydown(event)" />
-            <button class="search-btn" onclick="loadChannel()">Search</button>
+            <button class="clear-btn" onclick="clearInput('chInput', 'chAutocomplete', filterChannelAutocomplete)" title="Clear">&times;</button>
             <div class="ch-autocomplete" id="chAutocomplete"></div>
           </div>
           <div id="chResults" style="display: none">
@@ -545,11 +546,11 @@
             <p class="stat-line">
               <strong id="chTotal">0</strong> berts in this channel
               <span class="stat-sep">·</span>
-              <span class="stat-zaza">zaza: <strong id="chZazas">0</strong></span>
+              <span id="chZazas"></span>
               <span class="stat-sep">·</span>
-              <span class="stat-zaza-l">zazaL: <strong id="chZazaLs">0</strong></span>
+              <span id="chZazaLs"></span>
               <span class="stat-sep">·</span>
-              <span class="stat-double">double: <strong id="chDoubleZazas">0</strong></span>
+              <span id="chDoubleZazas"></span>
             </p>
             <div class="grid">
               <div class="box">
@@ -587,7 +588,7 @@
           <h2>User Lookup</h2>
           <div class="search-row">
             <input type="text" id="uInput" placeholder="username…" autocomplete="off" oninput="filterUserAutocomplete()" onfocus="filterUserAutocomplete()" onkeydown="handleUserKeydown(event)" />
-            <button class="search-btn" onclick="loadUser()">Search</button>
+            <button class="clear-btn" onclick="clearInput('uInput', 'uAutocomplete', filterUserAutocomplete)" title="Clear">&times;</button>
             <div class="u-autocomplete" id="uAutocomplete"></div>
           </div>
           <div id="uResults" style="display: none">
@@ -595,16 +596,16 @@
             <p class="stat-line">
               <strong id="uTotal">0</strong> berts across all channels
               <span class="stat-sep">·</span>
-              <span class="stat-zaza">zaza: <strong id="uZazas">0</strong></span>
+              <span id="uZazas"></span>
               <span class="stat-sep">·</span>
-              <span class="stat-zaza-l">zazaL: <strong id="uZazaLs">0</strong></span>
+              <span id="uZazaLs"></span>
               <span class="stat-sep">·</span>
-              <span class="stat-double">double: <strong id="uDoubleZazas">0</strong></span>
+              <span id="uDoubleZazas"></span>
             </p>
-            <div class="channel-select-row">
-              <label for="uChannelSelect">Channel</label>
-              <select id="uChannelSelect" onchange="updateUserChannelView()"></select>
-              <span class="channel-count">Checks: <strong id="uChannelTotal">0</strong></span>
+            <div class="search-row">
+              <input type="text" id="uChannelInput" placeholder="channel name…" autocomplete="off" oninput="filterUserChannelAutocomplete()" onfocus="filterUserChannelAutocomplete()" onkeydown="handleUserChannelKeydown(event)" />
+              <button class="clear-btn" onclick="clearInput('uChannelInput', 'uChannelAutocomplete', filterUserChannelAutocomplete)" title="Clear">&times;</button>
+              <div class="ch-autocomplete" id="uChannelAutocomplete"></div>
             </div>
             <div class="grid">
               <div class="box">
@@ -674,6 +675,19 @@
       window.channelListCache = [];
       window.userListCache = [];
 
+      const ZAZA_EMOTE = "https://cdn.7tv.app/emote/01JBHY1T7RWKHNMC4TV7C7A54T/2x.webp";
+      const ZAZAL_EMOTE = "https://cdn.7tv.app/emote/01KRRDPG9MCPC4NEAHJSBQDPPY/2x.webp";
+
+      function zazaEmoteHTML(cls) {
+        return `<img src="${ZAZA_EMOTE}" style="height:1.1em;vertical-align:middle;" class="${cls || ""}" />`;
+      }
+      function zazaLEmoteHTML(cls) {
+        return `<img src="${ZAZAL_EMOTE}" style="height:1.1em;vertical-align:middle;" class="${cls || ""}" />`;
+      }
+      function zazaDoubleEmoteHTML() {
+        return `<span style="position:relative;display:inline-block;width:3.2em;height:1.1em;vertical-align:middle;"><img src="${ZAZA_EMOTE}" style="height:1.1em;position:absolute;left:0;top:0;" /><img src="${ZAZAL_EMOTE}" style="height:1.1em;position:absolute;left:0.8em;top:0;" /></span>`;
+      }
+
       function switchTab(tabId, btn) {
         document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
         document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
@@ -736,10 +750,21 @@
         loadChannel();
       }
 
+      function clearInput(inputId, autocompleteId, filterFn) {
+        const input = document.getElementById(inputId);
+        input.value = "";
+        input.focus();
+        if (autocompleteId) document.getElementById(autocompleteId).classList.remove("open");
+        if (filterFn) setTimeout(filterFn, 0);
+      }
+
       function handleChannelKeydown(e) {
         const dropdown = document.getElementById("chAutocomplete");
         const items = dropdown.querySelectorAll(".ch-autocomplete-item");
-        if (!dropdown.classList.contains("open") || items.length === 0) return;
+        if (!dropdown.classList.contains("open") || items.length === 0) {
+          if (e.key === "Enter") { e.preventDefault(); loadChannel(); }
+          return;
+        }
 
         if (e.key === "ArrowDown") {
           e.preventDefault();
@@ -749,18 +774,89 @@
           e.preventDefault();
           chAutocompleteIdx = Math.max(chAutocompleteIdx - 1, 0);
           items.forEach((el, i) => el.classList.toggle("active", i === chAutocompleteIdx));
-        } else if (e.key === "Enter" && chAutocompleteIdx >= 0) {
+        } else if (e.key === "Enter") {
           e.preventDefault();
-          selectChannel(items[chAutocompleteIdx].dataset.channel);
+          if (chAutocompleteIdx >= 0) selectChannel(items[chAutocompleteIdx].dataset.channel);
+          else loadChannel();
         } else if (e.key === "Escape") {
           dropdown.classList.remove("open");
         }
+      }
+
+      // ── User channel autocomplete ──
+      let uChAutocompleteIdx = -1;
+
+      function filterUserChannelAutocomplete() {
+        const input = document.getElementById("uChannelInput");
+        const dropdown = document.getElementById("uChannelAutocomplete");
+        const query = input.value.toLowerCase().trim();
+        const list = window.userChannelListCache || [];
+
+        if (!query && list.length === 0) {
+          dropdown.classList.remove("open");
+          return;
+        }
+
+        const matches = list.filter(c => c.name.includes(query));
+        if (matches.length === 0) {
+          dropdown.classList.remove("open");
+          return;
+        }
+
+        dropdown.innerHTML = matches.slice(0, 20).map((c) =>
+          `<div class="ch-autocomplete-item" data-channel="${c.name}" onclick="selectUserChannel('${c.name}')">
+            <span>#${c.name}</span>
+            <small>x${c.total}</small>
+          </div>`
+        ).join("");
+        dropdown.classList.add("open");
+        uChAutocompleteIdx = -1;
+      }
+
+      function selectUserChannel(name) {
+        document.getElementById("uChannelInput").value = name;
+        document.getElementById("uChannelAutocomplete").classList.remove("open");
+        loadUserChannelSelection();
+      }
+
+      function handleUserChannelKeydown(e) {
+        const dropdown = document.getElementById("uChannelAutocomplete");
+        const items = dropdown.querySelectorAll(".ch-autocomplete-item");
+        if (!dropdown.classList.contains("open") || items.length === 0) {
+          if (e.key === "Enter") { e.preventDefault(); loadUserChannelSelection(); }
+          return;
+        }
+
+        if (e.key === "ArrowDown") {
+          e.preventDefault();
+          uChAutocompleteIdx = Math.min(uChAutocompleteIdx + 1, items.length - 1);
+          items.forEach((el, i) => el.classList.toggle("active", i === uChAutocompleteIdx));
+        } else if (e.key === "ArrowUp") {
+          e.preventDefault();
+          uChAutocompleteIdx = Math.max(uChAutocompleteIdx - 1, 0);
+          items.forEach((el, i) => el.classList.toggle("active", i === uChAutocompleteIdx));
+        } else if (e.key === "Enter") {
+          e.preventDefault();
+          if (uChAutocompleteIdx >= 0) selectUserChannel(items[uChAutocompleteIdx].dataset.channel);
+          else loadUserChannelSelection();
+        } else if (e.key === "Escape") {
+          dropdown.classList.remove("open");
+        }
+      }
+
+      async function loadUserChannelSelection() {
+        if (!currentUserData) return;
+        const chan = document.getElementById("uChannelInput").value.toLowerCase().trim();
+        const channelStats = currentUserData.channels[chan];
+        if (!channelStats) return;
+        updateUserChannelView();
       }
 
       document.addEventListener("click", function(e) {
         if (!e.target.closest(".search-row")) {
           document.getElementById("chAutocomplete").classList.remove("open");
           document.getElementById("uAutocomplete").classList.remove("open");
+          document.getElementById("uChannelAutocomplete").classList.remove("open");
         }
       });
 
@@ -802,7 +898,10 @@
       function handleUserKeydown(e) {
         const dropdown = document.getElementById("uAutocomplete");
         const items = dropdown.querySelectorAll(".u-autocomplete-item");
-        if (!dropdown.classList.contains("open") || items.length === 0) return;
+        if (!dropdown.classList.contains("open") || items.length === 0) {
+          if (e.key === "Enter") { e.preventDefault(); loadUser(); }
+          return;
+        }
 
         if (e.key === "ArrowDown") {
           e.preventDefault();
@@ -812,9 +911,10 @@
           e.preventDefault();
           uAutocompleteIdx = Math.max(uAutocompleteIdx - 1, 0);
           items.forEach((el, i) => el.classList.toggle("active", i === uAutocompleteIdx));
-        } else if (e.key === "Enter" && uAutocompleteIdx >= 0) {
+        } else if (e.key === "Enter") {
           e.preventDefault();
-          selectUser(items[uAutocompleteIdx].dataset.user);
+          if (uAutocompleteIdx >= 0) selectUser(items[uAutocompleteIdx].dataset.user);
+          else loadUser();
         } else if (e.key === "Escape") {
           dropdown.classList.remove("open");
         }
@@ -943,6 +1043,14 @@
             if (emoteId) {
               bertRender = `<div class="emote-wrapper"><img src="https://cdn.7tv.app/emote/${emoteId}/2x.webp" alt="${data.bert}" class="twitch-emote" /><span class="emote-tooltip">${data.bert}</span></div>`;
             }
+            let zazaOverlay = "";
+            if (data.is_zaza && data.is_zaza_l) {
+              zazaOverlay = `<span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;"><img src="${ZAZA_EMOTE}" style="height:32px;position:absolute;left:2px;top:3px;" /><img src="${ZAZAL_EMOTE}" style="height:32px;position:absolute;left:10px;top:3px;" /></span>`;
+            } else if (data.is_zaza) {
+              zazaOverlay = `<span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;"><img src="${ZAZA_EMOTE}" style="height:32px;top:3px;" /></span>`;
+            } else if (data.is_zaza_l) {
+              zazaOverlay = `<span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;"><img src="${ZAZAL_EMOTE}" style="height:32px;top:3px;" /></span>`;
+            }
             const timestamp = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
 
             item.innerHTML = `
@@ -951,7 +1059,7 @@
                 <span class="feed-time">${timestamp}</span>
               </div>
               <div>
-                <strong style="color: var(--accent);" class="link-name" onclick="navigateTo('user', '${data.username}')">${data.username}</strong> ${bertRender}
+                <strong style="color: var(--accent);" class="link-name" onclick="navigateTo('user', '${data.username}')">${data.username}</strong> ${bertRender}${zazaOverlay}
               </div>`;
             feedList.insertBefore(item, feedList.firstChild);
             while (feedList.children.length > 25) feedList.removeChild(feedList.lastChild);
@@ -968,9 +1076,9 @@
 
         document.getElementById("gTotal").innerText = data.total_activations;
         document.getElementById("gChans").innerText = data.channel_count;
-        document.getElementById("gZazas").innerText = data.total_zazas || 0;
-        document.getElementById("gZazaLs").innerText = data.total_zaza_ls || 0;
-        document.getElementById("gDoubleZazas").innerText = data.total_double_zazas || 0;
+        document.getElementById("gZazas").innerHTML = zazaEmoteHTML() + " <strong>" + (data.total_zazas || 0) + "</strong>";
+        document.getElementById("gZazaLs").innerHTML = zazaLEmoteHTML() + " <strong>" + (data.total_zaza_ls || 0) + "</strong>";
+        document.getElementById("gDoubleZazas").innerHTML = zazaDoubleEmoteHTML() + " <strong>" + (data.total_double_zazas || 0) + "</strong>";
         document.getElementById("gUsers").innerHTML = getTopHTML(data.users, 10, "user");
         document.getElementById("gBerts").innerHTML = getTopHTML(data.berts, 10, "bert");
 
@@ -1072,9 +1180,9 @@
         document.getElementById("chResults").style.display = "block";
         document.getElementById("chTitle").innerText = `Stats for #${data.channel}`;
         document.getElementById("chTotal").innerText = data.total_activations;
-        document.getElementById("chZazas").innerText = data.total_zazas || 0;
-        document.getElementById("chZazaLs").innerText = data.total_zaza_ls || 0;
-        document.getElementById("chDoubleZazas").innerText = data.total_double_zazas || 0;
+        document.getElementById("chZazas").innerHTML = zazaEmoteHTML() + " <strong>" + (data.total_zazas || 0) + "</strong>";
+        document.getElementById("chZazaLs").innerHTML = zazaLEmoteHTML() + " <strong>" + (data.total_zaza_ls || 0) + "</strong>";
+        document.getElementById("chDoubleZazas").innerHTML = zazaDoubleEmoteHTML() + " <strong>" + (data.total_double_zazas || 0) + "</strong>";
         document.getElementById("chUsers").innerHTML = getTopHTML(data.users, 10, "user");
 
         document.getElementById("chBertsList").innerHTML = (data.active_berts || [])
@@ -1203,25 +1311,27 @@
         document.getElementById("uResults").style.display = "block";
         document.getElementById("uTitle").innerText = `Player: ${currentUserData.username}`;
         document.getElementById("uTotal").innerText = currentUserData.global_total;
-        document.getElementById("uZazas").innerText = currentUserData.global_zazas || 0;
-        document.getElementById("uZazaLs").innerText = currentUserData.global_zaza_ls || 0;
-        document.getElementById("uDoubleZazas").innerText = currentUserData.global_double_zazas || 0;
+        document.getElementById("uZazas").innerHTML = zazaEmoteHTML() + " <strong>" + (currentUserData.global_zazas || 0) + "</strong>";
+        document.getElementById("uZazaLs").innerHTML = zazaLEmoteHTML() + " <strong>" + (currentUserData.global_zaza_ls || 0) + "</strong>";
+        document.getElementById("uDoubleZazas").innerHTML = zazaDoubleEmoteHTML() + " <strong>" + (currentUserData.global_double_zazas || 0) + "</strong>";
 
-        const select = document.getElementById("uChannelSelect");
-        select.innerHTML = "";
-        Object.keys(currentUserData.channels).forEach(ch => {
-          select.innerHTML += `<option value="${ch}">#${ch}</option>`;
+        const channels = Object.entries(currentUserData.channels).map(([ch, stats]) => {
+          return { name: ch, total: stats.total || 0 };
         });
-        if (Object.keys(currentUserData.channels).length > 0) updateUserChannelView();
+        channels.sort((a, b) => b.total - a.total);
+        window.userChannelListCache = channels;
+
+        if (channels.length > 0) {
+          document.getElementById("uChannelInput").value = channels[0].name;
+          loadUserChannelSelection();
+        }
       }
 
       async function updateUserChannelView() {
         if (!currentUserData) return;
-        const chan = document.getElementById("uChannelSelect").value;
+        const chan = document.getElementById("uChannelInput").value.toLowerCase().trim();
         const channelStats = currentUserData.channels[chan];
         if (!channelStats) return;
-
-        document.getElementById("uChannelTotal").innerText = channelStats.total;
 
         let emotesMap = {};
         try {
@@ -1243,12 +1353,14 @@
               const doubleCount = info.double_zaza_count || 0;
               const dateStr = info.first_seen ? formatDate(info.first_seen) : "Unknown";
               const emId = emotesMap[bert];
-              const zazaInfo = (zazaCount > 0 || zazaLCount > 0 || doubleCount > 0)
-                ? ` z:${zazaCount} L:${zazaLCount} 2x:${doubleCount}`
-                : "";
+              const zazaParts = [];
+              if (zazaCount > 0) zazaParts.push(`zaza x${zazaCount}`);
+              if (zazaLCount > 0) zazaParts.push(`zazaL x${zazaLCount}`);
+              if (doubleCount > 0) zazaParts.push(`double x${doubleCount}`);
+              const zazaStr = zazaParts.length > 0 ? `, ${zazaParts.join(", ")}` : "";
               return emId
-                ? `<div class="emote-wrapper"><img src="https://cdn.7tv.app/emote/${emId}/2x.webp" alt="${bert}" class="twitch-emote" /><small style="color: var(--text-muted); font-weight: 600; font-family: 'DM Mono', monospace; margin-left: 2px;">x${count}</small><span class="emote-tooltip">${bert} (x${count}${zazaInfo}, first: ${dateStr})</span></div>`
-                : `<span class="badge" title="First: ${dateStr}${zazaInfo}">${bert} <small>x${count}</small></span>`;
+                ? `<div class="emote-wrapper"><img src="https://cdn.7tv.app/emote/${emId}/2x.webp" alt="${bert}" class="twitch-emote" /><small style="color: var(--text-muted); font-weight: 600; font-family: 'DM Mono', monospace; margin-left: 2px;">x${count}</small><span class="emote-tooltip">${bert} (x${count}${zazaStr}, first: ${dateStr})</span></div>`
+                : `<span class="badge" title="x${count}${zazaStr}, first: ${dateStr}">${bert} <small>x${count}</small></span>`;
             }).join(" ") || "<i>None yet!</i>";
 
         document.getElementById("uMissing").innerHTML =
