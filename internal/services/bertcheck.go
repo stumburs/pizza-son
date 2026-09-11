@@ -9,15 +9,24 @@ import (
 )
 
 type BertRecord struct {
-	Count     int       `json:"count"`
-	ZazaCount int       `json:"zaza_count"`
-	FirstSeen time.Time `json:"first_seen"`
-	LastSeen  time.Time `json:"last_seen"`
+	Count          int       `json:"count"`
+	ZazaCount      int       `json:"zaza_count"`
+	ZazaLCount     int       `json:"zaza_l_count"`
+	DoubleZazaCount int      `json:"double_zaza_count"`
+	FirstSeen      time.Time `json:"first_seen"`
+	LastSeen       time.Time `json:"last_seen"`
+}
+
+type GoldenzazabertEvent struct {
+	Username  string    `json:"username"`
+	Timestamp time.Time `json:"timestamp"`
 }
 
 type UserStats struct {
 	TotalActivations  int                   `json:"total"`
 	TotalZazas        int                   `json:"total_zazas"`
+	TotalZazaLs       int                   `json:"total_zaza_ls"`
+	TotalDoubleZazas  int                   `json:"total_double_zazas"`
 	BertRecords       map[string]BertRecord `json:"bert_records"`
 	DailyActivations  map[string]int        `json:"daily_activations"`
 	HourlyActivations map[string]int        `json:"hourly_activations"`
@@ -25,10 +34,11 @@ type UserStats struct {
 }
 
 type ChannelData struct {
-	Berts             []string             `json:"berts"`
-	UserStats         map[string]UserStats `json:"user_stats"`
-	DailyActivations  map[string]int       `json:"daily_activations"`
-	HourlyActivations map[string]int       `json:"hourly_activations"`
+	Berts                  []string                `json:"berts"`
+	UserStats              map[string]UserStats    `json:"user_stats"`
+	DailyActivations       map[string]int          `json:"daily_activations"`
+	HourlyActivations      map[string]int          `json:"hourly_activations"`
+	GoldenzazabertEvents   []GoldenzazabertEvent   `json:"goldenzazabert_events,omitempty"`
 }
 
 type BertService struct {
@@ -71,7 +81,7 @@ func (s *BertService) GetBerts(channel string) []string {
 	return []string{}
 }
 
-func (s *BertService) RegisterActivation(channel, user, bert string, isZaza bool) int {
+func (s *BertService) RegisterActivation(channel, user, bert string, isZaza, isZazaL, bothZaza bool) int {
 	s.Mu.Lock()
 	defer s.Mu.Unlock()
 	s.ensureChannel(channel)
@@ -116,6 +126,14 @@ func (s *BertService) RegisterActivation(channel, user, bert string, isZaza bool
 		record.ZazaCount++
 		stats.TotalZazas++
 	}
+	if isZazaL {
+		record.ZazaLCount++
+		stats.TotalZazaLs++
+	}
+	if bothZaza {
+		record.DoubleZazaCount++
+		stats.TotalDoubleZazas++
+	}
 
 	// save updates back to state
 	stats.BertRecords[bert] = record
@@ -124,6 +142,17 @@ func (s *BertService) RegisterActivation(channel, user, bert string, isZaza bool
 	stats.HourlyActivations[hourStr]++
 
 	chData.UserStats[user] = stats
+
+	// record goldenzazabert event
+	if bert == "goldenzazabert" {
+		if chData.GoldenzazabertEvents == nil {
+			chData.GoldenzazabertEvents = []GoldenzazabertEvent{}
+		}
+		chData.GoldenzazabertEvents = append(chData.GoldenzazabertEvents, GoldenzazabertEvent{
+			Username:  user,
+			Timestamp: now,
+		})
+	}
 
 	// update global total
 	s.globalTotal++

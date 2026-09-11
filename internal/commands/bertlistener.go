@@ -83,6 +83,7 @@ func init() {
 			finalMessage := baseResponse
 
 			var isZazaRoll bool = false
+			var isZazaLRoll bool = false
 
 			if rand.Float64() < zazaChance {
 				finalMessage += " zaza"
@@ -91,10 +92,10 @@ func init() {
 
 			if rand.Float64() < zazaChance {
 				finalMessage += " zazaL"
-				isZazaRoll = true
+				isZazaLRoll = true
 			}
 
-			newTotal := services.BertServiceInstance.RegisterActivation(ctx.Message.Channel, ctx.Message.User.Name, baseResponse, isZazaRoll)
+			newTotal := services.BertServiceInstance.RegisterActivation(ctx.Message.Channel, ctx.Message.User.Name, baseResponse, isZazaRoll, isZazaLRoll, isZazaRoll && isZazaLRoll)
 
 			ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, finalMessage)
 

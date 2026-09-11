@@ -5,8 +5,21 @@ import (
 	"log"
 	"net/http"
 	"pizza-son/internal/services"
+	"regexp"
 	"strings"
+	"time"
 )
+
+var discordSnowflakeRe = regexp.MustCompile(`^\d{17,20}$`)
+var discordEmojiRe = regexp.MustCompile(`^<a?:\w+:\d+>$`)
+
+func isDiscordChannel(name string) bool {
+	return discordSnowflakeRe.MatchString(name)
+}
+
+func isDiscordBert(name string) bool {
+	return discordEmojiRe.MatchString(name)
+}
 
 type WebService struct {
 	port string
@@ -55,32 +68,93 @@ func (ws *WebService) handleGlobalStats(w http.ResponseWriter, r *http.Request) 
 	defer services.BertServiceInstance.Mu.RUnlock()
 
 	totalActivations := 0
+	totalZazas := 0
+	totalZazaLs := 0
+	totalDoubleZazas := 0
 	globalUsers := make(map[string]int)
 	globalBerts := make(map[string]int)
 	globalHourly := make(map[string]int)
+	channelTotals := make(map[string]int)
+	firstPersonPerBert := make(map[string]map[string]any) // channel -> bert -> {user, timestamp}
+	var allGoldenzazabertEvents []map[string]any
 
-	for _, chData := range services.BertServiceInstance.Data {
+	for chName, chData := range services.BertServiceInstance.Data {
+		if isDiscordChannel(chName) {
+			continue
+		}
+		firstPersonPerBert[chName] = make(map[string]any)
+
+		// compute first person per bert from existing BertRecord data
+		for username, stats := range chData.UserStats {
+			for bertName, record := range stats.BertRecords {
+				if isDiscordBert(bertName) {
+					continue
+				}
+				existing, exists := firstPersonPerBert[chName][bertName]
+				if !exists {
+					firstPersonPerBert[chName][bertName] = map[string]any{
+						"user":      username,
+						"timestamp": record.FirstSeen,
+					}
+				} else if existingMap, ok := existing.(map[string]any); ok {
+					if record.FirstSeen.Before(existingMap["timestamp"].(time.Time)) {
+						firstPersonPerBert[chName][bertName] = map[string]any{
+							"user":      username,
+							"timestamp": record.FirstSeen,
+						}
+					}
+				}
+			}
+		}
+
 		for username, stats := range chData.UserStats {
 			totalActivations += stats.TotalActivations
+			totalZazas += stats.TotalZazas
+			totalZazaLs += stats.TotalZazaLs
+			totalDoubleZazas += stats.TotalDoubleZazas
 			globalUsers[username] += stats.TotalActivations
+			channelTotals[chName] += stats.TotalActivations
 
 			for bertName, record := range stats.BertRecords {
-				globalBerts[bertName] += record.Count
+				if !isDiscordBert(bertName) {
+					globalBerts[bertName] += record.Count
+				}
 			}
 
 			for hour, count := range stats.HourlyActivations {
 				globalHourly[hour] += count
 			}
 		}
+
+		for _, event := range chData.GoldenzazabertEvents {
+			allGoldenzazabertEvents = append(allGoldenzazabertEvents, map[string]any{
+				"username":  event.Username,
+				"channel":   chName,
+				"timestamp": event.Timestamp,
+			})
+		}
+	}
+
+	channelCount := 0
+	for ch := range services.BertServiceInstance.Data {
+		if !isDiscordChannel(ch) {
+			channelCount++
+		}
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
-		"total_activations": totalActivations,
-		"channel_count":     len(services.BertServiceInstance.Data),
-		"users":             globalUsers,
-		"berts":             globalBerts,
-		"hourly_timeline":   globalHourly,
+		"total_activations":        totalActivations,
+		"total_zazas":              totalZazas,
+		"total_zaza_ls":            totalZazaLs,
+		"total_double_zazas":       totalDoubleZazas,
+		"channel_count":            channelCount,
+		"channel_totals":           channelTotals,
+		"users":                    globalUsers,
+		"berts":                    globalBerts,
+		"hourly_timeline":          globalHourly,
+		"first_person_per_bert":    firstPersonPerBert,
+		"goldenzazabert_hall":      allGoldenzazabertEvents,
 	})
 }
 
@@ -102,28 +176,59 @@ func (ws *WebService) handleChannelStats(w http.ResponseWriter, r *http.Request)
 	}
 
 	totalBerts := 0
+	totalZazas := 0
+	totalZazaLs := 0
+	totalDoubleZazas := 0
 	userTotals := make(map[string]int)
 	bertTotals := make(map[string]int)
+	firstPersonPerBert := make(map[string]any)
 
 	for user, uStats := range data.UserStats {
 		totalBerts += uStats.TotalActivations
+		totalZazas += uStats.TotalZazas
+		totalZazaLs += uStats.TotalZazaLs
+		totalDoubleZazas += uStats.TotalDoubleZazas
 		userTotals[user] = uStats.TotalActivations
 
 		for bert, record := range uStats.BertRecords {
+			if isDiscordBert(bert) {
+				continue
+			}
 			bertTotals[bert] += record.Count
+
+			// track first person per bert
+			existing, exists := firstPersonPerBert[bert]
+			if !exists {
+				firstPersonPerBert[bert] = map[string]any{
+					"user":      user,
+					"timestamp": record.FirstSeen,
+				}
+			} else if existingMap, ok := existing.(map[string]any); ok {
+				if record.FirstSeen.Before(existingMap["timestamp"].(time.Time)) {
+					firstPersonPerBert[bert] = map[string]any{
+						"user":      user,
+						"timestamp": record.FirstSeen,
+					}
+				}
+			}
 		}
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 
 	json.NewEncoder(w).Encode(map[string]interface{}{
-		"channel":           channel,
-		"total_activations": totalBerts,
-		"active_berts":      data.Berts,
-		"users":             userTotals,
-		"berts":             bertTotals,
-		"daily_timeline":    data.DailyActivations,
-		"hourly_timeline":   data.HourlyActivations,
+		"channel":                  channel,
+		"total_activations":        totalBerts,
+		"total_zazas":              totalZazas,
+		"total_zaza_ls":            totalZazaLs,
+		"total_double_zazas":       totalDoubleZazas,
+		"active_berts":             data.Berts,
+		"users":                    userTotals,
+		"berts":                    bertTotals,
+		"daily_timeline":           data.DailyActivations,
+		"hourly_timeline":          data.HourlyActivations,
+		"first_person_per_bert":    firstPersonPerBert,
+		"goldenzazabert_events":    data.GoldenzazabertEvents,
 	})
 }
 
@@ -139,23 +244,37 @@ func (ws *WebService) handleUserStats(w http.ResponseWriter, r *http.Request) {
 	defer services.BertServiceInstance.Mu.RUnlock()
 
 	globalTotal := 0
+	globalZazas := 0
+	globalZazaLs := 0
+	globalDoubleZazas := 0
 	channelBreakdown := make(map[string]any)
 
 	// loop through all channels to see where this user exists
 	for chName, chData := range services.BertServiceInstance.Data {
+		if isDiscordChannel(chName) {
+			continue
+		}
 		if stats, hasUser := chData.UserStats[user]; hasUser {
 			globalTotal += stats.TotalActivations
+			globalZazas += stats.TotalZazas
+			globalZazaLs += stats.TotalZazaLs
+			globalDoubleZazas += stats.TotalDoubleZazas
 
 			// calculate missing/collected for this specific channel
 			collected := make(map[string]any)
 			var missing []string
 			for _, b := range chData.Berts {
+				if isDiscordBert(b) {
+					continue
+				}
 				if record, exists := stats.BertRecords[b]; exists && record.Count > 0 {
 					collected[b] = map[string]any{
-						"count":      record.Count,
-						"zaza_count": record.ZazaCount,
-						"first_seen": record.FirstSeen,
-						"last_seen":  record.LastSeen,
+						"count":            record.Count,
+						"zaza_count":       record.ZazaCount,
+						"zaza_l_count":     record.ZazaLCount,
+						"double_zaza_count": record.DoubleZazaCount,
+						"first_seen":       record.FirstSeen,
+						"last_seen":        record.LastSeen,
 					}
 				} else {
 					missing = append(missing, b)
@@ -163,12 +282,14 @@ func (ws *WebService) handleUserStats(w http.ResponseWriter, r *http.Request) {
 			}
 
 			channelBreakdown[chName] = map[string]any{
-				"total":           stats.TotalActivations,
-				"total_zazas":     stats.TotalZazas,
-				"daily_timeline":  stats.DailyActivations, // feeds the Chart.js timeline
-				"hourly_timeline": stats.HourlyActivations,
-				"collected":       collected,
-				"missing":         missing,
+				"total":              stats.TotalActivations,
+				"total_zazas":        stats.TotalZazas,
+				"total_zaza_ls":      stats.TotalZazaLs,
+				"total_double_zazas": stats.TotalDoubleZazas,
+				"daily_timeline":     stats.DailyActivations,
+				"hourly_timeline":    stats.HourlyActivations,
+				"collected":          collected,
+				"missing":            missing,
 			}
 		}
 	}
@@ -180,9 +301,12 @@ func (ws *WebService) handleUserStats(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
-		"username":     user,
-		"global_total": globalTotal,
-		"channels":     channelBreakdown,
+		"username":            user,
+		"global_total":        globalTotal,
+		"global_zazas":        globalZazas,
+		"global_zaza_ls":      globalZazaLs,
+		"global_double_zazas": globalDoubleZazas,
+		"channels":            channelBreakdown,
 	})
 }
 
