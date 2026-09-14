@@ -116,4 +116,32 @@
 | 112 | I think you need to use the mini gorilla grip chimpanzee style banked speedslide inversion reversal hyperprecision gorilla orangutan glue technique for this map. just a thought | kenny2crazy | 2026-07-01 |
 | 113 | rythim is a lyser | Clems_88 | 2026-07-05 |
 | 114 | Lease and a key | robert_paul_champagne | 2026-07-09 |
+| 115 | born to be mild | critsapphire | 2026-07-09 |
+| 116 | authorities say lysergium has the best vibes on twitch.tv | IAmLubes | 2026-07-11 |
+| 117 | he's a cunning linguist <img src="https://cdn.7tv.app/emote/01FTRDQR5R0003AV56G21Q7ARH/1x.webp" alt="Shirley" title="Shirley" style="height:1.5em;vertical-align:middle;"> | pizza_tm | 2026-07-14 |
+| 118 | Always Be Checkin' | Chillagveehar | 2026-07-15 |
+| 119 | AYAYA omg AOT & hxh is so <img src="https://cdn.7tv.app/emote/01F7P0RPER000F5SMXK6KMCGBT/1x.webp" alt="uwu" title="uwu" style="height:1.5em;vertical-align:middle;"> type 1 if you agree!!! | Jave | 2026-07-16 |
+| 120 | the demon code prevents me, from declining a rock-off challange | stistrup | 2026-07-19 |
+| 121 | ͏ | Sir_Lysergium | 2026-07-19 |
+| 122 | she trumped on my donald till bankrupted | Blaynech_Ash | 2026-08-18 |
+| 123 | @kalamity14lol you love men being united, based | eepylilyTM | 2026-08-18 |
+| 124 | imagine stealing ur childhood friend's identity just to play lagoon LOL | eepylilyTM | 2026-08-18 |
+| 125 | and then, lyser got... this run | smartpotatoman | 2026-08-21 |
+| 126 | apparently, its fun to beat the maps | FAB01tm | 2026-08-21 |
+| 127 | habing more splleing misatkae | SlidelockTM | 2026-08-27 |
+| 128 | @pizza_tm <img src="https://cdn.7tv.app/emote/01EZPJCXQ8000C438200A44F38/1x.webp" alt="dinkDonk" title="dinkDonk" style="height:1.5em;vertical-align:middle;"> streamer should be back <img src="https://cdn.7tv.app/emote/01GWBD2YR00002CCPRV6KPX758/1x.webp" alt="mhm" title="mhm" style="height:1.5em;vertical-align:middle;"> <img src="https://cdn.7tv.app/emote/01EZPJCXQ8000C438200A44F38/1x.webp" alt="dinkDonk" title="dinkDonk" style="height:1.5em;vertical-align:middle;"> | pizza_son | 2026-08-27 |
+| 129 | i got my giums lysered on | stistrup | 2026-08-29 |
+| 130 | baby got <img src="https://cdn.7tv.app/emote/01K6B3Y3SG5ZBAWXXVKX7BKBE5/1x.webp" alt="bert" title="bert" style="height:1.5em;vertical-align:middle;"> | pizza_tm | 2026-08-29 |
+| 131 | johnny 2 bad lyser 2 good | Clems_88 | 2026-08-31 |
+| 132 | been trying to reach you about your stadium car's extended warranty | Vodraxia | 2026-09-01 |
+| 133 | chatterino sounds like something ned flanders would say | critsapphire | 2026-09-01 |
+| 134 | men i don't trust | frytek2k | 2026-09-04 |
+| 135 | I TURTLED AR 11.5 Son rotate me pside down wtf id rhis game | Blaynech_Ash | 2026-09-05 |
+| 136 | lemon backwards is melon | Shengar | 2026-09-06 |
+| 137 | @pizza_tm <img src="https://cdn.7tv.app/emote/01GNDQAB700007ZS3YJA73WVT4/1x.webp" alt="mods" title="mods" style="height:1.5em;vertical-align:middle;"> are crazy not good tbh | pizza_son | 2026-09-06 |
+| 138 | TOUCH ME LYSER | critsapphire | 2026-09-06 |
+| 139 | Bert = best ever racing team | cambo_7777 | 2026-09-11 |
+| 140 | Harldy know'er | GreekD00d | 2026-09-13 |
+| 141 | gavid gilmour can make me comfortably numb | jajabobbee | 2026-09-13 |
+| 142 | istg if this becomes a quote im gonna cash out | notnope111 | 2026-09-14 |
 
