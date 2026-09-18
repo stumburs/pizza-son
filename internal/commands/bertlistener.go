@@ -97,7 +97,12 @@ func init() {
 
 			newTotal := services.BertServiceInstance.RegisterActivation(ctx.Message.Channel, ctx.Message.User.Name, baseResponse, isZazaRoll, isZazaLRoll, isZazaRoll && isZazaLRoll)
 
-			ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, finalMessage)
+			if baseResponse == "BigBert" {
+				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "bigbert1")
+				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "bigbert2"+strings.TrimPrefix(finalMessage, "BigBert"))
+			} else {
+				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, finalMessage)
+			}
 
 			// global milestone
 			if newTotal%1000 == 0 {

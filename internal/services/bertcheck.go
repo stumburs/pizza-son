@@ -159,10 +159,18 @@ func (s *BertService) RegisterActivation(channel, user, bert string, isZaza, isZ
 
 	// look up emote ID and broadcast
 	var emoteID string
+	var emoteIDs []string
 	if SevenTVServiceInstance != nil {
 		emoteID = SevenTVServiceInstance.GetEmoteID(channel, bert)
+		if bert == "BigBert" {
+			id1 := SevenTVServiceInstance.GetEmoteID(channel, "bigbert1")
+			id2 := SevenTVServiceInstance.GetEmoteID(channel, "bigbert2")
+			if id1 != "" && id2 != "" {
+				emoteIDs = []string{id1, id2}
+			}
+		}
 	}
-	LiveFeedInstance.Broadcast(user, channel, bert, emoteID, isZaza, isZazaL)
+	LiveFeedInstance.Broadcast(user, channel, bert, emoteID, emoteIDs, isZaza, isZazaL)
 
 	s.save()
 	return s.globalTotal
