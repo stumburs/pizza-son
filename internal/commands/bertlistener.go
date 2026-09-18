@@ -99,7 +99,7 @@ func init() {
 
 			if baseResponse == "BigBert" {
 				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "bigbert1")
-				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "bigbert2"+strings.TrimPrefix(finalMessage, "BigBert"))
+				ctx.Client.Say(ctx.Message.Channel, "bigbert2"+strings.TrimPrefix(finalMessage, "BigBert"))
 			} else {
 				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, finalMessage)
 			}
