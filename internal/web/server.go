@@ -5,21 +5,9 @@ import (
 	"log"
 	"net/http"
 	"pizza-son/internal/services"
-	"regexp"
 	"strings"
 	"time"
 )
-
-var discordSnowflakeRe = regexp.MustCompile(`^\d{17,20}$`)
-var discordEmojiRe = regexp.MustCompile(`^<a?:\w+:\d+>$`)
-
-func isDiscordChannel(name string) bool {
-	return discordSnowflakeRe.MatchString(name)
-}
-
-func isDiscordBert(name string) bool {
-	return discordEmojiRe.MatchString(name)
-}
 
 type WebService struct {
 	port string
@@ -67,7 +55,8 @@ func (ws *WebService) handleGlobalStats(w http.ResponseWriter, r *http.Request) 
 	services.BertServiceInstance.Mu.RLock()
 	defer services.BertServiceInstance.Mu.RUnlock()
 
-	totalActivations := 0
+	// same source of truth as the milestone counter
+	totalActivations := services.BertServiceInstance.GlobalTotalLocked()
 	totalZazas := 0
 	totalZazaLs := 0
 	totalDoubleZazas := 0
@@ -79,7 +68,7 @@ func (ws *WebService) handleGlobalStats(w http.ResponseWriter, r *http.Request) 
 	var allGoldenzazabertEvents []map[string]any
 
 	for chName, chData := range services.BertServiceInstance.Data {
-		if isDiscordChannel(chName) {
+		if services.IsDiscordChannel(chName) {
 			continue
 		}
 		firstPersonPerBert[chName] = make(map[string]any)
@@ -87,7 +76,7 @@ func (ws *WebService) handleGlobalStats(w http.ResponseWriter, r *http.Request) 
 		// compute first person per bert from existing BertRecord data
 		for username, stats := range chData.UserStats {
 			for bertName, record := range stats.BertRecords {
-				if isDiscordBert(bertName) {
+				if services.IsDiscordBert(bertName) {
 					continue
 				}
 				existing, exists := firstPersonPerBert[chName][bertName]
@@ -108,7 +97,6 @@ func (ws *WebService) handleGlobalStats(w http.ResponseWriter, r *http.Request) 
 		}
 
 		for username, stats := range chData.UserStats {
-			totalActivations += stats.TotalActivations
 			totalZazas += stats.TotalZazas
 			totalZazaLs += stats.TotalZazaLs
 			totalDoubleZazas += stats.TotalDoubleZazas
@@ -116,7 +104,7 @@ func (ws *WebService) handleGlobalStats(w http.ResponseWriter, r *http.Request) 
 			channelTotals[chName] += stats.TotalActivations
 
 			for bertName, record := range stats.BertRecords {
-				if !isDiscordBert(bertName) {
+				if !services.IsDiscordBert(bertName) {
 					globalBerts[bertName] += record.Count
 				}
 			}
@@ -137,7 +125,7 @@ func (ws *WebService) handleGlobalStats(w http.ResponseWriter, r *http.Request) 
 
 	channelCount := 0
 	for ch := range services.BertServiceInstance.Data {
-		if !isDiscordChannel(ch) {
+		if !services.IsDiscordChannel(ch) {
 			channelCount++
 		}
 	}
@@ -191,7 +179,7 @@ func (ws *WebService) handleChannelStats(w http.ResponseWriter, r *http.Request)
 		userTotals[user] = uStats.TotalActivations
 
 		for bert, record := range uStats.BertRecords {
-			if isDiscordBert(bert) {
+			if services.IsDiscordBert(bert) {
 				continue
 			}
 			bertTotals[bert] += record.Count
@@ -251,7 +239,7 @@ func (ws *WebService) handleUserStats(w http.ResponseWriter, r *http.Request) {
 
 	// loop through all channels to see where this user exists
 	for chName, chData := range services.BertServiceInstance.Data {
-		if isDiscordChannel(chName) {
+		if services.IsDiscordChannel(chName) {
 			continue
 		}
 		if stats, hasUser := chData.UserStats[user]; hasUser {
@@ -264,7 +252,7 @@ func (ws *WebService) handleUserStats(w http.ResponseWriter, r *http.Request) {
 			collected := make(map[string]any)
 			var missing []string
 			for _, b := range chData.Berts {
-				if isDiscordBert(b) {
+				if services.IsDiscordBert(b) {
 					continue
 				}
 				if record, exists := stats.BertRecords[b]; exists && record.Count > 0 {

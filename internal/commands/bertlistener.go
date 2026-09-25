@@ -104,8 +104,8 @@ func init() {
 				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, finalMessage)
 			}
 
-			// global milestone
-			if newTotal%1000 == 0 {
+			// global milestone, only non-Discord channels count towards the global total
+			if newTotal%1000 == 0 && !services.IsDiscordChannel(ctx.Message.Channel) {
 				displayName := ctx.Message.User.DisplayName
 				if displayName == "" {
 					displayName = ctx.Message.User.Name

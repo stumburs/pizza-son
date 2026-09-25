@@ -3,10 +3,26 @@ package services
 import (
 	"log"
 	"pizza-son/internal/store"
+	"regexp"
 	"slices"
 	"sync"
 	"time"
 )
+
+var discordSnowflakeRe = regexp.MustCompile(`^\d{17,20}$`)
+var discordEmojiRe = regexp.MustCompile(`^<a?:\w+:\d+>$`)
+
+// IsDiscordChannel reports whether a bert data key is a Discord channel
+// (Discord channel IDs are snowflakes). Discord channels are not part of
+// the public stats, so every aggregate has to filter them the same way.
+func IsDiscordChannel(name string) bool {
+	return discordSnowflakeRe.MatchString(name)
+}
+
+// IsDiscordBert reports whether a bert name is a Discord custom emoji.
+func IsDiscordBert(name string) bool {
+	return discordEmojiRe.MatchString(name)
+}
 
 type BertRecord struct {
 	Count          int       `json:"count"`
@@ -42,10 +58,9 @@ type ChannelData struct {
 }
 
 type BertService struct {
-	Mu          sync.RWMutex
-	store       *store.Store[map[string]*ChannelData]
-	Data        map[string]*ChannelData // channel name -> data
-	globalTotal int
+	Mu    sync.RWMutex
+	store *store.Store[map[string]*ChannelData]
+	Data  map[string]*ChannelData // channel name -> data
 }
 
 type BertStats struct {
@@ -81,6 +96,24 @@ func (s *BertService) GetBerts(channel string) []string {
 	return []string{}
 }
 
+// GlobalTotalLocked returns the total number of bert activations across all
+// channels the stats site reports on, i.e. Discord channels are excluded.
+// The caller must hold s.Mu.
+func (s *BertService) GlobalTotalLocked() int {
+	total := 0
+	for chName, chData := range s.Data {
+		if IsDiscordChannel(chName) {
+			continue
+		}
+		for _, uStats := range chData.UserStats {
+			total += uStats.TotalActivations
+		}
+	}
+	return total
+}
+
+// RegisterActivation records a bert activation and returns the new global
+// total as reported by the stats site.
 func (s *BertService) RegisterActivation(channel, user, bert string, isZaza, isZazaL, bothZaza bool) int {
 	s.Mu.Lock()
 	defer s.Mu.Unlock()
@@ -154,9 +187,6 @@ func (s *BertService) RegisterActivation(channel, user, bert string, isZaza, isZ
 		})
 	}
 
-	// update global total
-	s.globalTotal++
-
 	// look up emote ID and broadcast
 	var emoteID string
 	var emoteIDs []string
@@ -173,7 +203,7 @@ func (s *BertService) RegisterActivation(channel, user, bert string, isZaza, isZ
 	LiveFeedInstance.Broadcast(user, channel, bert, emoteID, emoteIDs, isZaza, isZazaL)
 
 	s.save()
-	return s.globalTotal
+	return s.GlobalTotalLocked()
 }
 
 func (s *BertService) AddBert(channel, name string) {
@@ -222,14 +252,10 @@ func (s *BertService) GetUserStats(channel, user string) BertStats {
 		activeBerts[b] = true
 	}
 
-	// channel total only counts currently active berts
+	// totals count every recorded activation, same as the stats site
 	channelTotal := 0
 	for _, uStats := range data.UserStats {
-		for bert, record := range uStats.BertRecords {
-			if activeBerts[bert] {
-				channelTotal += record.Count
-			}
-		}
+		channelTotal += uStats.TotalActivations
 	}
 
 	stats, ok := data.UserStats[user]
@@ -240,24 +266,21 @@ func (s *BertService) GetUserStats(channel, user string) BertStats {
 		}
 	}
 
-	// only count activations of currently active berts
-	activeTotal := 0
+	// collection progress only counts currently active berts, same as the stats site
 	bestBert, max := "", -1
 	collectedBerts := 0
 	for bert, record := range stats.BertRecords {
-		if !activeBerts[bert] {
-			continue
-		}
-		activeTotal += record.Count
-		collectedBerts++
 		if record.Count > max {
 			max = record.Count
 			bestBert = bert
 		}
+		if activeBerts[bert] {
+			collectedBerts++
+		}
 	}
 
 	return BertStats{
-		TotalBertchecks:        activeTotal,
+		TotalBertchecks:        stats.TotalActivations,
 		MostCommonBert:         bestBert,
 		MostCommonCount:        max,
 		BertsCollectedOutOfAll: collectedBerts,
@@ -319,12 +342,5 @@ func (s *BertService) load() {
 	if migrated {
 		log.Println("[Bert] Legacy database records successfully transformed to new timeline format!")
 		s.save()
-	}
-
-	// compute global total from loaded data
-	for _, chData := range s.Data {
-		for _, uStats := range chData.UserStats {
-			s.globalTotal += uStats.TotalActivations
-		}
 	}
 }
