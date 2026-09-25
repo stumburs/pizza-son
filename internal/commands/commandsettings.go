@@ -9,8 +9,11 @@ import (
 
 // These commands can never be disabled
 var ProtectedCommands = map[string]bool{
-	"command": true,
-	"ping":    true,
+	"command":  true,
+	"commands": true,
+	"listener": true,
+	"ping":     true,
+	"toggle":   true,
 }
 
 // These listeners can never be disabled

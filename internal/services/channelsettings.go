@@ -2,15 +2,22 @@ package services
 
 import (
 	"log"
+	"maps"
 	"pizza-son/internal/store"
 	"slices"
 	"strings"
 	"sync"
 )
 
+type ToggleSnapshot struct {
+	DisabledCommands  map[string]bool `json:"disabled_commands"`
+	DisabledListeners map[string]bool `json:"disabled_listeners"`
+}
+
 type ChannelSettings struct {
 	DisabledCommands  map[string]bool `json:"disabled_commands"`
 	DisabledListeners map[string]bool `json:"disabled_listeners"`
+	ToggleOffSnapshot *ToggleSnapshot `json:"toggle_off_snapshot,omitempty"`
 }
 
 type ChannelSettingsService struct {
@@ -134,6 +141,45 @@ func (s *ChannelSettingsService) ListDisabledListeners(channel string) []string 
 		return []string{}
 	}
 	return listDisabled(cs.DisabledListeners)
+}
+
+// Bulk
+func (s *ChannelSettingsService) DisableAll(channel string, commands, listeners []string) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	cs := s.getOrCreate(channel)
+	if cs.ToggleOffSnapshot == nil {
+		cs.ToggleOffSnapshot = &ToggleSnapshot{
+			DisabledCommands:  maps.Clone(cs.DisabledCommands),
+			DisabledListeners: maps.Clone(cs.DisabledListeners),
+		}
+	}
+	for _, name := range commands {
+		cs.DisabledCommands[strings.ToLower(name)] = true
+	}
+	for _, name := range listeners {
+		cs.DisabledListeners[strings.ToLower(name)] = true
+	}
+	s.save()
+}
+
+// EnableAll restores the state captured by DisableAll, returning true if a
+// snapshot was restored. If there is no snapshot it enables everything.
+func (s *ChannelSettingsService) EnableAll(channel string) bool {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	cs := s.getOrCreate(channel)
+	if snap := cs.ToggleOffSnapshot; snap != nil {
+		cs.DisabledCommands = snap.DisabledCommands
+		cs.DisabledListeners = snap.DisabledListeners
+		cs.ToggleOffSnapshot = nil
+		s.save()
+		return true
+	}
+	clear(cs.DisabledCommands)
+	clear(cs.DisabledListeners)
+	s.save()
+	return false
 }
 
 // Shared
