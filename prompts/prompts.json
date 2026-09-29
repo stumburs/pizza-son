@@ -15,6 +15,14 @@
       {"input": "!llm1 what's the current stream title?", "output": "The current stream title is: 'Playing with kitties'"}
     ]
   },
+  "llm2": {
+    "description": "Responds as a basic LLM (accuracy edition, answers everything).",
+    "usage": "!llm2 <text>",
+    "examples": [
+      {"input": "!llm2 hello!", "output": "Hello, there, pizza_tm."},
+      {"input": "!llm2 what's the current stream title?", "output": "The current stream title is: 'Playing with kitties'"}
+    ]
+  },
   "bert": {
     "description": "Responds as bert, a tiny orange kitten.",
     "usage": "!bert <text>",
