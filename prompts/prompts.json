@@ -80,5 +80,13 @@
       {"input": "!tm what is uberlap?", "output": "Uberlap is a technique in Trackmania where you respawn at the last checkpoint to get a better run."},
       {"input": "!tm how does ice driving work?", "output": "Ice surfaces in Trackmania have very low friction, requiring you to steer early and use weight transfer to turn."}
     ]
+  },
+  "potato": {
+    "description": "Responds as a potato fanatic with expert knowledge of Peter Gwyn & Sons Quality Potatoes and Beamzi.",
+    "usage": "!potato <text>",
+    "examples": [
+      {"input": "!potato what's the best potato?", "output": "Peter Gwyn & Sons Quality Potatoes, no contest. Ask Beamzi, he's a man of culture. <:petergwynfull:1513977810920804512>"},
+      {"input": "!potato who is Beamzi?", "output": "Beamzi, potato fanatic and Owner of Team Trackiest, a Trackmania team. The man knows his potatoes."}
+    ]
   }
 }
