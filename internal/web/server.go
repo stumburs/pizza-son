@@ -25,12 +25,17 @@ func (ws *WebService) Start() {
 	http.HandleFunc("/panel", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "./web/public/panel.html")
 	})
+	http.HandleFunc("/vote", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./web/public/vote.html")
+	})
 
 	// API endpoints
 	http.HandleFunc("/api/global", enableCORS(ws.handleGlobalStats))
 	http.HandleFunc("/api/channel", enableCORS(ws.handleChannelStats))
 	http.HandleFunc("/api/user", enableCORS(ws.handleUserStats))
 	http.HandleFunc("/api/emotes", enableCORS(ws.handleChannelEmotes))
+	http.HandleFunc("/api/vote/submit", enableCORS(ws.handleVoteSubmit))
+	http.HandleFunc("/api/vote/results", enableCORS(ws.handleVoteResults))
 	http.HandleFunc("/api/live", enableCORS(services.LiveFeedInstance.HandleLiveFeed))
 
 	// Panel API (auth + settings control)

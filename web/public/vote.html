@@ -1,0 +1,475 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bert Vote - sir_lysergium</title>
+    <style>
+      :root {
+        --bg: #08080a;
+        --surface-1: #111114;
+        --surface-2: #18181c;
+        --surface-3: #222228;
+        --border: rgba(255, 255, 255, 0.06);
+        --border-hover: rgba(255, 255, 255, 0.12);
+        --accent: #a78bfa;
+        --accent-dim: rgba(167, 139, 250, 0.12);
+        --text-primary: #f0f0f4;
+        --text-secondary: #8b8b9a;
+        --text-muted: #55555f;
+        --radius-sm: 6px;
+        --radius-md: 10px;
+        --radius-lg: 14px;
+      }
+      *, *::before, *::after { box-sizing: border-box; }
+      body {
+        font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+        font-size: 15px;
+        background: var(--bg);
+        color: var(--text-primary);
+        margin: 0;
+        padding: 24px 16px 64px;
+        min-height: 100vh;
+        -webkit-font-smoothing: antialiased;
+      }
+      .main { max-width: 880px; margin: 0 auto; }
+      .page-header { display: flex; align-items: baseline; gap: 12px; margin-bottom: 8px; }
+      .header-dot {
+        width: 7px; height: 7px; border-radius: 50%;
+        background: var(--accent); align-self: center; flex-shrink: 0;
+      }
+      h1 { font-size: 1.4rem; font-weight: 600; letter-spacing: -0.02em; margin: 0; }
+      .header-sub { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+      .lede { color: var(--text-secondary); margin: 0 0 20px; line-height: 1.5; }
+      .lede code { color: var(--text-primary); font-size: 0.9em; }
+      .card {
+        background: var(--surface-1);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 20px;
+        margin-bottom: 16px;
+      }
+      .card h2 { margin: 0 0 6px; font-size: 1.05rem; }
+      .card p.hint { margin: 0 0 14px; color: var(--text-secondary); font-size: 0.9rem; line-height: 1.5; }
+      .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+      label.field { display: flex; flex-direction: column; gap: 6px; font-size: 0.85rem; color: var(--text-secondary); }
+      input[type="text"] {
+        padding: 9px 14px;
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--border);
+        background: var(--surface-2);
+        color: var(--text-primary);
+        font-size: 0.95rem;
+        outline: none;
+        min-width: 200px;
+      }
+      input[type="text"]:focus { border-color: var(--accent); }
+      button {
+        font-family: inherit;
+        cursor: pointer;
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--border);
+        background: var(--surface-2);
+        color: var(--text-primary);
+        padding: 9px 16px;
+        font-size: 0.925rem;
+        font-weight: 500;
+        transition: border-color 0.15s, background 0.15s;
+      }
+      button:hover:not(:disabled) { border-color: var(--accent); background: var(--surface-3); }
+      button:disabled { opacity: 0.45; cursor: default; }
+      button.primary { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+      button.primary:hover:not(:disabled) { background: rgba(167, 139, 250, 0.2); }
+      button.small { padding: 5px 10px; font-size: 0.85rem; }
+      .status { font-size: 0.9rem; color: var(--text-secondary); margin-top: 12px; min-height: 1.4em; }
+      .status.error { color: #fca5a5; }
+      ol.rank-list { list-style: none; margin: 0 0 16px; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+      li.rank-item {
+        display: flex; align-items: center; gap: 12px;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        padding: 10px 12px;
+      }
+      li.rank-item.dragging { opacity: 0.4; border-color: var(--accent); }
+      li.rank-item.dragover { border-color: var(--accent); }
+      .rank-pos {
+        font-variant-numeric: tabular-nums;
+        font-weight: 700;
+        color: var(--accent);
+        min-width: 52px;
+        font-size: 0.85rem;
+      }
+      .rank-pos small { display: block; font-weight: 400; color: var(--text-muted); font-size: 0.7rem; }
+      .rank-emote {
+        width: 72px; height: 56px; flex-shrink: 0;
+        display: flex; align-items: center; justify-content: center;
+        background: var(--surface-1);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        overflow: hidden;
+      }
+      .rank-emote img { max-width: 68px; max-height: 52px; object-fit: contain; }
+      .rank-name { font-weight: 600; word-break: break-word; flex: 1; }
+      .rank-controls { display: flex; gap: 6px; flex-shrink: 0; }
+      .rank-controls button { padding: 6px 10px; font-size: 1rem; line-height: 1; }
+      table.standings { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+      table.standings th, table.standings td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--border); }
+      table.standings th { color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+      table.standings td.num, table.standings th.num { text-align: right; font-variant-numeric: tabular-nums; }
+      .mini-emote { height: 28px; vertical-align: middle; }
+      .muted { color: var(--text-muted); }
+      .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+      .stat-line { color: var(--text-secondary); font-size: 0.9rem; margin: 0 0 12px; }
+      .stat-line strong { color: var(--text-primary); font-variant-numeric: tabular-nums; }
+      @media (max-width: 640px) {
+        .cols { grid-template-columns: 1fr; }
+        .rank-emote { width: 56px; }
+        .rank-pos { min-width: 44px; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="main">
+      <div class="page-header">
+        <div class="header-dot"></div>
+        <h1>bert vote</h1>
+        <span class="header-sub">sir_lysergium</span>
+      </div>
+      <p class="lede">
+        Enter a display name, then rank 5 random berts per round, best at the top and worst at the bottom.
+        Scoring uses Borda count: 1st place gets 4 points, then 3, 2, 1, and last place gets 0.
+        Every submitted round is saved in this browser (localStorage) and, when the server
+        backend is reachable, also sent to the shared tally.
+      </p>
+
+      <div class="card">
+        <h2>Your ballot</h2>
+        <p class="hint">Use the up/down buttons or drag rows to order them. Top = best, bottom = worst.</p>
+        <div class="row" style="margin-bottom: 14px;">
+          <label class="field">Display name (required)
+            <input type="text" id="voterInput" placeholder="e.g. pizza_tm" autocomplete="off" maxlength="40" required />
+          </label>
+        </div>
+        <div id="loadingLabel" class="status">Loading berts and emotes…</div>
+        <ol class="rank-list" id="rankList"></ol>
+        <div class="row">
+          <button class="primary" id="submitBtn" disabled>Submit ranking + continue voting</button>
+          <button id="skipBtn" disabled>Skip these 5</button>
+        </div>
+        <div class="status" id="roundStatus"></div>
+      </div>
+
+      <div class="cols">
+        <div class="card">
+          <h2>Your standings (Borda)</h2>
+          <p class="stat-line"><strong id="myRounds">0</strong> rounds submitted · <strong id="mySeen">0</strong> berts ranked</p>
+          <div id="myTable"><span class="muted">No votes yet.</span></div>
+          <div class="row" style="margin-top: 14px;">
+            <button class="small" id="resetBtn">Reset my votes</button>
+          </div>
+        </div>
+        <div class="card">
+          <h2>Shared standings (all voters)</h2>
+          <p class="stat-line"><strong id="sharedRounds">–</strong> rounds counted server-side</p>
+          <div id="sharedTable"><span class="muted">Loading shared tally…</span></div>
+          <div class="row" style="margin-top: 14px;">
+            <button class="small" id="refreshSharedBtn">Refresh shared tally</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>How scoring works</h2>
+        <p class="hint">
+          Each round you rank 5 berts. The top bert gets 4 points, then 3, 2, 1, and the
+          bottom bert gets 0. Points are added up across all rounds and all voters.
+          Bert seen in more rounds can score more, which is expected: regular appearances
+          near the top are what makes a bert the best overall.
+        </p>
+      </div>
+    </div>
+
+    <script>
+      "use strict";
+      var CHANNEL = "sir_lysergium";
+      var LS_BALLOTS = "bertvote.ballots.v1";
+      var LS_VOTER = "bertvote.voter.v1";
+      // BigBert has no single emote; the channel uses bigbert1 + bigbert2 side by side.
+      var COMPOSITE = { BigBert: ["bigbert1", "bigbert2"] };
+
+      var allBerts = [];
+      var emoteByName = {};
+      var current = []; // ordered best -> worst
+      var ballots = [];
+      var dragIdx = null;
+      var dataLoaded = false;
+
+      function $(id) { return document.getElementById(id); }
+
+      function updateSubmitState() {
+        var hasName = $("voterInput").value.trim().length > 0;
+        $("submitBtn").disabled = !(dataLoaded && hasName);
+      }
+
+      function loadLocal() {
+        try {
+          var raw = localStorage.getItem(LS_BALLOTS);
+          if (raw) {
+            var parsed = JSON.parse(raw);
+            if (Array.isArray(parsed)) ballots = parsed.filter(isValidBallot);
+          }
+        } catch (e) { ballots = []; }
+        try {
+          var v = localStorage.getItem(LS_VOTER);
+          if (v) $("voterInput").value = v;
+        } catch (e) {}
+        $("voterInput").addEventListener("input", function () {
+          try { localStorage.setItem(LS_VOTER, $("voterInput").value.trim()); } catch (e) {}
+          updateSubmitState();
+        });
+      }
+
+      function saveLocal() {
+        try { localStorage.setItem(LS_BALLOTS, JSON.stringify(ballots)); } catch (e) {}
+      }
+
+      function isValidBallot(b) {
+        return b && Array.isArray(b.ranking) && b.ranking.length === 5 &&
+          b.ranking.every(function (n) { return typeof n === "string" && n.length > 0; });
+      }
+
+      function emoteImg(name, cls) {
+        var parts = COMPOSITE[name];
+        if (parts && parts.every(function (p) { return emoteByName[p]; })) {
+          return parts.map(function (p) {
+            return '<img src="https://cdn.7tv.app/emote/' + emoteByName[p] + '/4x.webp" alt="' + escapeHtml(name) + '" loading="lazy" />';
+          }).join("");
+        }
+        var id = emoteByName[name];
+        if (!id) return "";
+        // onerror falls back to smaller sizes in case a 4x render does not exist
+        return '<img src="https://cdn.7tv.app/emote/' + id + '/4x.webp" alt="' + escapeHtml(name) + '" loading="lazy" class="' + (cls || "") + '"' +
+          ' onerror="if(!this.dataset.fb){this.dataset.fb=1;this.src=\'https://cdn.7tv.app/emote/' + id + '/2x.webp\';}" />';
+      }
+
+      function escapeHtml(s) {
+        return String(s).replace(/[&<>"']/g, function (c) {
+          return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+        });
+      }
+
+      function sampleFive() {
+        var pool = allBerts.slice();
+        // shuffle
+        for (var i = pool.length - 1; i > 0; i--) {
+          var j = Math.floor(Math.random() * (i + 1));
+          var t = pool[i]; pool[i] = pool[j]; pool[j] = t;
+        }
+        var pick = pool.slice(0, 5);
+        // avoid serving the exact same set twice in a row when possible
+        if (pool.length > 5 && current.length === 5) {
+          var same = pick.slice().sort().join("|") === current.slice().sort().join("|");
+          if (same) {
+            var k = Math.floor(Math.random() * pool.length);
+            pick[0] = pool[k];
+          }
+        }
+        return pick;
+      }
+
+      function renderRound() {
+        var list = $("rankList");
+        list.innerHTML = "";
+        var labels = ["1st · best · 4 pts", "2nd · 3 pts", "3rd · 2 pts", "4th · 1 pt", "5th · worst · 0 pts"];
+        current.forEach(function (name, idx) {
+          var li = document.createElement("li");
+          li.className = "rank-item";
+          li.draggable = true;
+          li.dataset.idx = idx;
+          li.innerHTML =
+            '<span class="rank-pos">' + labels[idx].split(" · ")[0] + '<small>' + labels[idx].split(" · ").slice(1).join(" · ") + '</small></span>' +
+            '<span class="rank-emote">' + (emoteImg(name) || escapeHtml(name)) + '</span>' +
+            '<span class="rank-name">' + escapeHtml(name) + '</span>' +
+            '<span class="rank-controls">' +
+            '<button data-act="up" data-i="' + idx + '" aria-label="Move ' + escapeHtml(name) + ' up"' + (idx === 0 ? " disabled" : "") + '>↑</button>' +
+            '<button data-act="down" data-i="' + idx + '" aria-label="Move ' + escapeHtml(name) + ' down"' + (idx === current.length - 1 ? " disabled" : "") + '>↓</button>' +
+            '</span>';
+          li.addEventListener("dragstart", function (e) {
+            dragIdx = idx;
+            li.classList.add("dragging");
+            try { e.dataTransfer.effectAllowed = "move"; } catch (err) {}
+          });
+          li.addEventListener("dragend", function () {
+            dragIdx = null;
+            list.querySelectorAll(".rank-item").forEach(function (el) {
+              el.classList.remove("dragging", "dragover");
+            });
+          });
+          li.addEventListener("dragover", function (e) {
+            e.preventDefault();
+            li.classList.add("dragover");
+          });
+          li.addEventListener("dragleave", function () { li.classList.remove("dragover"); });
+          li.addEventListener("drop", function (e) {
+            e.preventDefault();
+            if (dragIdx === null || dragIdx === idx) return;
+            var item = current.splice(dragIdx, 1)[0];
+            current.splice(idx, 0, item);
+            renderRound();
+          });
+          list.appendChild(li);
+        });
+        list.querySelectorAll("button[data-act]").forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            var i = parseInt(btn.dataset.i, 10);
+            if (btn.dataset.act === "up" && i > 0) {
+              var t = current[i - 1]; current[i - 1] = current[i]; current[i] = t;
+            } else if (btn.dataset.act === "down" && i < current.length - 1) {
+              var u = current[i + 1]; current[i + 1] = current[i]; current[i] = u;
+            }
+            renderRound();
+          });
+        });
+      }
+
+      function bordaTotals(list) {
+        var totals = {}, seen = {};
+        list.forEach(function (b) {
+          var n = b.ranking.length;
+          b.ranking.forEach(function (name, pos) {
+            totals[name] = (totals[name] || 0) + (n - 1 - pos);
+            seen[name] = (seen[name] || 0) + 1;
+          });
+        });
+        return { totals: totals, seen: seen };
+      }
+
+      function standingsHTML(totals, seen, limit) {
+        var rows = Object.keys(totals).map(function (name) {
+          return { name: name, pts: totals[name], n: seen[name] || 0 };
+        });
+        rows.sort(function (a, b) { return b.pts - a.pts || a.name.localeCompare(b.name); });
+        if (!rows.length) return '<span class="muted">No votes yet.</span>';
+        var html = '<table class="standings"><thead><tr><th>#</th><th>Bert</th><th class="num">Points</th><th class="num">Rounds</th></tr></thead><tbody>';
+        rows.slice(0, limit || rows.length).forEach(function (r, i) {
+          var img = emoteImg(r.name, "mini-emote");
+          html += '<tr><td>' + (i + 1) + '</td><td>' + (img || "") + ' ' + escapeHtml(r.name) + '</td>' +
+            '<td class="num">' + r.pts + '</td><td class="num">' + r.n + '</td></tr>';
+        });
+        return html + '</tbody></table>';
+      }
+
+      function renderMine() {
+        var t = bordaTotals(ballots);
+        $("myRounds").textContent = ballots.length;
+        $("mySeen").textContent = Object.keys(t.seen).length;
+        $("myTable").innerHTML = standingsHTML(t.totals, t.seen, 30);
+        $("roundStatus").textContent = ballots.length
+          ? "Saved locally: " + ballots.length + " round" + (ballots.length === 1 ? "" : "s") + " so far."
+          : "";
+        $("roundStatus").className = "status";
+      }
+
+      function setStatus(msg, isError) {
+        var el = $("roundStatus");
+        el.textContent = msg;
+        el.className = "status" + (isError ? " error" : "");
+      }
+
+      function nextRound() {
+        current = sampleFive();
+        renderRound();
+      }
+
+      function submitCurrent() {
+        if (current.length !== 5) return;
+        var voter = $("voterInput").value.trim();
+        if (!voter) {
+          setStatus("Enter a display name before submitting.", true);
+          $("voterInput").focus();
+          return;
+        }
+        var ballot = {
+          voter: voter,
+          ranking: current.slice(), // best -> worst
+          ts: new Date().toISOString()
+        };
+        ballots.push(ballot);
+        saveLocal();
+        // best-effort shared tally; local save already done above
+        fetch("/api/vote/submit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ voter: ballot.voter, ranking: ballot.ranking })
+        }).then(function (res) {
+          if (!res.ok) throw new Error("server returned " + res.status);
+          setStatus("Vote saved locally and sent to the shared tally. New berts below.");
+          refreshShared();
+        }).catch(function () {
+          setStatus("Vote saved locally. Shared tally unreachable, your vote is still stored in this browser.");
+        });
+        try { localStorage.setItem(LS_VOTER, ballot.voter); } catch (e) {}
+        renderMine();
+        nextRound();
+      }
+
+      function refreshShared() {
+        fetch("/api/vote/results").then(function (res) {
+          if (!res.ok) throw new Error("status " + res.status);
+          return res.json();
+        }).then(function (data) {
+          $("sharedRounds").textContent = data.total_ballots != null ? data.total_ballots : 0;
+          $("sharedTable").innerHTML = standingsHTML(data.totals || {}, data.appearances || {}, 30);
+        }).catch(function () {
+          $("sharedRounds").textContent = "–";
+          $("sharedTable").innerHTML = '<span class="muted">Shared tally unavailable (backend not reachable). Local votes above are unaffected.</span>';
+        });
+      }
+
+      function init() {
+        loadLocal();
+        renderMine();
+        updateSubmitState();
+        $("submitBtn").addEventListener("click", submitCurrent);
+        $("skipBtn").addEventListener("click", nextRound);
+        $("refreshSharedBtn").addEventListener("click", refreshShared);
+        $("resetBtn").addEventListener("click", function () {
+          if (!ballots.length) return;
+          if (!confirm("Delete all " + ballots.length + " locally saved round(s) in this browser?")) return;
+          ballots = [];
+          saveLocal();
+          renderMine();
+        });
+
+        Promise.all([
+          fetch("/api/channel?name=" + CHANNEL).then(function (r) {
+            if (!r.ok) throw new Error("channel api: " + r.status);
+            return r.json();
+          }),
+          fetch("/api/emotes?channel=" + CHANNEL).then(function (r) {
+            if (!r.ok) throw new Error("emotes api: " + r.status);
+            return r.json();
+          })
+        ]).then(function (res) {
+          allBerts = res[0].active_berts || [];
+          (res[1] || []).forEach(function (em) {
+            if (em && em.name && em.id) emoteByName[em.name] = em.id;
+          });
+          if (!allBerts.length) throw new Error("no berts returned");
+          $("loadingLabel").style.display = "none";
+          dataLoaded = true;
+          updateSubmitState();
+          $("skipBtn").disabled = false;
+          nextRound();
+        }).catch(function (err) {
+          $("loadingLabel").textContent = "Failed to load bert data: " + err.message;
+          $("loadingLabel").className = "status error";
+        });
+        refreshShared();
+      }
+
+      document.addEventListener("DOMContentLoaded", init);
+    </script>
+  </body>
+</html>

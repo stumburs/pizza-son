@@ -150,6 +150,43 @@
         text-transform: uppercase;
       }
 
+      .vote-banner {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: var(--accent-dim);
+        border: 1px solid rgba(167, 139, 250, 0.35);
+        border-radius: var(--radius-md);
+        padding: 10px 14px;
+        margin-bottom: 16px;
+        font-size: 0.925rem;
+      }
+      .vote-banner-text { color: var(--text-secondary); flex: 1; }
+      .vote-banner-text strong { color: var(--accent); font-weight: 600; }
+      .vote-banner-sep { color: var(--text-muted); margin: 0 8px; }
+      .vote-banner-btn {
+        background: var(--accent-dim);
+        border: 1px solid var(--accent);
+        color: var(--accent);
+        font-weight: 600;
+        padding: 7px 16px;
+        border-radius: var(--radius-sm);
+        text-decoration: none;
+        white-space: nowrap;
+        transition: background 0.15s;
+      }
+      .vote-banner-btn:hover { background: rgba(167, 139, 250, 0.2); }
+      .vote-banner-dismiss {
+        background: transparent;
+        border: none;
+        color: var(--text-muted);
+        font-size: 1.1rem;
+        line-height: 1;
+        cursor: pointer;
+        padding: 2px 6px;
+      }
+      .vote-banner-dismiss:hover { color: var(--text-primary); }
+
       .container { flex: 1; min-width: 0; }
 
       .tabs {
@@ -485,6 +522,11 @@
           </button>
         </div>
       </div>
+      <div class="vote-banner" id="voteBanner">
+        <span class="vote-banner-text"><strong>Bert vote is open</strong><span class="vote-banner-sep">·</span>rank the sir_lysergium berts from worst to best</span>
+        <a class="vote-banner-btn" href="/vote">Vote now</a>
+        <button class="vote-banner-dismiss" onclick="dismissVoteBanner()" aria-label="Dismiss" title="Dismiss">&times;</button>
+      </div>
       <div class="tabs">
         <button class="tab active" onclick="switchTab('global', this); loadGlobal();">🌎 Global</button>
         <button class="tab" onclick="switchTab('channel', this)">📺 Channel</button>
@@ -713,6 +755,19 @@
         document.getElementById(tabId).classList.add("active");
         btn.classList.add("active");
       }
+
+      function dismissVoteBanner() {
+        try { localStorage.setItem("bertstats.voteBannerDismissed", "1"); } catch (e) {}
+        document.getElementById("voteBanner").style.display = "none";
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        try {
+          if (localStorage.getItem("bertstats.voteBannerDismissed") === "1") {
+            document.getElementById("voteBanner").style.display = "none";
+          }
+        } catch (e) {}
+      });
 
       function getCountValue(value) {
         if (typeof value === "object" && value !== null) {
