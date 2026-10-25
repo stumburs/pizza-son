@@ -63,6 +63,9 @@ type ListenerEntry struct {
 	Matcher     func(ctx CommandContext) bool
 	OnCooldown  func(ctx CommandContext, remaining time.Duration)
 	Handler     Listener
+	// Passive listeners observe messages without replying or otherwise
+	// handling them. They are excluded from activity statistics.
+	Passive bool
 }
 
 // All commands
@@ -100,9 +103,6 @@ func (r *Registry) Dispatch(client Sender, msg models.Message) {
 		}
 	}
 
-	r.mu.Lock()
-	defer r.mu.Unlock()
-
 	message := strings.TrimSpace(msg.Text)
 
 	// Trim leading @mention if this is a reply
@@ -112,6 +112,13 @@ func (r *Registry) Dispatch(client Sender, msg models.Message) {
 			message = parts[1]
 		}
 	}
+
+	// Record every chat message before dispatching. Commands are still chat
+	// messages, but are flagged so the stats site can separate them.
+	services.ActivityServiceInstance.LogMessage(msg, strings.HasPrefix(message, r.Prefix))
+
+	r.mu.Lock()
+	defer r.mu.Unlock()
 
 	ctx := CommandContext{
 		Client:   client,
@@ -131,7 +138,7 @@ func (r *Registry) Dispatch(client Sender, msg models.Message) {
 		l := l
 
 		// cooldown
-		go func() {
+		go func(ctx CommandContext) {
 			// match listener
 			if l.Matcher != nil && !l.Matcher(ctx) {
 				return
@@ -147,11 +154,14 @@ func (r *Registry) Dispatch(client Sender, msg models.Message) {
 					return
 				}
 			}
-			l.Handler(ctx)
+			handled := l.Handler(ctx)
+			if handled && !l.Passive {
+				services.ActivityServiceInstance.LogListener(msg, l.Name)
+			}
 			if l.Cooldown > 0 {
 				GlobalCooldowns.Set(l.Name, msg.Channel, msg.User.ID)
 			}
-		}()
+		}(ctx)
 	}
 
 	if !strings.HasPrefix(message, r.Prefix) {
@@ -192,6 +202,7 @@ func (r *Registry) Dispatch(client Sender, msg models.Message) {
 		GlobalCooldowns.Set(cmd.Name, msg.Channel, msg.User.ID)
 	}
 
+	services.ActivityServiceInstance.LogCommand(msg, cmd.Name)
 	go cmd.Handler(ctx)
 }
 
@@ -233,6 +244,7 @@ func (r *Registry) DispatchCommand(ctx CommandContext) {
 		return
 	}
 	ctx.Args = ctx.Args[1:]
+	services.ActivityServiceInstance.LogCommand(ctx.Message, cmd.Name)
 	go cmd.Handler(ctx)
 }
 

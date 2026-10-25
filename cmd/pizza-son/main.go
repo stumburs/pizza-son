@@ -27,6 +27,7 @@ func main() {
 	services.NewCurrencyService()
 	services.NewRNNService()
 	services.NewLoggerService()
+	services.NewActivityService()
 	services.NewChannelSettingsService()
 	services.NewMudwrestleService()
 	services.NewPredictionService()
@@ -66,7 +67,11 @@ func main() {
 	})
 
 	// bertstats
-	webServer := web.NewWebService(":8080")
+	addr := os.Getenv("PIZZA_SON_ADDR")
+	if addr == "" {
+		addr = ":8080"
+	}
+	webServer := web.NewWebService(addr)
 	webServer.Start()
 
 	// STT stream listening (disabled by default)
@@ -98,5 +103,6 @@ func main() {
 
 	log.Println("Shutting down...")
 	discordBot.Stop()
+	services.ActivityServiceInstance.Close()
 	services.LoggerServiceInstance.Close()
 }

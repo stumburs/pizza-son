@@ -24,6 +24,7 @@ func init() {
 	RegisterListener(bot.ListenerEntry{
 		Name:        "currency",
 		Description: "Awards slices to users for chatting",
+		Passive:     true,
 		Handler: func(ctx bot.CommandContext) bool {
 			// Exclude Discord
 			if ctx.Message.Platform == models.PlatformDiscord {

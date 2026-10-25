@@ -11,6 +11,7 @@ func init() {
 	RegisterListener(bot.ListenerEntry{
 		Name:        "markov",
 		Description: "Feeds chat messages into Markov generator",
+		Passive:     true,
 		Handler: func(ctx bot.CommandContext) bool {
 			if strings.HasPrefix(ctx.Message.Text, config.Get().Bot.Prefix) {
 				return false

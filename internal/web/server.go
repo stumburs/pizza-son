@@ -19,21 +19,29 @@ func NewWebService(port string) *WebService {
 
 func (ws *WebService) Start() {
 	fs := http.FileServer(http.Dir("./web/public"))
-	http.Handle("/", fs)
 
-	// Clean URLs for panel
-	http.HandleFunc("/panel", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "./web/public/panel.html")
-	})
-	http.HandleFunc("/vote", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "./web/public/vote.html")
+	// All human-facing routes load the same shell. Tabs inside the shell load
+	// the individual views without a full page reload.
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/", "/bertstats", "/bertstats/", "/vote", "/vote/", "/panel", "/panel/":
+			http.ServeFile(w, r, "./web/public/shell.html")
+		case "/berts", "/berts/":
+			http.Redirect(w, r, "/bertstats", http.StatusMovedPermanently)
+		default:
+			fs.ServeHTTP(w, r)
+		}
 	})
 
 	// API endpoints
+	http.HandleFunc("/api/site/summary", enableCORS(ws.handleSiteSummary))
 	http.HandleFunc("/api/global", enableCORS(ws.handleGlobalStats))
 	http.HandleFunc("/api/channel", enableCORS(ws.handleChannelStats))
 	http.HandleFunc("/api/user", enableCORS(ws.handleUserStats))
 	http.HandleFunc("/api/emotes", enableCORS(ws.handleChannelEmotes))
+	http.HandleFunc("/api/activity/global", enableCORS(ws.handleActivityGlobal))
+	http.HandleFunc("/api/activity/channel", enableCORS(ws.handleActivityChannel))
+	http.HandleFunc("/api/activity/user", enableCORS(ws.handleActivityUser))
 	http.HandleFunc("/api/vote/submit", enableCORS(ws.handleVoteSubmit))
 	http.HandleFunc("/api/vote/results", enableCORS(ws.handleVoteResults))
 	http.HandleFunc("/api/live", enableCORS(services.LiveFeedInstance.HandleLiveFeed))
@@ -137,17 +145,17 @@ func (ws *WebService) handleGlobalStats(w http.ResponseWriter, r *http.Request) 
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
-		"total_activations":        totalActivations,
-		"total_zazas":              totalZazas,
-		"total_zaza_ls":            totalZazaLs,
-		"total_double_zazas":       totalDoubleZazas,
-		"channel_count":            channelCount,
-		"channel_totals":           channelTotals,
-		"users":                    globalUsers,
-		"berts":                    globalBerts,
-		"hourly_timeline":          globalHourly,
-		"first_person_per_bert":    firstPersonPerBert,
-		"goldenzazabert_hall":      allGoldenzazabertEvents,
+		"total_activations":     totalActivations,
+		"total_zazas":           totalZazas,
+		"total_zaza_ls":         totalZazaLs,
+		"total_double_zazas":    totalDoubleZazas,
+		"channel_count":         channelCount,
+		"channel_totals":        channelTotals,
+		"users":                 globalUsers,
+		"berts":                 globalBerts,
+		"hourly_timeline":       globalHourly,
+		"first_person_per_bert": firstPersonPerBert,
+		"goldenzazabert_hall":   allGoldenzazabertEvents,
 	})
 }
 
@@ -210,18 +218,18 @@ func (ws *WebService) handleChannelStats(w http.ResponseWriter, r *http.Request)
 	w.Header().Set("Content-Type", "application/json")
 
 	json.NewEncoder(w).Encode(map[string]interface{}{
-		"channel":                  channel,
-		"total_activations":        totalBerts,
-		"total_zazas":              totalZazas,
-		"total_zaza_ls":            totalZazaLs,
-		"total_double_zazas":       totalDoubleZazas,
-		"active_berts":             data.Berts,
-		"users":                    userTotals,
-		"berts":                    bertTotals,
-		"daily_timeline":           data.DailyActivations,
-		"hourly_timeline":          data.HourlyActivations,
-		"first_person_per_bert":    firstPersonPerBert,
-		"goldenzazabert_events":    data.GoldenzazabertEvents,
+		"channel":               channel,
+		"total_activations":     totalBerts,
+		"total_zazas":           totalZazas,
+		"total_zaza_ls":         totalZazaLs,
+		"total_double_zazas":    totalDoubleZazas,
+		"active_berts":          data.Berts,
+		"users":                 userTotals,
+		"berts":                 bertTotals,
+		"daily_timeline":        data.DailyActivations,
+		"hourly_timeline":       data.HourlyActivations,
+		"first_person_per_bert": firstPersonPerBert,
+		"goldenzazabert_events": data.GoldenzazabertEvents,
 	})
 }
 
@@ -262,12 +270,12 @@ func (ws *WebService) handleUserStats(w http.ResponseWriter, r *http.Request) {
 				}
 				if record, exists := stats.BertRecords[b]; exists && record.Count > 0 {
 					collected[b] = map[string]any{
-						"count":            record.Count,
-						"zaza_count":       record.ZazaCount,
-						"zaza_l_count":     record.ZazaLCount,
+						"count":             record.Count,
+						"zaza_count":        record.ZazaCount,
+						"zaza_l_count":      record.ZazaLCount,
 						"double_zaza_count": record.DoubleZazaCount,
-						"first_seen":       record.FirstSeen,
-						"last_seen":        record.LastSeen,
+						"first_seen":        record.FirstSeen,
+						"last_seen":         record.LastSeen,
 					}
 				} else {
 					missing = append(missing, b)

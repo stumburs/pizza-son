@@ -1,0 +1,737 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Overview · pizza-son</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0b0b0d;
+        --surface: #131315;
+        --surface-2: #19191c;
+        --border: rgba(255, 255, 255, 0.09);
+        --border-strong: rgba(255, 255, 255, 0.16);
+        --text: #ededf0;
+        --text-secondary: #b8b8c2;
+        --text-muted: #90909b;
+        --accent: #b7a6f5;
+        --accent-soft: rgba(183, 166, 245, 0.12);
+        --green: #4ade80;
+        --radius: 10px;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: "DM Sans", system-ui, sans-serif;
+        font-size: 15px;
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      .page {
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 30px 24px 56px;
+      }
+
+      .intro {
+        max-width: 620px;
+        margin-bottom: 26px;
+      }
+
+      .intro p {
+        margin: 0;
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+        line-height: 1.6;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+        gap: 8px;
+        margin-bottom: 38px;
+      }
+
+      .stat {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: var(--surface);
+        padding: 14px 15px 13px;
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+      }
+
+      .stat-label {
+        color: var(--text-secondary);
+        font-size: 0.82rem;
+        font-weight: 500;
+      }
+
+      .stat-value {
+        color: var(--text);
+        font-size: 1.5rem;
+        font-weight: 600;
+        line-height: 1;
+        letter-spacing: -0.02em;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .stat.live .stat-value {
+        color: var(--green);
+      }
+
+      .section {
+        margin-bottom: 40px;
+      }
+
+      .section-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 12px;
+      }
+
+      .section-head h2 {
+        margin: 0;
+        font-size: 1.04rem;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+      }
+
+      .section-head span {
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+      }
+
+      .live-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 10px;
+      }
+
+      .live-card {
+        display: flex;
+        flex-direction: column;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: var(--surface);
+        overflow: hidden;
+        text-decoration: none;
+      }
+
+      .live-card:hover {
+        border-color: var(--border-strong);
+      }
+
+      .live-thumb {
+        position: relative;
+        aspect-ratio: 16 / 9;
+        background: var(--surface-2);
+        overflow: hidden;
+      }
+
+      .live-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+
+      .live-badge {
+        position: absolute;
+        top: 9px;
+        left: 9px;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 3px 8px;
+        border-radius: 4px;
+        background: rgba(11, 11, 13, 0.9);
+        border: 1px solid rgba(74, 222, 128, 0.4);
+        color: var(--green);
+        font-size: 0.72rem;
+        font-weight: 600;
+      }
+
+      .live-badge::before {
+        content: "";
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: var(--green);
+      }
+
+      .viewers {
+        position: absolute;
+        right: 9px;
+        bottom: 9px;
+        padding: 3px 7px;
+        border-radius: 4px;
+        background: rgba(11, 11, 13, 0.9);
+        color: var(--text);
+        font-size: 0.75rem;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .live-body {
+        padding: 12px 13px 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        flex: 1;
+      }
+
+      .live-channel {
+        color: var(--accent);
+        font-weight: 600;
+        font-size: 0.9rem;
+      }
+
+      .live-title {
+        margin: 0;
+        color: var(--text);
+        font-size: 0.9rem;
+        line-height: 1.4;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+
+      .live-meta {
+        margin-top: auto;
+        padding-top: 6px;
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        color: var(--text-muted);
+        font-size: 0.8rem;
+      }
+
+      .live-meta .game {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .empty {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 24px 18px;
+        color: var(--text-secondary);
+        background: var(--surface);
+        font-size: 0.9rem;
+        text-align: center;
+      }
+
+      .table-wrap {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: var(--surface);
+        overflow: auto;
+      }
+
+      .channel-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 640px;
+      }
+
+      .channel-table th {
+        padding: 10px 14px;
+        color: var(--text-secondary);
+        font-size: 0.76rem;
+        font-weight: 500;
+        text-align: right;
+        white-space: nowrap;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .channel-table th:first-child {
+        text-align: left;
+      }
+
+      .channel-table td {
+        padding: 11px 14px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.045);
+        color: var(--text-secondary);
+        font-size: 0.86rem;
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+      }
+
+      .channel-table tr:last-child td {
+        border-bottom: none;
+      }
+
+      .channel-table tbody tr:hover {
+        background: rgba(255, 255, 255, 0.025);
+      }
+
+      .channel-table td:first-child {
+        text-align: left;
+        color: var(--text);
+        font-weight: 500;
+      }
+
+      .channel-name {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        text-decoration: none;
+      }
+
+      .channel-name:hover {
+        color: var(--accent);
+      }
+
+      .channel-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #3a3a40;
+        flex-shrink: 0;
+      }
+
+      .channel-dot.live {
+        background: var(--green);
+      }
+
+      .leaderboard-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 10px;
+      }
+
+      .leaderboard {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: var(--surface);
+        padding: 15px 16px;
+      }
+
+      .leaderboard h3 {
+        margin: 0 0 10px;
+        color: var(--text-secondary);
+        font-size: 0.86rem;
+        font-weight: 600;
+      }
+
+      .leader-row {
+        display: grid;
+        grid-template-columns: 20px 1fr auto;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 0;
+        font-size: 0.88rem;
+      }
+
+      .leader-rank {
+        color: var(--text-muted);
+        font-size: 0.78rem;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .leader-name {
+        color: var(--text-secondary);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .leader-row:first-child .leader-name {
+        color: var(--text);
+      }
+
+      .leader-count {
+        color: var(--text-muted);
+        font-size: 0.8rem;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .site-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+        padding-top: 18px;
+        border-top: 1px solid var(--border);
+        color: var(--text-muted);
+        font-size: 0.82rem;
+      }
+
+      .site-footer a {
+        color: var(--text-secondary);
+        text-decoration: none;
+      }
+
+      .site-footer a:hover {
+        color: var(--accent);
+      }
+
+      .footer-links {
+        display: flex;
+        gap: 14px;
+      }
+
+      .ai-note {
+        margin: 10px 0 0;
+        color: var(--text-muted);
+        font-size: 0.84rem;
+        line-height: 1.55;
+      }
+
+      .ai-note a {
+        color: var(--text-secondary);
+        text-decoration: underline;
+        text-underline-offset: 2px;
+      }
+
+      .ai-note a:hover {
+        color: var(--accent);
+      }
+
+      @media (max-width: 640px) {
+        .page {
+          padding: 22px 16px 40px;
+        }
+
+        .stats-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .stat-value {
+          font-size: 1.3rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <section class="intro">
+        <p>
+          Live status of the channels pizza-son runs in, plus chat and bert totals.
+        </p>
+      </section>
+
+      <section class="stats-grid" aria-label="Totals">
+        <div class="stat">
+          <span class="stat-label">Twitch channels</span>
+          <span class="stat-value" id="statChannels">—</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Discord channels</span>
+          <span class="stat-value" id="statDiscord">—</span>
+        </div>
+        <div class="stat live">
+          <span class="stat-label">Live now</span>
+          <span class="stat-value" id="statLive">—</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Messages</span>
+          <span class="stat-value" id="statMessages">—</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Commands</span>
+          <span class="stat-value" id="statCommands">—</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Listener hits</span>
+          <span class="stat-value" id="statListeners">—</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Chatters</span>
+          <span class="stat-value" id="statUsers">—</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Berts checked</span>
+          <span class="stat-value" id="statBerts">—</span>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <h2>Live now</h2>
+          <span id="liveCount"></span>
+        </div>
+        <div class="live-grid" id="liveGrid">
+          <div class="empty">Looking for live channels…</div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <h2>Channels</h2>
+          <span>activity recorded by pizza-son</span>
+        </div>
+        <div class="table-wrap">
+          <table class="channel-table">
+            <thead>
+              <tr>
+                <th>Channel</th>
+                <th>Messages</th>
+                <th>Commands</th>
+                <th>Listener hits</th>
+                <th>Chatters</th>
+                <th>Berts</th>
+              </tr>
+            </thead>
+            <tbody id="channelBody">
+              <tr>
+                <td colspan="6" style="text-align: center; color: var(--text-secondary)">
+                  Loading channels…
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="leaderboard-grid">
+          <div class="leaderboard">
+            <h3>Top berts</h3>
+            <div id="topBerts"></div>
+          </div>
+          <div class="leaderboard">
+            <h3>Top commands</h3>
+            <div id="topCommands"></div>
+          </div>
+          <div class="leaderboard">
+            <h3>Top listeners</h3>
+            <div id="topListeners"></div>
+          </div>
+        </div>
+      </section>
+
+      <footer class="site-footer">
+        <span>pizza-son · <span id="updatedAt">loading</span></span>
+        <span class="footer-links">
+          <a href="/bertstats">Bert stats</a>
+          <a href="/api/site/summary" target="_blank" rel="noopener">API</a>
+          <a href="https://twitch.tv/pizza_tm" target="_blank" rel="noopener">Twitch</a>
+        </span>
+      </footer>
+
+      <p class="ai-note">
+        This site was generated with AI. <a href="https://stumburs.github.io/ai" target="_blank" rel="noopener">Read my rant about it</a>.
+      </p>
+    </div>
+
+    <script src="/view.js"></script>
+    <script>
+      const numberFormat = new Intl.NumberFormat();
+
+      const htmlEscape = (value) =>
+        String(value ?? "").replace(/[&<>"']/g, (char) => ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        })[char]);
+
+      function formatNumber(value) {
+        return numberFormat.format(Number(value) || 0);
+      }
+
+      function formatUptime(seconds) {
+        const total = Math.max(0, Number(seconds) || 0);
+        const days = Math.floor(total / 86400);
+        const hours = Math.floor((total % 86400) / 3600);
+        const minutes = Math.floor((total % 3600) / 60);
+        if (days > 0) return `${days}d ${hours}h`;
+        if (hours > 0) return `${hours}h ${minutes}m`;
+        return `${minutes}m`;
+      }
+
+      function formatUpdated(iso) {
+        if (!iso) return "loading";
+        const date = new Date(iso);
+        if (Number.isNaN(date.getTime())) return "loading";
+        return `updated ${date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+      }
+
+      function renderChannels(channels) {
+        const body = document.getElementById("channelBody");
+        if (!channels || channels.length === 0) {
+          body.innerHTML = `
+            <tr>
+              <td colspan="6" style="text-align: center; color: var(--text-secondary)">
+                No channels recorded yet.
+              </td>
+            </tr>`;
+          return;
+        }
+
+        body.innerHTML = channels
+          .map((channel) => {
+            const name = htmlEscape(channel.name);
+            const live = Boolean(channel.live);
+            return `
+              <tr>
+                <td>
+                  <a
+                    class="channel-name"
+                    href="https://twitch.tv/${encodeURIComponent(channel.name)}"
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    <span class="channel-dot ${live ? "live" : ""}"></span>
+                    <span>${name}</span>
+                  </a>
+                </td>
+                <td>${formatNumber(channel.messages)}</td>
+                <td>${formatNumber(channel.commands)}</td>
+                <td>${formatNumber(channel.listeners)}</td>
+                <td>${formatNumber(channel.users)}</td>
+                <td>${formatNumber(channel.berts)}</td>
+              </tr>`;
+          })
+          .join("");
+      }
+
+      function thumbnailFor(channel) {
+        if (channel.thumbnail) {
+          return channel.thumbnail
+            .replace("{width}", "640")
+            .replace("{height}", "360");
+        }
+        return `https://static-cdn.jtvnw.net/previews-ttv/live_user_${encodeURIComponent(channel.name)}-640x360.jpg`;
+      }
+
+      function renderLive(channels) {
+        const liveChannels = (channels || []).filter((channel) => channel.live);
+        document.getElementById("liveCount").textContent =
+          liveChannels.length > 0
+            ? `${liveChannels.length} streaming`
+            : "none streaming";
+
+        const grid = document.getElementById("liveGrid");
+        if (liveChannels.length === 0) {
+          grid.innerHTML = `<div class="empty">Nobody from the channel list is live right now.</div>`;
+          return;
+        }
+
+        grid.innerHTML = liveChannels
+          .map((channel) => {
+            const name = htmlEscape(channel.name);
+            const title = htmlEscape(channel.title || "Untitled stream");
+            const game = htmlEscape(channel.game || "No category");
+            return `
+              <a
+                class="live-card"
+                href="https://twitch.tv/${encodeURIComponent(channel.name)}"
+                target="_blank"
+                rel="noopener"
+              >
+                <div class="live-thumb">
+                  <img
+                    src="${htmlEscape(thumbnailFor(channel))}"
+                    alt="${name} stream preview"
+                    loading="lazy"
+                    onerror="this.style.display='none'"
+                  />
+                  <span class="live-badge">live</span>
+                  <span class="viewers">${formatNumber(channel.viewers)} viewers</span>
+                </div>
+                <div class="live-body">
+                  <span class="live-channel">#${name}</span>
+                  <p class="live-title">${title}</p>
+                  <div class="live-meta">
+                    <span class="game">${game}</span>
+                    <span>${formatUptime(channel.uptime_seconds)}</span>
+                  </div>
+                </div>
+              </a>`;
+          })
+          .join("");
+      }
+
+      function renderLeaderboard(elementId, entries, prefix = "") {
+        const element = document.getElementById(elementId);
+        if (!entries || entries.length === 0) {
+          element.innerHTML = `<div class="empty" style="padding: 16px">Nothing here yet.</div>`;
+          return;
+        }
+
+        element.innerHTML = entries
+          .map(
+            (entry, index) => `
+              <div class="leader-row">
+                <span class="leader-rank">${index + 1}</span>
+                <span class="leader-name" title="${htmlEscape(entry.name)}">${prefix}${htmlEscape(entry.name)}</span>
+                <span class="leader-count">${formatNumber(entry.count)}</span>
+              </div>`
+          )
+          .join("");
+      }
+
+      function render(data) {
+        const totals = data.totals || {};
+        document.getElementById("statChannels").textContent = formatNumber(
+          data.bot?.twitch_channels ?? totals.channels
+        );
+        document.getElementById("statDiscord").textContent = formatNumber(
+          data.bot?.discord_channels
+        );
+        document.getElementById("statLive").textContent = formatNumber(totals.live_channels);
+        document.getElementById("statMessages").textContent = formatNumber(totals.messages);
+        document.getElementById("statCommands").textContent = formatNumber(totals.commands);
+        document.getElementById("statListeners").textContent = formatNumber(
+          totals.listener_activations
+        );
+        document.getElementById("statUsers").textContent = formatNumber(totals.unique_users);
+        document.getElementById("statBerts").textContent = formatNumber(totals.berts);
+
+        renderLive(data.channels);
+        renderChannels(data.channels);
+        renderLeaderboard("topBerts", data.top_berts);
+        renderLeaderboard("topCommands", data.top_commands, "!");
+        renderLeaderboard("topListeners", data.top_listeners);
+
+        document.getElementById("updatedAt").textContent = formatUpdated(data.generated_at);
+      }
+
+      async function loadSummary() {
+        try {
+          const response = await fetch("/api/site/summary", { cache: "no-store" });
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          render(await response.json());
+        } catch (error) {
+          document.getElementById("updatedAt").textContent = "update failed";
+        }
+      }
+
+      loadSummary();
+      setInterval(loadSummary, 30000);
+
+      document.addEventListener("visibilitychange", () => {
+        if (!document.hidden) loadSummary();
+      });
+    </script>
+  </body>
+</html>

@@ -11,6 +11,9 @@ import (
 	"time"
 )
 
+// bertStatsURL is the public dashboard the !bertstats command links to.
+const bertStatsURL = "https://pizzason.stumburs.id.lv/bertstats"
+
 type TrollRule struct {
 	User     string
 	Chance   float64
@@ -197,7 +200,7 @@ func init() {
 		Permission:  bot.All,
 		Category:    bot.CategoryFun,
 		Examples: []bot.CommandExample{
-			{Input: "!bertstats", Output: "View all bert stats at https://bertstats.stumburs.id.lv"},
+			{Input: "!bertstats", Output: "View all bert stats at " + bertStatsURL},
 		},
 		Handler: func(ctx bot.CommandContext) {
 			target := ctx.Message.User.Name
@@ -208,12 +211,12 @@ func init() {
 
 			stats := services.BertServiceInstance.GetUserStats(ctx.Message.Channel, target)
 			if stats.TotalBertchecks == 0 {
-				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, fmt.Sprintf("%s has never bertchecked smh based berters here: https://bertstats.stumburs.id.lv", target))
+				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, fmt.Sprintf("%s has never bertchecked smh based berters here: %s", target, bertStatsURL))
 				return
 			}
 
 			ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, fmt.Sprintf(
-				"%s: %d total berts. Most common: %s (%dx). %d/%d collected. %d berts by all chatters. View all bert stats at https://bertstats.stumburs.id.lv",
+				"%s: %d total berts. Most common: %s (%dx). %d/%d collected. %d berts by all chatters. View all bert stats at %s",
 				target,
 				stats.TotalBertchecks,
 				stats.MostCommonBert,
@@ -221,6 +224,7 @@ func init() {
 				stats.BertsCollectedOutOfAll,
 				stats.TotalBerts,
 				stats.ChannelTotalBertchecks,
+				bertStatsURL,
 			))
 		},
 	})
@@ -251,6 +255,7 @@ func init() {
 
 			if matched {
 				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "firsttimeberter")
+				return true
 			}
 
 			return false

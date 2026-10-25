@@ -13,19 +13,19 @@
     />
     <style>
       :root {
-        --bg: #08080a;
-        --surface-1: #111114;
-        --surface-2: #18181c;
-        --surface-3: #222228;
-        --border: rgba(255, 255, 255, 0.06);
-        --border-hover: rgba(255, 255, 255, 0.12);
-        --accent: #a78bfa;
-        --accent-dim: rgba(167, 139, 250, 0.12);
-        --accent-glow: rgba(167, 139, 250, 0.25);
-        --text-primary: #f0f0f4;
-        --text-secondary: #8b8b9a;
-        --text-muted: #55555f;
-        --green: #34d399;
+        --bg: #0b0b0d;
+        --surface-1: #131315;
+        --surface-2: #19191c;
+        --surface-3: #232327;
+        --border: rgba(255, 255, 255, 0.09);
+        --border-hover: rgba(255, 255, 255, 0.16);
+        --accent: #b7a6f5;
+        --accent-dim: rgba(183, 166, 245, 0.12);
+        --accent-glow: rgba(183, 166, 245, 0.18);
+        --text-primary: #ededf0;
+        --text-secondary: #b8b8c2;
+        --text-muted: #90909b;
+        --green: #4ade80;
         --blue: #60a5fa;
         --pink: #f472b6;
         --yellow: #fbbf24;
@@ -51,21 +51,9 @@
         background: var(--bg);
         color: var(--text-primary);
         margin: 0;
-        padding: 24px 20px;
+        padding: 20px 20px 32px;
         min-height: 100vh;
         -webkit-font-smoothing: antialiased;
-      }
-
-      body::before {
-        content: "";
-        position: fixed;
-        inset: 0;
-        background-image:
-          linear-gradient(rgba(167, 139, 250, 0.015) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(167, 139, 250, 0.015) 1px, transparent 1px);
-        background-size: 40px 40px;
-        pointer-events: none;
-        z-index: 1;
       }
 
       .main-layout {
@@ -90,14 +78,15 @@
         z-index: 1;
         max-width: 1340px;
         margin: 0 auto 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
       }
 
-      .page-header {
-        display: flex;
-        align-items: baseline;
-        gap: 12px;
-        margin-bottom: 24px;
+      .top-bar .tabs {
+        margin-bottom: 0;
       }
+
       .header-controls {
         margin-left: auto;
         display: flex;
@@ -121,71 +110,6 @@
       .fun-toggle:hover { border-color: var(--border-hover); background: var(--surface-3); }
       .fun-toggle.active { border-color: var(--accent); background: var(--accent-dim); }
       .fun-toggle img { width: 100%; height: 100%; object-fit: contain; }
-      h1 {
-        font-size: 1.5rem;
-        font-weight: 600;
-        letter-spacing: -0.02em;
-        margin: 0;
-        color: var(--text-primary);
-      }
-      .header-dot {
-        width: 7px;
-        height: 7px;
-        border-radius: 50%;
-        background: var(--accent);
-        box-shadow: 0 0 10px var(--accent-glow);
-        flex-shrink: 0;
-        align-self: center;
-        animation: pulse-dot 2.5s ease-in-out infinite;
-      }
-      @keyframes pulse-dot {
-        0%, 100% { opacity: 1; box-shadow: 0 0 8px var(--accent-glow); }
-        50% { opacity: 0.5; box-shadow: 0 0 4px transparent; }
-      }
-      .header-sub {
-        font-size: 0.8rem;
-        color: var(--text-muted);
-        font-weight: 400;
-        letter-spacing: 0.03em;
-        text-transform: uppercase;
-      }
-
-      .vote-banner {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        background: var(--accent-dim);
-        border: 1px solid rgba(167, 139, 250, 0.35);
-        border-radius: var(--radius-md);
-        padding: 10px 14px;
-        margin-bottom: 16px;
-        font-size: 0.925rem;
-      }
-      .vote-banner-text { color: var(--text-secondary); flex: 1; }
-      .vote-banner-text strong { color: var(--accent); font-weight: 600; }
-      .vote-banner-sep { color: var(--text-muted); margin: 0 8px; }
-      .vote-banner-btn {
-        background: var(--accent-dim);
-        border: 1px solid var(--accent);
-        color: var(--accent);
-        font-weight: 600;
-        padding: 7px 16px;
-        border-radius: var(--radius-sm);
-        text-decoration: none;
-        white-space: nowrap;
-        transition: background 0.15s;
-      }
-      .vote-banner-btn:hover { background: rgba(167, 139, 250, 0.2); }
-      .vote-banner-dismiss {
-        background: transparent;
-        border: none;
-        color: var(--text-muted);
-        font-size: 1.1rem;
-        line-height: 1;
-        cursor: pointer;
-        padding: 2px 6px;
-      }
-      .vote-banner-dismiss:hover { color: var(--text-primary); }
 
       .container { flex: 1; min-width: 0; }
 
@@ -311,8 +235,8 @@
       }
       .badge small { font-family: "DM Mono", monospace; font-size: 0.75rem; color: var(--text-muted); }
       .badge.missing { background: var(--red-dim); color: var(--red-text); border-color: rgba(239, 68, 68, 0.2); }
-      .badge.gold { border-color: rgba(167, 139, 250, 0.35); color: var(--accent); background: var(--accent-dim); }
-      .badge.gold small { color: rgba(167, 139, 250, 0.6); }
+      .badge.gold { border-color: rgba(183, 166, 245, 0.35); color: var(--accent); background: var(--accent-dim); }
+      .badge.gold small { color: rgba(183, 166, 245, 0.6); }
 
       hr { border-color: var(--border); }
 
@@ -510,28 +434,18 @@
     </style>
   </head>
   <body>
-    <div id="bertBgContainer" style="position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0;transition:opacity 0.4s;overflow:hidden;background:#08080a;"></div>
+    <div id="bertBgContainer" style="position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0;transition:opacity 0.4s;overflow:hidden;background:#0b0b0d;"></div>
     <div class="top-bar">
-      <div class="page-header">
-        <div class="header-dot"></div>
-        <h1>bert stats</h1>
-        <span class="header-sub">live tracker</span>
-        <div class="header-controls">
-          <button class="fun-toggle" id="funToggle" onclick="toggleFunMode()" title="for fun">
-            <img src="https://cdn.7tv.app/emote/01K6B3Y3SG5ZBAWXXVKX7BKBE5/4x.webp" alt=":)" />
-          </button>
-        </div>
-      </div>
-      <div class="vote-banner" id="voteBanner">
-        <span class="vote-banner-text"><strong>Bert vote is open</strong><span class="vote-banner-sep">·</span>rank the sir_lysergium berts from worst to best</span>
-        <a class="vote-banner-btn" href="/vote">Vote now</a>
-        <button class="vote-banner-dismiss" onclick="dismissVoteBanner()" aria-label="Dismiss" title="Dismiss">&times;</button>
-      </div>
       <div class="tabs">
-        <button class="tab active" onclick="switchTab('global', this); loadGlobal();">🌎 Global</button>
-        <button class="tab" onclick="switchTab('channel', this)">📺 Channel</button>
-        <button class="tab" onclick="switchTab('user', this)">👤 User</button>
-        <button class="tab" onclick="switchTab('goldenzaza', this); loadGoldenzaza();">✨ Goldenzaza</button>
+        <button class="tab active" onclick="switchTab('global', this); loadGlobal();">Global</button>
+        <button class="tab" onclick="switchTab('channel', this)">Channel</button>
+        <button class="tab" onclick="switchTab('user', this)">User</button>
+        <button class="tab" onclick="switchTab('goldenzaza', this); loadGoldenzaza();">Goldenzaza</button>
+      </div>
+      <div class="header-controls">
+        <button class="fun-toggle" id="funToggle" onclick="toggleFunMode()" title="for fun">
+          <img src="https://cdn.7tv.app/emote/01K6B3Y3SG5ZBAWXXVKX7BKBE5/4x.webp" alt=":)" />
+        </button>
       </div>
     </div>
 
@@ -553,24 +467,24 @@
           </p>
           <div class="grid">
             <div class="box">
-              <h3>🏆 Top Berters</h3>
+              <h3>Top Berters</h3>
               <div id="gUsers">Loading...</div>
             </div>
             <div class="box">
-              <h3>🔥 Most Popular Berts</h3>
+              <h3>Most Popular Berts</h3>
               <div id="gBerts">Loading...</div>
             </div>
           </div>
           <div class="chart-container">
-            <h3>📊 Global Top Berts</h3>
+            <h3>Global Top Berts</h3>
             <canvas id="globalChart" style="max-height: 280px; width: 100%"></canvas>
           </div>
           <div class="full-width-chart">
-            <h3>📈 Total Berts Globally (hourly)</h3>
+            <h3>Total Berts Globally (hourly)</h3>
             <canvas id="globalHourlyCumulativeChart" style="max-height: 260px; width: 100%"></canvas>
           </div>
           <div class="full-width-chart" style="margin-top: 14px">
-            <h3>🥇 First to Discover</h3>
+            <h3>First to Discover</h3>
             <div id="gFirstDiscover">Loading...</div>
           </div>
         </div>
@@ -596,7 +510,7 @@
             </p>
             <div class="grid">
               <div class="box">
-                <h3>🏆 Top Berters Here</h3>
+                <h3>Top Berters Here</h3>
                 <div id="chUsers"></div>
               </div>
               <div class="box">
@@ -606,20 +520,20 @@
             </div>
             <div class="grid" style="margin-top: 14px">
               <div class="box">
-                <h3>📈 Channel Daily Timeline</h3>
+                <h3>Channel Daily Timeline</h3>
                 <canvas id="channelChart" style="max-height: 220px; width: 100%"></canvas>
               </div>
               <div class="box">
-                <h3>🕒 Last 24h Activity</h3>
+                <h3>Last 24h Activity</h3>
                 <canvas id="channelHourlyChart" style="max-height: 220px; width: 100%"></canvas>
               </div>
             </div>
             <div class="full-width-chart">
-              <h3>📈 Total Berts (hourly)</h3>
+              <h3>Total Berts (hourly)</h3>
               <canvas id="channelHourlyCumulativeChart" style="max-height: 260px; width: 100%"></canvas>
             </div>
             <div class="full-width-chart" style="margin-top: 14px">
-              <h3>🥇 First to Discover</h3>
+              <h3>First to Discover</h3>
               <div id="chFirstDiscover"></div>
             </div>
           </div>
@@ -651,26 +565,26 @@
             </div>
             <div class="grid">
               <div class="box">
-                <h3>✅ Collected Here</h3>
+                <h3>Collected Here</h3>
                 <div id="uCollected"></div>
               </div>
               <div class="box">
-                <h3>❌ Missing Here</h3>
+                <h3>Missing Here</h3>
                 <div id="uMissing"></div>
               </div>
             </div>
             <div class="grid" style="margin-top: 14px">
               <div class="box">
-                <h3>📈 Total Berts (daily)</h3>
+                <h3>Total Berts (daily)</h3>
                 <canvas id="userChart" style="max-height: 220px; width: 100%"></canvas>
               </div>
               <div class="box">
-                <h3>🕒 Last 24h Activity</h3>
+                <h3>Last 24h Activity</h3>
                 <canvas id="userHourlyChart" style="max-height: 220px; width: 100%"></canvas>
               </div>
             </div>
             <div class="full-width-chart">
-              <h3>📈 Total Berts (hourly)</h3>
+              <h3>Total Berts (hourly)</h3>
               <canvas id="userHourlyCumulativeChart" style="max-height: 260px; width: 100%"></canvas>
             </div>
           </div>
@@ -678,7 +592,7 @@
 
         <!-- GOLDENZAZA -->
         <div id="goldenzaza" class="panel">
-          <h2>✨ Goldenzazabert Hall of Fame</h2>
+          <h2>Goldenzazabert Hall of Fame</h2>
           <p class="stat-line">
             <span style="color: var(--gold-text);">0.005% chance in sir_lysergium</span>
           </p>
@@ -703,6 +617,7 @@
       </div>
     </div>
 
+    <script src="/view.js"></script>
     <script>
       let globalChartInstance = null;
       let globalHourlyCumulativeChartInstance = null;
@@ -755,19 +670,6 @@
         document.getElementById(tabId).classList.add("active");
         btn.classList.add("active");
       }
-
-      function dismissVoteBanner() {
-        try { localStorage.setItem("bertstats.voteBannerDismissed", "1"); } catch (e) {}
-        document.getElementById("voteBanner").style.display = "none";
-      }
-
-      document.addEventListener("DOMContentLoaded", function () {
-        try {
-          if (localStorage.getItem("bertstats.voteBannerDismissed") === "1") {
-            document.getElementById("voteBanner").style.display = "none";
-          }
-        } catch (e) {}
-      });
 
       function getCountValue(value) {
         if (typeof value === "object" && value !== null) {
@@ -1194,8 +1096,8 @@
             responsive: true,
             plugins: { legend: { display: false } },
             scales: {
-              x: { grid: { color: "#1e1e22" }, ticks: { color: "#55555f", stepSize: 1 } },
-              y: { grid: { display: false }, ticks: { color: "#55555f" } },
+              x: { grid: { color: "#1e1e22" }, ticks: { color: "#90909b", stepSize: 1 } },
+              y: { grid: { display: false }, ticks: { color: "#90909b" } },
             },
           },
         });
@@ -1225,8 +1127,8 @@
             responsive: true,
             plugins: { legend: { display: false } },
             scales: {
-              x: { grid: { color: "#161618" }, ticks: { color: "#55555f", maxTicksLimit: 12 } },
-              y: { grid: { color: "#1e1e22" }, ticks: { color: "#55555f" } },
+              x: { grid: { color: "#161618" }, ticks: { color: "#90909b", maxTicksLimit: 12 } },
+              y: { grid: { color: "#1e1e22" }, ticks: { color: "#90909b" } },
             },
           },
         });
@@ -1290,8 +1192,8 @@
             responsive: true,
             plugins: { legend: { display: false } },
             scales: {
-              x: { grid: { color: "#1e1e22" }, ticks: { color: "#55555f" } },
-              y: { grid: { color: "#1e1e22" }, ticks: { color: "#55555f", stepSize: 1 } },
+              x: { grid: { color: "#1e1e22" }, ticks: { color: "#90909b" } },
+              y: { grid: { color: "#1e1e22" }, ticks: { color: "#90909b", stepSize: 1 } },
             },
           },
         });
@@ -1318,8 +1220,8 @@
             responsive: true,
             plugins: { legend: { display: false } },
             scales: {
-              x: { grid: { display: false }, ticks: { color: "#55555f" } },
-              y: { grid: { color: "#1e1e22" }, ticks: { color: "#55555f", stepSize: 1 } },
+              x: { grid: { display: false }, ticks: { color: "#90909b" } },
+              y: { grid: { color: "#1e1e22" }, ticks: { color: "#90909b", stepSize: 1 } },
             },
           },
         });
@@ -1349,8 +1251,8 @@
             responsive: true,
             plugins: { legend: { display: false } },
             scales: {
-              x: { grid: { color: "#161618" }, ticks: { color: "#55555f", maxTicksLimit: 12 } },
-              y: { grid: { color: "#1e1e22" }, ticks: { color: "#55555f", stepSize: 1 } },
+              x: { grid: { color: "#161618" }, ticks: { color: "#90909b", maxTicksLimit: 12 } },
+              y: { grid: { color: "#1e1e22" }, ticks: { color: "#90909b", stepSize: 1 } },
             },
           },
         });
@@ -1449,7 +1351,7 @@
           (channelStats.missing || [])
             .map(bert => {
               return renderBertEmote(bert, emotesMap) || `<span class="badge missing">${bert}</span>`;
-            }).join(" ") || "<i>Got 'em all! 🎉</i>";
+            }).join(" ") || "<i>Got 'em all!</i>";
 
         const userTimeline = fillDailyTimeline(channelStats.daily_timeline || {});
         const sortedDates = Object.keys(userTimeline);
@@ -1473,8 +1375,8 @@
             responsive: true,
             plugins: { legend: { display: false } },
             scales: {
-              x: { grid: { color: "#1e1e22" }, ticks: { color: "#55555f" } },
-              y: { grid: { color: "#1e1e22" }, ticks: { color: "#55555f", stepSize: 1 } },
+              x: { grid: { color: "#1e1e22" }, ticks: { color: "#90909b" } },
+              y: { grid: { color: "#1e1e22" }, ticks: { color: "#90909b", stepSize: 1 } },
             },
           },
         });
@@ -1501,8 +1403,8 @@
             responsive: true,
             plugins: { legend: { display: false } },
             scales: {
-              x: { grid: { display: false }, ticks: { color: "#55555f" } },
-              y: { grid: { color: "#1e1e22" }, ticks: { color: "#55555f", stepSize: 1 } },
+              x: { grid: { display: false }, ticks: { color: "#90909b" } },
+              y: { grid: { color: "#1e1e22" }, ticks: { color: "#90909b", stepSize: 1 } },
             },
           },
         });
@@ -1532,8 +1434,8 @@
             responsive: true,
             plugins: { legend: { display: false } },
             scales: {
-              x: { grid: { color: "#161618" }, ticks: { color: "#55555f", maxTicksLimit: 12 } },
-              y: { grid: { color: "#1e1e22" }, ticks: { color: "#55555f" } },
+              x: { grid: { color: "#161618" }, ticks: { color: "#90909b", maxTicksLimit: 12 } },
+              y: { grid: { color: "#1e1e22" }, ticks: { color: "#90909b" } },
             },
           },
         });

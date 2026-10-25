@@ -23,6 +23,7 @@ func init() {
 			}
 			if matched {
 				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "FirstTimeBen")
+				return true
 			}
 
 			return false

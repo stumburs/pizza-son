@@ -88,6 +88,12 @@ func Get() *Config {
 	return cfg
 }
 
+// Current returns the loaded config, or nil when config.Load has not been
+// called. It is intended for optional consumers such as the public site.
+func Current() *Config {
+	return cfg
+}
+
 func Reload(path string) {
 	log.Println("[Config] Reloaded config from", path)
 	Load(path)

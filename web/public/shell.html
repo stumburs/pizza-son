@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>pizza-son</title>
+    <link rel="canonical" href="https://pizzason.stumburs.id.lv/" />
+    <meta name="theme-color" content="#0b0b0d" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0b0b0d;
+        --border: rgba(255, 255, 255, 0.09);
+        --text: #ededf0;
+        --text-secondary: #b8b8c2;
+        --accent: #b7a6f5;
+        --header-height: 56px;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 100%;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: "DM Sans", system-ui, sans-serif;
+        font-size: 15px;
+        -webkit-font-smoothing: antialiased;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      .topbar {
+        flex: 0 0 auto;
+        display: flex;
+        align-items: center;
+        gap: 28px;
+        height: var(--header-height);
+        padding: 0 24px;
+        border-bottom: 1px solid var(--border);
+        background: var(--bg);
+        position: relative;
+        z-index: 10;
+      }
+
+      .brand {
+        color: var(--text);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 1rem;
+        letter-spacing: -0.01em;
+        white-space: nowrap;
+      }
+
+      .brand:hover {
+        color: var(--accent);
+      }
+
+      .tabs {
+        display: flex;
+        align-items: stretch;
+        align-self: stretch;
+        gap: 2px;
+        overflow-x: auto;
+        scrollbar-width: none;
+      }
+
+      .tabs::-webkit-scrollbar {
+        display: none;
+      }
+
+      .tab {
+        display: inline-flex;
+        align-items: center;
+        padding: 0 14px;
+        color: var(--text-secondary);
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 500;
+        border-bottom: 2px solid transparent;
+        white-space: nowrap;
+        transition: color 0.15s, border-color 0.15s;
+      }
+
+      .tab:hover {
+        color: var(--text);
+      }
+
+      .tab.active {
+        color: var(--text);
+        border-bottom-color: var(--accent);
+      }
+
+      .stage {
+        flex: 1;
+        min-height: 0;
+        position: relative;
+      }
+
+      .view-frame {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        border: 0;
+        background: var(--bg);
+        display: none;
+      }
+
+      .view-frame.visible {
+        display: block;
+      }
+
+      @media (max-width: 640px) {
+        .topbar {
+          gap: 16px;
+          padding: 0 14px;
+        }
+
+        .tab {
+          padding: 0 10px;
+          font-size: 0.86rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/" data-tab="overview">pizza-son</a>
+      <nav class="tabs" aria-label="Main">
+        <a class="tab" href="/" data-tab="overview">Overview</a>
+        <a class="tab" href="/bertstats" data-tab="berts">Bert stats</a>
+        <a class="tab" href="/vote" data-tab="vote">Vote</a>
+        <a class="tab" href="/panel" data-tab="panel">Panel</a>
+      </nav>
+    </header>
+
+    <main class="stage" id="stage"></main>
+
+    <script>
+      const views = {
+        overview: { src: "/views/overview.html", route: "/", title: "pizza-son" },
+        berts: { src: "/views/berts.html", route: "/bertstats", title: "Bert stats · pizza-son" },
+        vote: { src: "/views/vote.html", route: "/vote", title: "Vote · pizza-son" },
+        panel: { src: "/views/panel.html", route: "/panel", title: "Panel · pizza-son" },
+      };
+
+      const frames = {};
+      let current = null;
+      let consumedPanelHash = false;
+
+      function tabFromPath(pathname) {
+        const path = pathname.replace(/\/+$/, "") || "/";
+        if (path === "/bertstats") return "berts";
+        if (path === "/vote") return "vote";
+        if (path === "/panel") return "panel";
+        return "overview";
+      }
+
+      function frameFor(name) {
+        if (frames[name]) return frames[name];
+
+        const frame = document.createElement("iframe");
+        frame.className = "view-frame";
+        frame.title = name;
+        frame.dataset.tab = name;
+
+        let src = views[name].src;
+        if (name === "panel" && location.hash) {
+          src += location.hash;
+          consumedPanelHash = true;
+        }
+        frame.src = src;
+
+        document.getElementById("stage").appendChild(frame);
+        frames[name] = frame;
+        return frame;
+      }
+
+      function showTab(name, push) {
+        if (!views[name]) name = "overview";
+        if (current === name) return;
+
+        if (current && frames[current]) {
+          frames[current].classList.remove("visible");
+        }
+
+        const frame = frameFor(name);
+        frame.classList.add("visible");
+        current = name;
+
+        document.title = views[name].title;
+
+        document.querySelectorAll(".tab").forEach((tab) => {
+          tab.classList.toggle("active", tab.dataset.tab === name);
+        });
+
+        if (push) {
+          const route = views[name].route;
+          if (location.pathname !== route) {
+            history.pushState({ tab: name }, "", route);
+          }
+        }
+      }
+
+      document.querySelectorAll(".tab, .brand").forEach((link) => {
+        link.addEventListener("click", (event) => {
+          event.preventDefault();
+          showTab(link.dataset.tab, true);
+        });
+      });
+
+      window.addEventListener("popstate", () => {
+        showTab(tabFromPath(location.pathname), false);
+      });
+
+      window.addEventListener("message", (event) => {
+        if (event.origin !== location.origin) return;
+        const data = event.data;
+        if (!data || data.type !== "pizzason:navigate" || !views[data.tab]) return;
+        showTab(data.tab, true);
+      });
+
+      showTab(tabFromPath(location.pathname), false);
+
+      if (consumedPanelHash) {
+        history.replaceState(null, "", location.pathname);
+      }
+    </script>
+  </body>
+</html>

@@ -3,31 +3,31 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Control Panel - Bert Stats</title>
+    <title>Control panel · pizza-son</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
     <style>
       :root {
-        --bg: #08080a;
-        --surface-1: #111114;
-        --surface-2: #18181c;
-        --surface-3: #222228;
-        --border: rgba(255, 255, 255, 0.06);
-        --border-hover: rgba(255, 255, 255, 0.12);
-        --accent: #a78bfa;
-        --accent-dim: rgba(167, 139, 250, 0.12);
-        --accent-glow: rgba(167, 139, 250, 0.25);
-        --green: #34d399;
-        --green-dim: rgba(52, 211, 153, 0.12);
-        --red: #ef4444;
-        --red-dim: rgba(239, 68, 68, 0.12);
-        --text-primary: #f0f0f4;
-        --text-secondary: #8b8b9a;
-        --text-muted: #55555f;
+        --bg: #0b0b0d;
+        --surface-1: #131315;
+        --surface-2: #19191c;
+        --surface-3: #232327;
+        --border: rgba(255, 255, 255, 0.09);
+        --border-hover: rgba(255, 255, 255, 0.16);
+        --accent: #b7a6f5;
+        --accent-dim: rgba(183, 166, 245, 0.12);
+        --accent-glow: rgba(183, 166, 245, 0.18);
+        --green: #4ade80;
+        --green-dim: rgba(74, 222, 128, 0.12);
+        --red: #f87171;
+        --red-dim: rgba(248, 113, 113, 0.12);
+        --text-primary: #ededf0;
+        --text-secondary: #b8b8c2;
+        --text-muted: #90909b;
         --radius-sm: 6px;
         --radius-md: 10px;
         --radius-lg: 14px;
@@ -39,20 +39,9 @@
         background: var(--bg);
         color: var(--text-primary);
         margin: 0;
-        padding: 24px 20px;
+        padding: 22px 20px 48px;
         min-height: 100vh;
         -webkit-font-smoothing: antialiased;
-      }
-      body::before {
-        content: "";
-        position: fixed;
-        inset: 0;
-        background-image:
-          linear-gradient(rgba(167, 139, 250, 0.015) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(167, 139, 250, 0.015) 1px, transparent 1px);
-        background-size: 40px 40px;
-        pointer-events: none;
-        z-index: 0;
       }
       .main {
         position: relative;
@@ -142,18 +131,6 @@
         margin: 0;
         letter-spacing: -0.02em;
       }
-      .header-dot {
-        width: 7px; height: 7px;
-        border-radius: 50%;
-        background: var(--accent);
-        box-shadow: 0 0 10px var(--accent-glow);
-        flex-shrink: 0;
-        animation: pulse 2.5s ease-in-out infinite;
-      }
-      @keyframes pulse {
-        0%, 100% { opacity: 1; box-shadow: 0 0 8px var(--accent-glow); }
-        50% { opacity: 0.5; box-shadow: 0 0 4px transparent; }
-      }
       .user-info {
         margin-left: auto;
         display: flex;
@@ -204,7 +181,7 @@
       }
       .channel-btn.active {
         background: var(--accent-dim);
-        border-color: rgba(167, 139, 250, 0.3);
+        border-color: rgba(183, 166, 245, 0.3);
         color: var(--accent);
       }
 
@@ -368,7 +345,7 @@
   <body>
     <div class="main" id="app">
       <div id="loginScreen" class="login-screen">
-        <h1>control panel</h1>
+        <h1>Control panel</h1>
         <p id="loginDesc">Log in with your Twitch account to manage commands and listeners.</p>
         <button class="login-btn" id="loginBtn" onclick="login()">
           <svg viewBox="0 0 24 24"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.428l-3 3v-3H6.857V1.714h13.714Z"/></svg>
@@ -379,11 +356,10 @@
 
       <div id="panelView" class="hidden">
         <div class="header">
-          <div class="header-dot"></div>
-          <h1>control panel</h1>
+          <h1>Control panel</h1>
           <div class="user-info">
             <span id="userDisplay"></span>
-            <button class="logout-btn" onclick="logout()">log out</button>
+            <button class="logout-btn" onclick="logout()">Log out</button>
           </div>
         </div>
 
@@ -408,6 +384,7 @@
       </div>
     </div>
 
+    <script src="/view.js"></script>
     <script>
       let sessionToken = null;
       let currentChannel = null;
@@ -451,7 +428,7 @@
           if (!res.ok) {
             const text = await res.text();
             document.getElementById('loginScreen').innerHTML = `
-              <h1>control panel</h1>
+              <h1>Control panel</h1>
               <p style="color: var(--red);">Login failed: ${text}</p>
               <button class="login-btn" onclick="login()">Try again</button>
             `;
@@ -462,7 +439,7 @@
           showPanel(data);
         } catch (e) {
           document.getElementById('loginScreen').innerHTML = `
-            <h1>control panel</h1>
+            <h1>Control panel</h1>
             <p style="color: var(--red);">Connection error</p>
             <button class="login-btn" onclick="login()">Try again</button>
           `;
@@ -484,11 +461,13 @@
           .then(r => r.json())
           .then(data => {
             const redirect = encodeURIComponent(window.location.origin + '/panel');
-            window.location.href = 'https://id.twitch.tv/oauth2/authorize' +
+            const url = 'https://id.twitch.tv/oauth2/authorize' +
               '?client_id=' + data.client_id +
               '&redirect_uri=' + redirect +
               '&response_type=token' +
               '&scope=user:read:email';
+            // Twitch refuses to render its consent screen inside an iframe.
+            (window.top || window).location.href = url;
           })
           .catch(() => { setLoggingIn(false); });
       }

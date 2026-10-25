@@ -15,6 +15,8 @@ import (
 type TwitchService struct {
 	client         *helix.Client
 	cache          map[string]cachedStreamInfo
+	liveCache      map[string]StreamInfo
+	liveFetchedAt  time.Time
 	mu             sync.Mutex
 	onTokenRefresh func(string)
 }
@@ -34,7 +36,12 @@ type StreamInfo struct {
 	StartedAt    time.Time
 }
 
-const cacheDuration = 1 * time.Minute
+const (
+	cacheDuration = 1 * time.Minute
+	// liveCacheDuration keeps the public site from hitting Helix on every
+	// page load while still feeling live.
+	liveCacheDuration = 30 * time.Second
+)
 
 var TwitchServiceInstance *TwitchService
 
@@ -65,8 +72,9 @@ func NewTwitchService() {
 	}
 
 	TwitchServiceInstance = &TwitchService{
-		client: client,
-		cache:  map[string]cachedStreamInfo{},
+		client:    client,
+		cache:     map[string]cachedStreamInfo{},
+		liveCache: map[string]StreamInfo{},
 	}
 	TwitchServiceInstance.startTokenRefresh()
 	log.Println("[Twitch] Service initialized")
@@ -173,6 +181,100 @@ func (s *TwitchService) GetStreamInfoFresh(channel string) StreamInfo {
 	delete(s.cache, channel)
 	s.mu.Unlock()
 	return s.GetStreamInfo(channel)
+}
+
+// GetLiveStreams fetches live status for many channels in a single Helix
+// request. Results are cached briefly so the public site can poll freely. The
+// returned map is keyed by lowercase channel login and only contains channels
+// that are currently live.
+func (s *TwitchService) GetLiveStreams(channels []string) map[string]StreamInfo {
+	result := make(map[string]StreamInfo)
+	if len(channels) == 0 {
+		return result
+	}
+
+	normalized := make([]string, 0, len(channels))
+	seen := make(map[string]struct{}, len(channels))
+	for _, ch := range channels {
+		ch = strings.ToLower(strings.TrimSpace(ch))
+		if ch == "" {
+			continue
+		}
+		if _, ok := seen[ch]; ok {
+			continue
+		}
+		seen[ch] = struct{}{}
+		normalized = append(normalized, ch)
+	}
+	if len(normalized) == 0 {
+		return result
+	}
+
+	s.mu.Lock()
+	if !s.liveFetchedAt.IsZero() && time.Since(s.liveFetchedAt) < liveCacheDuration {
+		for _, ch := range normalized {
+			if info, ok := s.liveCache[ch]; ok {
+				result[ch] = info
+			}
+		}
+		s.mu.Unlock()
+		return result
+	}
+	s.mu.Unlock()
+
+	if s.client == nil {
+		return result
+	}
+
+	fetched := make(map[string]StreamInfo)
+	for start := 0; start < len(normalized); start += 100 {
+		end := start + 100
+		if end > len(normalized) {
+			end = len(normalized)
+		}
+
+		resp, err := s.client.GetStreams(&helix.StreamsParams{
+			UserLogins: normalized[start:end],
+			Type:       "live",
+			First:      100,
+		})
+		if err != nil {
+			log.Printf("[Twitch] Could not fetch live streams: %v", err)
+			continue
+		}
+		if resp.ErrorMessage != "" {
+			log.Printf("[Twitch] Could not fetch live streams: %s", resp.ErrorMessage)
+			continue
+		}
+
+		for _, stream := range resp.Data.Streams {
+			login := strings.ToLower(stream.UserLogin)
+			if login == "" {
+				continue
+			}
+			fetched[login] = StreamInfo{
+				GameName:     stream.GameName,
+				StreamTitle:  stream.Title,
+				ChannelName:  stream.UserName,
+				ViewerCount:  stream.ViewerCount,
+				ChannelTags:  stream.Tags,
+				ThumbnailURL: stream.ThumbnailURL,
+				StartedAt:    stream.StartedAt,
+			}
+		}
+	}
+
+	s.mu.Lock()
+	s.liveCache = fetched
+	s.liveFetchedAt = time.Now()
+	s.mu.Unlock()
+
+	for _, ch := range normalized {
+		if info, ok := fetched[ch]; ok {
+			result[ch] = info
+		}
+	}
+	return result
 }
 
 func (s *TwitchService) GetUserID(username string) (string, error) {
