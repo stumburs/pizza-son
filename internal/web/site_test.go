@@ -108,7 +108,12 @@ func TestBuildSiteSummary(t *testing.T) {
 		},
 	}
 
-	summary := buildSiteSummary(now, cfg, activity, berts, live)
+	streams := services.StreamStatsSnapshot{
+		TotalSeconds:   9000,
+		ChannelSeconds: map[string]int64{"alpha": 5400, "beta": 3600},
+	}
+
+	summary := buildSiteSummary(now, cfg, activity, berts, live, streams)
 
 	if summary.Bot.Name != "pizza-son" || summary.Bot.TwitchChannels != 2 || summary.Bot.DiscordChannels != 1 {
 		t.Errorf("bot info = %#v", summary.Bot)
@@ -128,6 +133,9 @@ func TestBuildSiteSummary(t *testing.T) {
 	if summary.Totals.Berts != 6 {
 		t.Errorf("berts = %d, want 6 (discord excluded)", summary.Totals.Berts)
 	}
+	if summary.Totals.StreamedSeconds != 9000 {
+		t.Errorf("streamed seconds = %d, want 9000", summary.Totals.StreamedSeconds)
+	}
 
 	if len(summary.Channels) != 2 {
 		t.Fatalf("channels = %d, want 2", len(summary.Channels))
@@ -137,6 +145,9 @@ func TestBuildSiteSummary(t *testing.T) {
 	}
 	if summary.Channels[0].Uptime != 5400 {
 		t.Errorf("uptime = %d, want 5400", summary.Channels[0].Uptime)
+	}
+	if summary.Channels[0].Streamed != 5400 {
+		t.Errorf("streamed = %d, want 5400", summary.Channels[0].Streamed)
 	}
 	if summary.Channels[0].Viewers != 42 || summary.Channels[0].Game != "Art" {
 		t.Errorf("live metadata missing: %#v", summary.Channels[0])
@@ -154,12 +165,12 @@ func TestBuildSiteSummary(t *testing.T) {
 }
 
 func TestBuildSiteSummaryWithoutServices(t *testing.T) {
-	summary := buildSiteSummary(time.Now(), nil, nil, nil, nil)
+	summary := buildSiteSummary(time.Now(), nil, nil, nil, nil, services.StreamStatsSnapshot{})
 
 	if summary.Bot.Name != "pizza-son" {
 		t.Errorf("bot name = %q", summary.Bot.Name)
 	}
-	if summary.Totals.Channels != 0 || summary.Totals.Messages != 0 {
+	if summary.Totals.Channels != 0 || summary.Totals.Messages != 0 || summary.Totals.StreamedSeconds != 0 {
 		t.Errorf("totals = %#v, want zero", summary.Totals)
 	}
 	if summary.Channels == nil || summary.TopCommands == nil || summary.TopBerts == nil {

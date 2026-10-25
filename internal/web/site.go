@@ -27,13 +27,14 @@ type SiteBotInfo struct {
 }
 
 type SiteTotals struct {
-	Channels            int `json:"channels"`
-	LiveChannels        int `json:"live_channels"`
-	Messages            int `json:"messages"`
-	Commands            int `json:"commands"`
-	ListenerActivations int `json:"listener_activations"`
-	UniqueUsers         int `json:"unique_users"`
-	Berts               int `json:"berts"`
+	Channels            int   `json:"channels"`
+	LiveChannels        int   `json:"live_channels"`
+	StreamedSeconds     int64 `json:"streamed_seconds"`
+	Messages            int   `json:"messages"`
+	Commands            int   `json:"commands"`
+	ListenerActivations int   `json:"listener_activations"`
+	UniqueUsers         int   `json:"unique_users"`
+	Berts               int   `json:"berts"`
 }
 
 type SiteChannel struct {
@@ -47,11 +48,12 @@ type SiteChannel struct {
 	StartedAt *time.Time      `json:"started_at,omitempty"`
 	Uptime    int64           `json:"uptime_seconds,omitempty"`
 
-	Messages  int `json:"messages"`
-	Commands  int `json:"commands"`
-	Listeners int `json:"listeners"`
-	Users     int `json:"users"`
-	Berts     int `json:"berts"`
+	Messages  int   `json:"messages"`
+	Commands  int   `json:"commands"`
+	Listeners int   `json:"listeners"`
+	Users     int   `json:"users"`
+	Berts     int   `json:"berts"`
+	Streamed  int64 `json:"streamed_seconds"`
 }
 
 type SiteSummary struct {
@@ -85,7 +87,12 @@ func (ws *WebService) handleSiteSummary(w http.ResponseWriter, r *http.Request) 
 		live = services.TwitchServiceInstance.GetLiveStreams(twitchChannels)
 	}
 
-	summary := buildSiteSummary(time.Now(), cfg, services.ActivityServiceInstance, services.BertServiceInstance, live)
+	streams := services.StreamStatsSnapshot{ChannelSeconds: map[string]int64{}}
+	if services.StreamStatsInstance != nil {
+		streams = services.StreamStatsInstance.Snapshot()
+	}
+
+	summary := buildSiteSummary(time.Now(), cfg, services.ActivityServiceInstance, services.BertServiceInstance, live, streams)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Cache-Control", "no-store")
@@ -100,6 +107,7 @@ func buildSiteSummary(
 	activity siteActivityReader,
 	berts *services.BertService,
 	live map[string]services.StreamInfo,
+	streams services.StreamStatsSnapshot,
 ) SiteSummary {
 	summary := SiteSummary{
 		GeneratedAt:  now,
@@ -165,6 +173,7 @@ func buildSiteSummary(
 			Listeners: stats.Listeners.Total,
 			Users:     len(stats.Users),
 			Berts:     bertTotalsByChannel[name],
+			Streamed:  streams.ChannelSeconds[name],
 		}
 
 		if info, ok := live[name]; ok && !info.StartedAt.IsZero() {
@@ -200,6 +209,7 @@ func buildSiteSummary(
 	summary.Totals.Channels = len(summary.Channels)
 	summary.Totals.UniqueUsers = len(seenUsers)
 	summary.Totals.Berts = sumSiteCounts(bertTotalsByChannel)
+	summary.Totals.StreamedSeconds = streams.TotalSeconds
 
 	sort.Slice(summary.Channels, func(i, j int) bool {
 		a, b := summary.Channels[i], summary.Channels[j]

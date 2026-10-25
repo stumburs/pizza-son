@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Overview · pizza-son</title>
+    <link rel="icon" type="image/webp" href="https://cdn.7tv.app/emote/01K6B3Y3SG5ZBAWXXVKX7BKBE5/4x.webp" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -442,8 +443,8 @@
           Live status of the channels pizza-son runs in, plus chat and bert totals.
         </p>
         <p class="data-note">
-          Activity data started being logged on 25 October 2026, so totals only
-          cover from then onward.
+          Stats started being logged on 25 October 2026, so totals only cover
+          from then onward.
         </p>
       </section>
 
@@ -459,6 +460,10 @@
         <div class="stat live">
           <span class="stat-label">Live now</span>
           <span class="stat-value" id="statLive">—</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Hours streamed</span>
+          <span class="stat-value" id="statStreamed">—</span>
         </div>
         <div class="stat">
           <span class="stat-label">Messages</span>
@@ -507,11 +512,12 @@
                 <th>Listener hits</th>
                 <th>Chatters</th>
                 <th>Berts</th>
+                <th>Streamed</th>
               </tr>
             </thead>
             <tbody id="channelBody">
               <tr>
-                <td colspan="6" style="text-align: center; color: var(--text-secondary)">
+                <td colspan="7" style="text-align: center; color: var(--text-secondary)">
                   Loading channels…
                 </td>
               </tr>
@@ -578,6 +584,12 @@
         return `${minutes}m`;
       }
 
+      function formatHours(seconds) {
+        const hours = (Number(seconds) || 0) / 3600;
+        if (hours >= 100) return `${numberFormat.format(Math.round(hours))} h`;
+        return `${hours.toFixed(1)} h`;
+      }
+
       function formatUpdated(iso) {
         if (!iso) return "loading";
         const date = new Date(iso);
@@ -590,7 +602,7 @@
         if (!channels || channels.length === 0) {
           body.innerHTML = `
             <tr>
-              <td colspan="6" style="text-align: center; color: var(--text-secondary)">
+              <td colspan="7" style="text-align: center; color: var(--text-secondary)">
                 No channels recorded yet.
               </td>
             </tr>`;
@@ -619,6 +631,7 @@
                 <td>${formatNumber(channel.listeners)}</td>
                 <td>${formatNumber(channel.users)}</td>
                 <td>${formatNumber(channel.berts)}</td>
+                <td>${formatHours(channel.streamed_seconds)}</td>
               </tr>`;
           })
           .join("");
@@ -709,6 +722,7 @@
           data.bot?.discord_channels
         );
         document.getElementById("statLive").textContent = formatNumber(totals.live_channels);
+        document.getElementById("statStreamed").textContent = formatHours(totals.streamed_seconds);
         document.getElementById("statMessages").textContent = formatNumber(totals.messages);
         document.getElementById("statCommands").textContent = formatNumber(totals.commands);
         document.getElementById("statListeners").textContent = formatNumber(

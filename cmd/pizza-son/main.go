@@ -28,6 +28,7 @@ func main() {
 	services.NewRNNService()
 	services.NewLoggerService()
 	services.NewActivityService()
+	services.NewStreamStatsService()
 	services.NewChannelSettingsService()
 	services.NewMudwrestleService()
 	services.NewPredictionService()
