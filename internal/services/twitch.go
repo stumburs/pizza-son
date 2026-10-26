@@ -16,7 +16,7 @@ type TwitchService struct {
 	client         *helix.Client
 	cache          map[string]cachedStreamInfo
 	liveCache      map[string]StreamInfo
-	liveFetchedAt  time.Time
+	liveCacheAt    map[string]time.Time
 	mu             sync.Mutex
 	onTokenRefresh func(string)
 }
@@ -72,9 +72,10 @@ func NewTwitchService() {
 	}
 
 	TwitchServiceInstance = &TwitchService{
-		client:    client,
-		cache:     map[string]cachedStreamInfo{},
-		liveCache: map[string]StreamInfo{},
+		client:      client,
+		cache:       map[string]cachedStreamInfo{},
+		liveCache:   map[string]StreamInfo{},
+		liveCacheAt: map[string]time.Time{},
 	}
 	TwitchServiceInstance.startTokenRefresh()
 	log.Println("[Twitch] Service initialized")
@@ -119,24 +120,34 @@ func (s *TwitchService) GetAccessToken() string {
 }
 
 func (s *TwitchService) GetStreamInfo(channel string) StreamInfo {
-	s.mu.Lock()
+	info, _ := s.GetStreamInfoErr(channel)
+	return info
+}
 
-	if cached, ok := s.cache[channel]; ok {
-		if time.Since(cached.fetchedAt) < cacheDuration {
-			s.mu.Unlock()
-			log.Printf("[Twitch] Cache hit for %s", channel)
-			return cached.info
-		}
+// GetStreamInfoErr returns the stream state and distinguishes "offline" from
+// "Twitch could not be reached". Callers that track uptime must not treat an
+// error as an offline stream.
+func (s *TwitchService) GetStreamInfoErr(channel string) (StreamInfo, error) {
+	s.mu.Lock()
+	if cached, ok := s.cache[channel]; ok && time.Since(cached.fetchedAt) < cacheDuration {
+		s.mu.Unlock()
+		return cached.info, nil
 	}
 	s.mu.Unlock()
+
+	if s.client == nil {
+		return StreamInfo{ChannelName: channel}, fmt.Errorf("twitch client not initialized")
+	}
 
 	usersResp, err := s.client.GetUsers(&helix.UsersParams{
 		Logins: []string{channel},
 	})
-
-	if err != nil || len(usersResp.Data.Users) == 0 {
+	if err != nil {
 		log.Printf("[Twitch] Could not resolve user ID for %s: %v", channel, err)
-		return StreamInfo{ChannelName: channel}
+		return StreamInfo{ChannelName: channel}, err
+	}
+	if len(usersResp.Data.Users) == 0 {
+		return StreamInfo{ChannelName: channel}, fmt.Errorf("twitch user not found: %s", channel)
 	}
 
 	broadcasterID := usersResp.Data.Users[0].ID
@@ -144,9 +155,12 @@ func (s *TwitchService) GetStreamInfo(channel string) StreamInfo {
 	chanResp, err := s.client.GetChannelInformation(&helix.GetChannelInformationParams{
 		BroadcasterIDs: []string{broadcasterID},
 	})
-	if err != nil || len(chanResp.Data.Channels) == 0 {
+	if err != nil {
 		log.Printf("[Twitch] Could not get channel info for %s: %v", channel, err)
-		return StreamInfo{ChannelName: channel}
+		return StreamInfo{ChannelName: channel}, err
+	}
+	if len(chanResp.Data.Channels) == 0 {
+		return StreamInfo{ChannelName: channel}, fmt.Errorf("twitch channel info not found: %s", channel)
 	}
 	ch := chanResp.Data.Channels[0]
 
@@ -157,11 +171,21 @@ func (s *TwitchService) GetStreamInfo(channel string) StreamInfo {
 		ChannelTags: ch.Tags,
 	}
 
-	// Get live stream data if possible
+	// Get live stream data if possible. An error here means we do not know
+	// whether the channel is live, so do not cache a bogus offline result.
 	streamResp, err := s.client.GetStreams(&helix.StreamsParams{
 		UserLogins: []string{channel},
 	})
-	if err == nil && len(streamResp.Data.Streams) > 0 {
+	if err != nil {
+		log.Printf("[Twitch] Could not get live stream for %s: %v", channel, err)
+		return info, err
+	}
+	if streamResp.ErrorMessage != "" {
+		err := fmt.Errorf("%s", streamResp.ErrorMessage)
+		log.Printf("[Twitch] Could not get live stream for %s: %v", channel, err)
+		return info, err
+	}
+	if len(streamResp.Data.Streams) > 0 {
 		info.ViewerCount = streamResp.Data.Streams[0].ViewerCount
 		info.ThumbnailURL = streamResp.Data.Streams[0].ThumbnailURL
 		info.StartedAt = streamResp.Data.Streams[0].StartedAt
@@ -171,26 +195,30 @@ func (s *TwitchService) GetStreamInfo(channel string) StreamInfo {
 	s.cache[channel] = cachedStreamInfo{info: info, fetchedAt: time.Now()}
 	s.mu.Unlock()
 
-	log.Printf("[Twitch] Cached stream info for %s", channel)
-
-	return info
+	return info, nil
 }
 
 func (s *TwitchService) GetStreamInfoFresh(channel string) StreamInfo {
+	info, _ := s.GetStreamInfoFreshErr(channel)
+	return info
+}
+
+func (s *TwitchService) GetStreamInfoFreshErr(channel string) (StreamInfo, error) {
 	s.mu.Lock()
 	delete(s.cache, channel)
 	s.mu.Unlock()
-	return s.GetStreamInfo(channel)
+	return s.GetStreamInfoErr(channel)
 }
 
 // GetLiveStreams fetches live status for many channels in a single Helix
 // request. Results are cached briefly so the public site can poll freely. The
 // returned map is keyed by lowercase channel login and only contains channels
-// that are currently live.
-func (s *TwitchService) GetLiveStreams(channels []string) map[string]StreamInfo {
+// that are currently live. An error means at least one Helix request failed,
+// so callers that track stream time should leave existing sessions untouched.
+func (s *TwitchService) GetLiveStreams(channels []string) (map[string]StreamInfo, error) {
 	result := make(map[string]StreamInfo)
 	if len(channels) == 0 {
-		return result
+		return result, nil
 	}
 
 	normalized := make([]string, 0, len(channels))
@@ -207,46 +235,65 @@ func (s *TwitchService) GetLiveStreams(channels []string) map[string]StreamInfo 
 		normalized = append(normalized, ch)
 	}
 	if len(normalized) == 0 {
-		return result
+		return result, nil
 	}
 
+	now := time.Now()
+	var stale []string
 	s.mu.Lock()
-	if !s.liveFetchedAt.IsZero() && time.Since(s.liveFetchedAt) < liveCacheDuration {
+	for _, ch := range normalized {
+		if at, ok := s.liveCacheAt[ch]; !ok || now.Sub(at) >= liveCacheDuration {
+			stale = append(stale, ch)
+		}
+	}
+	if len(stale) == 0 {
 		for _, ch := range normalized {
-			if info, ok := s.liveCache[ch]; ok {
+			if info, ok := s.liveCache[ch]; ok && info.ViewerCount > 0 {
 				result[ch] = info
 			}
 		}
 		s.mu.Unlock()
-		return result
+		return result, nil
 	}
 	s.mu.Unlock()
 
 	if s.client == nil {
-		return result
+		return result, fmt.Errorf("twitch client not initialized")
 	}
 
 	fetched := make(map[string]StreamInfo)
-	for start := 0; start < len(normalized); start += 100 {
+	settled := make(map[string]bool, len(stale))
+	var firstErr error
+	for start := 0; start < len(stale); start += 100 {
 		end := start + 100
-		if end > len(normalized) {
-			end = len(normalized)
+		if end > len(stale) {
+			end = len(stale)
 		}
+		chunk := stale[start:end]
 
 		resp, err := s.client.GetStreams(&helix.StreamsParams{
-			UserLogins: normalized[start:end],
+			UserLogins: chunk,
 			Type:       "live",
 			First:      100,
 		})
 		if err != nil {
+			if firstErr == nil {
+				firstErr = err
+			}
 			log.Printf("[Twitch] Could not fetch live streams: %v", err)
 			continue
 		}
 		if resp.ErrorMessage != "" {
+			if firstErr == nil {
+				firstErr = fmt.Errorf("%s", resp.ErrorMessage)
+			}
 			log.Printf("[Twitch] Could not fetch live streams: %s", resp.ErrorMessage)
 			continue
 		}
 
+		for _, ch := range chunk {
+			settled[ch] = true
+		}
 		for _, stream := range resp.Data.Streams {
 			login := strings.ToLower(stream.UserLogin)
 			if login == "" {
@@ -264,17 +311,27 @@ func (s *TwitchService) GetLiveStreams(channels []string) map[string]StreamInfo 
 		}
 	}
 
+	fetchedAt := time.Now()
 	s.mu.Lock()
-	s.liveCache = fetched
-	s.liveFetchedAt = time.Now()
-	s.mu.Unlock()
-
-	for _, ch := range normalized {
+	for _, ch := range stale {
+		if !settled[ch] {
+			continue
+		}
 		if info, ok := fetched[ch]; ok {
+			s.liveCache[ch] = info
+		} else {
+			delete(s.liveCache, ch)
+		}
+		s.liveCacheAt[ch] = fetchedAt
+	}
+	for _, ch := range normalized {
+		if info, ok := s.liveCache[ch]; ok && info.ViewerCount > 0 {
 			result[ch] = info
 		}
 	}
-	return result
+	s.mu.Unlock()
+
+	return result, firstErr
 }
 
 func (s *TwitchService) GetUserID(username string) (string, error) {

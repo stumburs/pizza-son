@@ -28,9 +28,20 @@ type StreamChannelStats struct {
 	Seconds int64 `json:"seconds"`
 }
 
+// StreamRecord is one completed stream. EndedAt is the last poll where the
+// channel was seen live, and Seconds is the time credited to the totals. The
+// history is kept so later features can chart months, compare lengths, etc.
+type StreamRecord struct {
+	Channel   string    `json:"channel"`
+	StartedAt time.Time `json:"started_at"`
+	EndedAt   time.Time `json:"ended_at"`
+	Seconds   int64     `json:"seconds"`
+}
+
 type StreamStatsData struct {
 	Channels map[string]*StreamChannelStats `json:"channels"`
 	Active   map[string]*StreamSession      `json:"active"`
+	Streams  []StreamRecord                 `json:"streams"`
 }
 
 // StreamStatsSnapshot is the read-only view used by the public site.
@@ -40,8 +51,8 @@ type StreamStatsSnapshot struct {
 }
 
 // StreamStatsService records how long configured channels have been live. It
-// polls Twitch once a minute, closes a session when a channel goes offline and
-// persists the accumulated totals between restarts.
+// polls Twitch once a minute, closes a session when a channel goes offline,
+// records the completed stream and persists totals and history between restarts.
 type StreamStatsService struct {
 	mu    sync.RWMutex
 	store *store.Store[StreamStatsData]
@@ -60,6 +71,7 @@ func newStreamStatsService(dir string) *StreamStatsService {
 	st := store.New(filepath.Join(dir, streamStatsFile), &StreamStatsData{
 		Channels: make(map[string]*StreamChannelStats),
 		Active:   make(map[string]*StreamSession),
+		Streams:  []StreamRecord{},
 	})
 	s := &StreamStatsService{store: st, data: st.Data()}
 
@@ -72,7 +84,7 @@ func newStreamStatsService(dir string) *StreamStatsService {
 	}
 	s.normalize()
 	if ok {
-		log.Printf("[Streams] Loaded stream totals for %d channels", len(s.data.Channels))
+		log.Printf("[Streams] Loaded stream totals for %d channels and %d streams", len(s.data.Channels), len(s.data.Streams))
 	}
 	return s
 }
@@ -83,6 +95,9 @@ func (s *StreamStatsService) normalize() {
 	}
 	if s.data.Active == nil {
 		s.data.Active = make(map[string]*StreamSession)
+	}
+	if s.data.Streams == nil {
+		s.data.Streams = []StreamRecord{}
 	}
 	for name, stats := range s.data.Channels {
 		if stats == nil || name == "" {
@@ -111,7 +126,15 @@ func (s *StreamStatsService) poll() {
 		return
 	}
 	channels := cfg.Bot.Channels
-	s.Track(TwitchServiceInstance.GetLiveStreams(channels), channels, time.Now())
+	live, err := TwitchServiceInstance.GetLiveStreams(channels)
+	if err != nil {
+		// An API failure is not proof that every stream ended. Leaving the
+		// active sessions alone prevents one bad poll from closing them and
+		// losing stream time.
+		log.Printf("[Streams] Skipping update, Twitch lookup failed: %v", err)
+		return
+	}
+	s.Track(live, channels, time.Now())
 }
 
 // Track updates the accumulators from one live snapshot. channels is the set
@@ -187,12 +210,36 @@ func (s *StreamStatsService) finishLocked(name string, session *StreamSession) {
 		return
 	}
 
+	seconds := int64(session.LastSeen.Sub(session.StartedAt).Seconds())
+
 	stats := s.data.Channels[name]
 	if stats == nil {
 		stats = &StreamChannelStats{}
 		s.data.Channels[name] = stats
 	}
-	stats.Seconds += int64(session.LastSeen.Sub(session.StartedAt).Seconds())
+	stats.Seconds += seconds
+
+	// Ignore zero-length sessions so the history only contains streams that
+	// actually contributed time.
+	if seconds > 0 {
+		s.data.Streams = append(s.data.Streams, StreamRecord{
+			Channel:   name,
+			StartedAt: session.StartedAt,
+			EndedAt:   session.LastSeen,
+			Seconds:   seconds,
+		})
+	}
+}
+
+// History returns a copy of every completed stream. It is intended for
+// future reporting such as monthly averages, graphs, and longest streams.
+func (s *StreamStatsService) History() []StreamRecord {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	history := make([]StreamRecord, len(s.data.Streams))
+	copy(history, s.data.Streams)
+	return history
 }
 
 // Snapshot returns completed time plus the elapsed part of every active

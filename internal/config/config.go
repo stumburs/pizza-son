@@ -13,6 +13,13 @@ type StreamerLink struct {
 	DiscordUserID  string `toml:"discord_user_id"` // UserID to ping the target person
 }
 
+// Notification is one Twitch -> Discord live notification target.
+type Notification struct {
+	TwitchChannel  string `toml:"twitch_channel"`
+	DiscordWebhook string `toml:"discord_webhook"`
+	Message        string `toml:"message"` // Custom ping message, supports {{channel}}, {{game}}, {{title}}. Defaults to "@everyone"
+}
+
 type Config struct {
 	Twitch struct {
 		User            string `toml:"user"`
@@ -42,11 +49,7 @@ type Config struct {
 		LengthToGenerate int `toml:"length_to_generate"`
 	} `toml:"markov"`
 
-	Notifications []struct {
-		TwitchChannel  string `toml:"twitch_channel"`
-		DiscordWebhook string `toml:"discord_webhook"`
-		Message        string `toml:"message"` // Custom ping message, supports {{channel}}, {{game}}, {{title}}. Defaults to "@everyone"
-	} `toml:"notifications"`
+	Notifications []Notification `toml:"notifications"`
 
 	STT struct {
 		Enabled         bool   `toml:"enabled"`

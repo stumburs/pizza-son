@@ -84,7 +84,9 @@ func (ws *WebService) handleSiteSummary(w http.ResponseWriter, r *http.Request) 
 
 	live := map[string]services.StreamInfo{}
 	if services.TwitchServiceInstance != nil {
-		live = services.TwitchServiceInstance.GetLiveStreams(twitchChannels)
+		// On a Twitch error the partial/cached result is still useful for the
+		// public summary; stream-time tracking is the caller that must skip.
+		live, _ = services.TwitchServiceInstance.GetLiveStreams(twitchChannels)
 	}
 
 	streams := services.StreamStatsSnapshot{ChannelSeconds: map[string]int64{}}

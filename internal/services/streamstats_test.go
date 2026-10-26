@@ -1,6 +1,8 @@
 package services
 
 import (
+	"os"
+	"path/filepath"
 	"testing"
 	"time"
 )
@@ -46,6 +48,32 @@ func TestStreamStatsTracksLiveAndOffline(t *testing.T) {
 	if len(svc.data.Active) != 0 {
 		t.Errorf("active sessions = %d, want 0", len(svc.data.Active))
 	}
+
+	if len(svc.data.Streams) != 1 {
+		t.Fatalf("history records = %d, want 1", len(svc.data.Streams))
+	}
+	record := svc.data.Streams[0]
+	if record.Channel != "alpha" {
+		t.Errorf("history channel = %q, want alpha", record.Channel)
+	}
+	if !record.StartedAt.Equal(started) {
+		t.Errorf("history start = %v, want %v", record.StartedAt, started)
+	}
+	if !record.EndedAt.Equal(now.Add(time.Minute)) {
+		t.Errorf("history end = %v, want %v", record.EndedAt, now.Add(time.Minute))
+	}
+	if record.Seconds != 7260 {
+		t.Errorf("history seconds = %d, want 7260", record.Seconds)
+	}
+
+	history := svc.History()
+	if len(history) != 1 {
+		t.Fatalf("History() returned %d records, want 1", len(history))
+	}
+	history[0].Channel = "mutated"
+	if svc.data.Streams[0].Channel != "alpha" {
+		t.Error("History() should return a copy")
+	}
 }
 
 func TestStreamStatsNewStreamReplacesOldSession(t *testing.T) {
@@ -71,6 +99,13 @@ func TestStreamStatsNewStreamReplacesOldSession(t *testing.T) {
 	if snapshot.TotalSeconds != want {
 		t.Errorf("total = %d, want %d", snapshot.TotalSeconds, want)
 	}
+
+	if len(svc.data.Streams) != 1 {
+		t.Fatalf("history records = %d, want 1", len(svc.data.Streams))
+	}
+	if got := svc.data.Streams[0].Seconds; got != 3600 {
+		t.Errorf("finished stream seconds = %d, want 3600", got)
+	}
 }
 
 func TestStreamStatsClosesRemovedChannels(t *testing.T) {
@@ -94,6 +129,9 @@ func TestStreamStatsClosesRemovedChannels(t *testing.T) {
 	if len(svc.data.Active) != 0 {
 		t.Errorf("active sessions = %d, want 0", len(svc.data.Active))
 	}
+	if len(svc.data.Streams) != 1 || svc.data.Streams[0].Channel != "alpha" {
+		t.Errorf("history = %#v, want one alpha record", svc.data.Streams)
+	}
 }
 
 func TestStreamStatsPersistsAcrossRestart(t *testing.T) {
@@ -114,6 +152,9 @@ func TestStreamStatsPersistsAcrossRestart(t *testing.T) {
 	if reloaded.data.Active["alpha"] == nil {
 		t.Error("active session was not restored")
 	}
+	if len(reloaded.data.Streams) != 0 {
+		t.Errorf("history before stream end = %d, want 0", len(reloaded.data.Streams))
+	}
 
 	// A poll after the restart continues the same session instead of
 	// double-counting it.
@@ -123,6 +164,46 @@ func TestStreamStatsPersistsAcrossRestart(t *testing.T) {
 
 	if got := reloaded.Snapshot().TotalSeconds; got != 5460 {
 		t.Errorf("total after restart poll = %d, want 5460", got)
+	}
+
+	// Ending the stream writes exactly one history record, and a second
+	// restart must not duplicate it.
+	reloaded.Track(nil, []string{"alpha"}, now.Add(2*time.Minute))
+	if len(reloaded.data.Streams) != 1 {
+		t.Fatalf("history records after end = %d, want 1", len(reloaded.data.Streams))
+	}
+
+	reloadedAgain := newStreamStatsService(dir)
+	if len(reloadedAgain.data.Streams) != 1 {
+		t.Fatalf("history records after second reload = %d, want 1", len(reloadedAgain.data.Streams))
+	}
+	if got := reloadedAgain.data.Streams[0].Seconds; got != 5460 {
+		t.Errorf("persisted history seconds = %d, want 5460", got)
+	}
+	if got := reloadedAgain.Snapshot().TotalSeconds; got != 5460 {
+		t.Errorf("total after second reload = %d, want 5460", got)
+	}
+}
+
+func TestStreamStatsLoadsLegacyDataWithoutHistory(t *testing.T) {
+	dir := t.TempDir()
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		t.Fatal(err)
+	}
+	legacy := `{"channels":{"alpha":{"seconds":3600}},"active":{}}`
+	if err := os.WriteFile(filepath.Join(dir, streamStatsFile), []byte(legacy), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	svc := newStreamStatsService(dir)
+	if svc.data.Streams == nil {
+		t.Fatal("history should be initialized for legacy data")
+	}
+	if len(svc.data.Streams) != 0 {
+		t.Errorf("legacy history = %d, want 0", len(svc.data.Streams))
+	}
+	if got := svc.Snapshot().TotalSeconds; got != 3600 {
+		t.Errorf("legacy total = %d, want 3600", got)
 	}
 }
 
@@ -139,5 +220,8 @@ func TestStreamStatsIgnoresInvalidSession(t *testing.T) {
 
 	if got := svc.Snapshot().TotalSeconds; got != 0 {
 		t.Errorf("total = %d, want 0", got)
+	}
+	if len(svc.data.Streams) != 0 {
+		t.Errorf("invalid session created history: %#v", svc.data.Streams)
 	}
 }

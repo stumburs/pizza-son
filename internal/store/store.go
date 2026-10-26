@@ -47,7 +47,33 @@ func (s *Store[T]) Save() error {
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(s.path, b, 0644)
+
+	dir := filepath.Dir(s.path)
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		return err
+	}
+
+	// Write to a temporary file first so a crash cannot leave a half-written
+	// JSON file behind.
+	tmp, err := os.CreateTemp(dir, "."+filepath.Base(s.path)+".tmp-*")
+	if err != nil {
+		return err
+	}
+	tmpName := tmp.Name()
+	defer os.Remove(tmpName)
+
+	if _, err := tmp.Write(b); err != nil {
+		tmp.Close()
+		return err
+	}
+	if err := tmp.Chmod(0644); err != nil {
+		tmp.Close()
+		return err
+	}
+	if err := tmp.Close(); err != nil {
+		return err
+	}
+	return os.Rename(tmpName, s.path)
 }
 
 func (s *Store[T]) EnsureDir() error {

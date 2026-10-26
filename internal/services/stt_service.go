@@ -9,6 +9,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"pizza-son/internal/config"
+	"pizza-son/internal/logging"
 	"pizza-son/internal/models"
 	"strings"
 	"sync"
@@ -18,18 +19,18 @@ import (
 type SayFunc func(channel, message string)
 
 type STTService struct {
-	mu                   sync.Mutex
-	sayFn                SayFunc
-	enabled              map[string]bool
-	quit                 chan struct{}
-	streamlinkPath       string
-	ffmpegPath           string
-	whisperPath          string
-	whisperModel         string
-	captureInterval      time.Duration
-	streamlinkAvailable  bool
-	ffmpegAvailable      bool
-	whisperAvailable     bool
+	mu                  sync.Mutex
+	sayFn               SayFunc
+	enabled             map[string]bool
+	quit                chan struct{}
+	streamlinkPath      string
+	ffmpegPath          string
+	whisperPath         string
+	whisperModel        string
+	captureInterval     time.Duration
+	streamlinkAvailable bool
+	ffmpegAvailable     bool
+	whisperAvailable    bool
 }
 
 var STTServiceInstance *STTService
@@ -71,14 +72,14 @@ func (s *STTService) checkDependencies() {
 		log.Printf("[STT] streamlink not found at '%s' - audio capture disabled", s.streamlinkPath)
 	} else {
 		s.streamlinkAvailable = true
-		log.Printf("[STT] streamlink found at '%s'", s.streamlinkPath)
+		logging.Debugf("[STT] streamlink found at '%s'", s.streamlinkPath)
 	}
 
 	if _, err := exec.LookPath(s.ffmpegPath); err != nil {
 		log.Printf("[STT] ffmpeg not found at '%s' - audio capture disabled", s.ffmpegPath)
 	} else {
 		s.ffmpegAvailable = true
-		log.Printf("[STT] ffmpeg found at '%s'", s.ffmpegPath)
+		logging.Debugf("[STT] ffmpeg found at '%s'", s.ffmpegPath)
 	}
 
 	if s.whisperModel != "" {
@@ -89,7 +90,7 @@ func (s *STTService) checkDependencies() {
 				log.Printf("[STT] whisper binary not found at '%s'", s.whisperPath)
 			} else {
 				s.whisperAvailable = true
-				log.Printf("[STT] whisper found at '%s' with model '%s'", s.whisperPath, s.whisperModel)
+				logging.Debugf("[STT] whisper found at '%s' with model '%s'", s.whisperPath, s.whisperModel)
 			}
 		}
 	} else {
@@ -127,26 +128,29 @@ func (s *STTService) processEnabledChannels() {
 	}
 	s.mu.Unlock()
 
-	log.Printf("[STT] Processing %d enabled channels: %v", len(channels), channels)
+	if len(channels) == 0 {
+		return
+	}
+	logging.Debugf("[STT] Processing %d enabled channels: %v", len(channels), channels)
 
 	for _, channel := range channels {
 		if !s.streamlinkAvailable {
-			log.Printf("[STT] %s: streamlink not available, skipping", channel)
+			logging.Debugf("[STT] %s: streamlink not available, skipping", channel)
 			return
 		}
 		if !s.ffmpegAvailable {
-			log.Printf("[STT] %s: ffmpeg not available, skipping", channel)
+			logging.Debugf("[STT] %s: ffmpeg not available, skipping", channel)
 			return
 		}
 		if !s.whisperAvailable {
-			log.Printf("[STT] %s: whisper not available, skipping", channel)
+			logging.Debugf("[STT] %s: whisper not available, skipping", channel)
 			return
 		}
 
 		info := TwitchServiceInstance.GetStreamInfo(channel)
-		log.Printf("[STT] %s: viewer_count=%d", channel, info.ViewerCount)
+		logging.Debugf("[STT] %s: viewer_count=%d", channel, info.ViewerCount)
 		if info.ViewerCount <= 0 {
-			log.Printf("[STT] %s: stream offline or no viewer data, skipping", channel)
+			logging.Debugf("[STT] %s: stream offline or no viewer data, skipping", channel)
 			continue
 		}
 
@@ -156,7 +160,7 @@ func (s *STTService) processEnabledChannels() {
 			continue
 		}
 
-		log.Printf("[STT] %s: transcribed %d chars", channel, len(text))
+		logging.Debugf("[STT] %s: transcribed %d chars", channel, len(text))
 		if text == "" {
 			continue
 		}
@@ -183,7 +187,7 @@ func (s *STTService) captureAndTranscribe(channel string) (string, error) {
 
 	fi, fiErr := os.Stat(captureFile)
 	if fiErr == nil {
-		log.Printf("[STT] %s: captured audio %s (%d bytes)", channel, captureFile, fi.Size())
+		logging.Debugf("[STT] %s: captured audio %s (%d bytes)", channel, captureFile, fi.Size())
 	}
 
 	if !s.whisperAvailable {
@@ -247,7 +251,7 @@ func (s *STTService) transcribe(audioFile string) (string, error) {
 	}
 
 	if stderr.Len() > 0 {
-		log.Printf("[STT] whisper stderr (%d bytes): %s", stderr.Len(), stderr.String()[:min(stderr.Len(), 300)])
+		logging.Debugf("[STT] whisper stderr (%d bytes): %s", stderr.Len(), stderr.String()[:min(stderr.Len(), 300)])
 	}
 
 	data, err := os.ReadFile(txtFile)
@@ -264,9 +268,9 @@ func (s *STTService) transcribe(audioFile string) (string, error) {
 	}
 	_ = os.Remove(txtFile)
 
-	log.Printf("[STT] whisper output (%d bytes): %q", len(data), string(data[:min(len(data), 500)]))
+	logging.Debugf("[STT] whisper output (%d bytes): %q", len(data), string(data[:min(len(data), 500)]))
 	parsed := s.parseWhisperOutput(string(data))
-	log.Printf("[STT] whisper parsed: %q", parsed)
+	logging.Debugf("[STT] whisper parsed: %q", parsed)
 	return parsed, nil
 }
 
@@ -333,11 +337,11 @@ func (s *STTService) handleTranscript(channel, transcript string) {
 	}
 
 	if response == "" || response == "SILENCE" {
-		log.Printf("[STT] %s: LLM returned SILENCE, not responding", channel)
+		logging.Debugf("[STT] %s: LLM returned SILENCE, not responding", channel)
 		return
 	}
 
-	log.Printf("[STT] %s: LLM responded: %s", channel, response)
+	logging.Debugf("[STT] %s: LLM responded: %s", channel, response)
 	if s.sayFn != nil {
 		s.sayFn(channel, response)
 	}
