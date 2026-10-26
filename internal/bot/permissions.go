@@ -56,6 +56,8 @@ func PermissionName(p Permission) string {
 		return "Subscriber"
 	case VIP:
 		return "VIP"
+	case Supporter:
+		return "Supporter"
 	case Moderator:
 		return "Moderator"
 	case BotModerator:

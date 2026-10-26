@@ -8,6 +8,8 @@
     "/bertstats": "berts",
     // Old location kept working for existing links.
     "/berts": "berts",
+    "/quotes": "quotes",
+    "/docs": "docs",
     "/vote": "vote",
     "/panel": "panel",
   };

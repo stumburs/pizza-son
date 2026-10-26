@@ -2,7 +2,7 @@
 
 pizza's Twitch Chat Bot
 
-[Online Documentation](https://stumburs.github.io/pizza-son/commands/)
+[Online Documentation](https://pizzason.stumburs.id.lv/docs)
 
 ## Requirements
 

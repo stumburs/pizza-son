@@ -1,0 +1,708 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Docs · pizza-son</title>
+    <link rel="icon" type="image/webp" href="https://cdn.7tv.app/emote/01K6B3Y3SG5ZBAWXXVKX7BKBE5/4x.webp" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #0b0b0d;
+        --surface: #131315;
+        --surface-2: #19191c;
+        --border: rgba(255, 255, 255, 0.09);
+        --border-strong: rgba(255, 255, 255, 0.16);
+        --text: #ededf0;
+        --text-secondary: #b8b8c2;
+        --text-muted: #90909b;
+        --accent: #b7a6f5;
+        --danger: #f08a8a;
+        --radius: 10px;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: "DM Sans", system-ui, sans-serif;
+        font-size: 15px;
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      code {
+        font-family: "DM Mono", ui-monospace, monospace;
+      }
+
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      .page {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 30px 24px 56px;
+      }
+
+      .intro {
+        margin-bottom: 22px;
+      }
+
+      .title-row {
+        display: flex;
+        align-items: baseline;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 6px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 1.4rem;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+      }
+
+      .header-sub {
+        color: var(--text-muted);
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+
+      .intro p {
+        margin: 0;
+        max-width: 620px;
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+        line-height: 1.6;
+      }
+
+      .section-tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 22px;
+        margin-bottom: 22px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .section-tab {
+        display: inline-flex;
+        align-items: baseline;
+        gap: 6px;
+        margin-bottom: -1px;
+        padding: 8px 1px 10px;
+        border: 0;
+        border-bottom: 2px solid transparent;
+        background: none;
+        color: var(--text-secondary);
+        font-family: inherit;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: color 0.15s, border-color 0.15s;
+      }
+
+      .section-tab:hover {
+        color: var(--text);
+      }
+
+      .section-tab.active {
+        color: var(--text);
+        border-bottom-color: var(--accent);
+      }
+
+      .section-tab .count {
+        color: var(--text-muted);
+        font-family: "DM Mono", ui-monospace, monospace;
+        font-size: 0.72rem;
+        font-weight: 400;
+      }
+
+      .section-tab.active .count {
+        color: var(--accent);
+      }
+
+      .controls {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 8px;
+      }
+
+      .search {
+        flex: 1 1 240px;
+        min-width: 200px;
+      }
+
+      .search input,
+      .category {
+        width: 100%;
+        padding: 10px 14px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: var(--surface-2);
+        color: var(--text);
+        font-family: inherit;
+        font-size: 0.94rem;
+        outline: none;
+        transition: border-color 0.15s;
+      }
+
+      .search input::placeholder {
+        color: var(--text-muted);
+      }
+
+      .search input:focus,
+      .category:focus {
+        border-color: var(--accent);
+      }
+
+      .category {
+        flex: 0 1 210px;
+        cursor: pointer;
+      }
+
+      .status {
+        flex: 1 1 100%;
+        color: var(--text-muted);
+        font-size: 0.8rem;
+      }
+
+      .status.error {
+        color: var(--danger);
+      }
+
+      .group {
+        margin-top: 30px;
+      }
+
+      .group-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 2px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .group-head h2 {
+        margin: 0;
+        font-size: 0.95rem;
+        font-weight: 600;
+        letter-spacing: 0.01em;
+      }
+
+      .group-head .group-count {
+        color: var(--text-muted);
+        font-family: "DM Mono", ui-monospace, monospace;
+        font-size: 0.75rem;
+      }
+
+      .entry {
+        padding: 16px 0;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .entry-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .entry-head h3 {
+        margin: 0;
+        font-size: 0.98rem;
+        font-weight: 500;
+      }
+
+      .entry-head h3 code {
+        color: var(--text);
+        font-size: 0.95rem;
+      }
+
+      .entry-perm {
+        color: var(--text-muted);
+        font-size: 0.76rem;
+      }
+
+      .entry-desc {
+        margin: 6px 0 0;
+        max-width: 720px;
+        color: var(--text-secondary);
+        font-size: 0.92rem;
+        line-height: 1.6;
+      }
+
+      .entry-usage {
+        margin-top: 10px;
+      }
+
+      .entry-usage code {
+        display: inline-block;
+        padding: 5px 9px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        background: var(--surface-2);
+        color: var(--text);
+        font-size: 0.83rem;
+        overflow-wrap: anywhere;
+      }
+
+      .entry-meta {
+        margin-top: 8px;
+        color: var(--text-muted);
+        font-size: 0.78rem;
+      }
+
+      .examples {
+        margin-top: 10px;
+      }
+
+      .examples summary {
+        width: fit-content;
+        color: var(--text-muted);
+        font-size: 0.8rem;
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .examples summary:hover {
+        color: var(--text-secondary);
+      }
+
+      .example-list {
+        margin-top: 8px;
+        padding-left: 14px;
+        border-left: 1px solid var(--border);
+      }
+
+      .example {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        flex-wrap: wrap;
+        padding: 4px 0;
+        font-size: 0.85rem;
+      }
+
+      .example code {
+        color: var(--text);
+        overflow-wrap: anywhere;
+      }
+
+      .example .arrow {
+        color: var(--text-muted);
+      }
+
+      .empty {
+        padding: 40px 16px;
+        border-bottom: 1px solid var(--border);
+        color: var(--text-secondary);
+        text-align: center;
+      }
+
+      .perm-help {
+        margin-top: 34px;
+        border-top: 1px solid var(--border);
+        padding-top: 16px;
+      }
+
+      .perm-help summary {
+        width: fit-content;
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+        font-weight: 500;
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .perm-help summary:hover {
+        color: var(--text);
+      }
+
+      .perm-rows {
+        margin-top: 12px;
+        max-width: 620px;
+      }
+
+      .perm-row {
+        display: flex;
+        gap: 16px;
+        padding: 6px 0;
+        border-bottom: 1px solid var(--border);
+        font-size: 0.84rem;
+      }
+
+      .perm-row:last-child {
+        border-bottom: 0;
+      }
+
+      .perm-name {
+        flex: 0 0 130px;
+        color: var(--text);
+      }
+
+      .perm-desc {
+        color: var(--text-secondary);
+      }
+
+      @media (max-width: 560px) {
+        .page {
+          padding: 24px 16px 44px;
+        }
+
+        .category {
+          flex: 1 1 100%;
+        }
+
+        .perm-name {
+          flex-basis: 105px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <header class="intro">
+        <div class="title-row">
+          <h1>Docs</h1>
+          <span class="header-sub">commands &amp; listeners</span>
+        </div>
+        <p>
+          All the commands and passive listeners pizza-son supports.
+        </p>
+      </header>
+
+      <nav class="section-tabs" aria-label="Documentation sections">
+        <button class="section-tab active" type="button" data-section="commands" aria-selected="true">
+          <span>Commands</span>
+          <span class="count" id="commandCount">—</span>
+        </button>
+        <button class="section-tab" type="button" data-section="listeners" aria-selected="false">
+          <span>Listeners</span>
+          <span class="count" id="listenerCount">—</span>
+        </button>
+      </nav>
+
+      <section id="commandsPanel">
+        <div class="controls">
+          <label class="search">
+            <span class="sr-only">Search commands</span>
+            <input id="commandSearch" type="search" placeholder="Search commands…" autocomplete="off" />
+          </label>
+          <select class="category" id="categoryFilter" aria-label="Command category">
+            <option value="all">All categories</option>
+          </select>
+        </div>
+        <div class="status" id="commandStatus" role="status">Loading commands…</div>
+        <div id="commandGroups"></div>
+      </section>
+
+      <section id="listenersPanel" hidden>
+        <div class="controls">
+          <label class="search">
+            <span class="sr-only">Search listeners</span>
+            <input id="listenerSearch" type="search" placeholder="Search listeners…" autocomplete="off" />
+          </label>
+        </div>
+        <div class="status" id="listenerStatus" role="status">Loading listeners…</div>
+        <div id="listenerList"></div>
+      </section>
+
+      <details class="perm-help" id="permissionHelp">
+        <summary>Permission levels</summary>
+        <div class="perm-rows" id="permissionRows"></div>
+      </details>
+    </main>
+
+    <script src="/view.js"></script>
+    <script>
+      const DOCS_URL = "/api/docs";
+
+      const state = {
+        data: null,
+        commandQuery: "",
+        category: "all",
+        listenerQuery: "",
+      };
+
+      const commandCountEl = document.getElementById("commandCount");
+      const listenerCountEl = document.getElementById("listenerCount");
+      const commandsPanel = document.getElementById("commandsPanel");
+      const listenersPanel = document.getElementById("listenersPanel");
+      const commandGroupsEl = document.getElementById("commandGroups");
+      const listenerListEl = document.getElementById("listenerList");
+      const commandStatusEl = document.getElementById("commandStatus");
+      const listenerStatusEl = document.getElementById("listenerStatus");
+      const commandSearchEl = document.getElementById("commandSearch");
+      const listenerSearchEl = document.getElementById("listenerSearch");
+      const categoryEl = document.getElementById("categoryFilter");
+      const permissionRowsEl = document.getElementById("permissionRows");
+
+      function escapeHtml(value) {
+        return String(value ?? "").replace(/[&<>"']/g, (char) => {
+          switch (char) {
+            case "&":
+              return "&amp;";
+            case "<":
+              return "&lt;";
+            case ">":
+              return "&gt;";
+            case '"':
+              return "&quot;";
+            default:
+              return "&#39;";
+          }
+        });
+      }
+
+      function formatCount(value) {
+        return new Intl.NumberFormat().format(Number(value) || 0);
+      }
+
+      function setStatus(el, message, isError) {
+        el.textContent = message;
+        el.classList.toggle("error", Boolean(isError));
+      }
+
+      function commandMatches(command, query) {
+        if (!query) return true;
+        const examples = (command.examples || [])
+          .flatMap((example) => [example.input, example.output])
+          .join(" ");
+        return [
+          command.name,
+          command.description,
+          command.usage,
+          command.permission,
+          examples,
+        ]
+          .join(" ")
+          .toLowerCase()
+          .includes(query);
+      }
+
+      function renderCommands() {
+        const data = state.data;
+        if (!data) return;
+
+        const query = state.commandQuery.trim().toLowerCase();
+        const groups = data.commands
+          .filter((group) => state.category === "all" || group.name === state.category)
+          .map((group) => ({
+            name: group.name,
+            commands: group.commands.filter((command) => commandMatches(command, query)),
+          }))
+          .filter((group) => group.commands.length > 0);
+
+        const visible = groups.reduce((sum, group) => sum + group.commands.length, 0);
+        const filtering = Boolean(query) || state.category !== "all";
+        setStatus(
+          commandStatusEl,
+          filtering
+            ? `${formatCount(visible)} of ${formatCount(data.total_commands)} commands`
+            : `${formatCount(data.total_commands)} commands`,
+          false
+        );
+
+        if (groups.length === 0) {
+          commandGroupsEl.innerHTML = `<div class="empty">No commands match those filters.</div>`;
+          return;
+        }
+
+        commandGroupsEl.innerHTML = groups
+          .map(
+            (group) => `
+            <section class="group">
+              <div class="group-head">
+                <h2>${escapeHtml(group.name)}</h2>
+                <span class="group-count">${formatCount(group.commands.length)}</span>
+              </div>
+              ${group.commands.map(renderCommand).join("")}
+            </section>`
+          )
+          .join("");
+      }
+
+      function renderCommand(command) {
+        const examples = command.examples || [];
+        return `
+          <article class="entry">
+            <div class="entry-head">
+              <h3><code>${escapeHtml(state.data.prefix || "!")}${escapeHtml(command.name)}</code></h3>
+              <span class="entry-perm">${escapeHtml(command.permission)}</span>
+            </div>
+            ${command.description ? `<p class="entry-desc">${escapeHtml(command.description)}</p>` : ""}
+            ${command.usage ? `<div class="entry-usage"><code>${escapeHtml(command.usage)}</code></div>` : ""}
+            ${command.cooldown ? `<div class="entry-meta">Cooldown ${escapeHtml(command.cooldown)}</div>` : ""}
+            ${examples.length ? renderExamples(examples) : ""}
+          </article>`;
+      }
+
+      function renderExamples(examples) {
+        return `
+          <details class="examples">
+            <summary>${formatCount(examples.length)} ${examples.length === 1 ? "example" : "examples"}</summary>
+            <div class="example-list">
+              ${examples
+                .map(
+                  (example) => `
+                  <div class="example">
+                    <code>${escapeHtml(example.input)}</code>
+                    ${example.output ? `<span class="arrow">→</span><code>${escapeHtml(example.output)}</code>` : ""}
+                  </div>`
+                )
+                .join("")}
+            </div>
+          </details>`;
+      }
+
+      function listenerMatches(listener, query) {
+        if (!query) return true;
+        return [listener.name, listener.description, listener.permission]
+          .join(" ")
+          .toLowerCase()
+          .includes(query);
+      }
+
+      function renderListeners() {
+        const data = state.data;
+        if (!data) return;
+
+        const query = state.listenerQuery.trim().toLowerCase();
+        const listeners = data.listeners.filter((listener) => listenerMatches(listener, query));
+
+        setStatus(
+          listenerStatusEl,
+          query
+            ? `${formatCount(listeners.length)} of ${formatCount(data.total_listeners)} listeners`
+            : `${formatCount(data.total_listeners)} listeners`,
+          false
+        );
+
+        if (listeners.length === 0) {
+          listenerListEl.innerHTML = `<div class="empty">No listeners match that search.</div>`;
+          return;
+        }
+
+        listenerListEl.innerHTML = listeners
+          .map(
+            (listener) => `
+            <article class="entry">
+              <div class="entry-head">
+                <h3><code>${escapeHtml(listener.name)}</code></h3>
+                <span class="entry-perm">${escapeHtml(listener.permission)}</span>
+              </div>
+              ${listener.description ? `<p class="entry-desc">${escapeHtml(listener.description)}</p>` : ""}
+              <div class="entry-meta">
+                ${listener.cooldown ? `Cooldown ${escapeHtml(listener.cooldown)}` : "No cooldown"}
+                ${listener.passive ? " · passive" : ""}
+              </div>
+            </article>`
+          )
+          .join("");
+      }
+
+      function renderPermissions() {
+        const levels = state.data?.permission_levels || [];
+        permissionRowsEl.innerHTML = levels
+          .map(
+            (level) => `
+            <div class="perm-row">
+              <span class="perm-name">${escapeHtml(level.name)}</span>
+              <span class="perm-desc">${escapeHtml(level.description)}</span>
+            </div>`
+          )
+          .join("");
+      }
+
+      function fillCategories() {
+        const groups = state.data?.commands || [];
+        categoryEl.innerHTML =
+          `<option value="all">All categories</option>` +
+          groups
+            .map((group) => `<option value="${escapeHtml(group.name)}">${escapeHtml(group.name)}</option>`)
+            .join("");
+      }
+
+      function selectSection(section) {
+        const showCommands = section === "commands";
+        commandsPanel.hidden = !showCommands;
+        listenersPanel.hidden = showCommands;
+        document.querySelectorAll(".section-tab").forEach((tab) => {
+          const active = tab.dataset.section === section;
+          tab.classList.toggle("active", active);
+          tab.setAttribute("aria-selected", String(active));
+        });
+      }
+
+      async function load() {
+        try {
+          const response = await fetch(DOCS_URL, { cache: "no-store" });
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+          state.data = await response.json();
+          commandCountEl.textContent = formatCount(state.data.total_commands);
+          listenerCountEl.textContent = formatCount(state.data.total_listeners);
+
+          fillCategories();
+          renderPermissions();
+          renderCommands();
+          renderListeners();
+        } catch (error) {
+          setStatus(commandStatusEl, "Could not load docs.", true);
+          setStatus(listenerStatusEl, "Could not load docs.", true);
+          commandGroupsEl.innerHTML = `<div class="empty">Commands could not be loaded.</div>`;
+          listenerListEl.innerHTML = `<div class="empty">Listeners could not be loaded.</div>`;
+        }
+      }
+
+      document.querySelectorAll(".section-tab").forEach((tab) => {
+        tab.addEventListener("click", () => selectSection(tab.dataset.section));
+      });
+
+      commandSearchEl.addEventListener("input", () => {
+        state.commandQuery = commandSearchEl.value;
+        renderCommands();
+      });
+
+      categoryEl.addEventListener("change", () => {
+        state.category = categoryEl.value;
+        renderCommands();
+      });
+
+      listenerSearchEl.addEventListener("input", () => {
+        state.listenerQuery = listenerSearchEl.value;
+        renderListeners();
+      });
+
+      load();
+    </script>
+  </body>
+</html>

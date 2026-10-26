@@ -146,6 +146,8 @@
       <nav class="tabs" aria-label="Main">
         <a class="tab" href="/" data-tab="overview">Overview</a>
         <a class="tab" href="/bertstats" data-tab="berts">Bert stats</a>
+        <a class="tab" href="/quotes" data-tab="quotes">Quotes</a>
+        <a class="tab" href="/docs" data-tab="docs">Docs</a>
         <a class="tab" href="/vote" data-tab="vote">Vote</a>
         <a class="tab" href="/panel" data-tab="panel">Panel</a>
       </nav>
@@ -157,6 +159,8 @@
       const views = {
         overview: { src: "/views/overview.html", route: "/", title: "pizza-son" },
         berts: { src: "/views/berts.html", route: "/bertstats", title: "Bert stats · pizza-son" },
+        quotes: { src: "/views/quotes.html", route: "/quotes", title: "Quotes · pizza-son" },
+        docs: { src: "/views/docs.html", route: "/docs", title: "Docs · pizza-son" },
         vote: { src: "/views/vote.html", route: "/vote", title: "Vote · pizza-son" },
         panel: { src: "/views/panel.html", route: "/panel", title: "Panel · pizza-son" },
       };
@@ -168,6 +172,8 @@
       function tabFromPath(pathname) {
         const path = pathname.replace(/\/+$/, "") || "/";
         if (path === "/bertstats") return "berts";
+        if (path === "/quotes") return "quotes";
+        if (path === "/docs") return "docs";
         if (path === "/vote") return "vote";
         if (path === "/panel") return "panel";
         return "overview";
@@ -182,6 +188,9 @@
         frame.dataset.tab = name;
 
         let src = views[name].src;
+        if (name === "quotes" && location.search) {
+          src += location.search;
+        }
         if (name === "panel" && location.hash) {
           src += location.hash;
           consumedPanelHash = true;

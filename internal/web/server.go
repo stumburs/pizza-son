@@ -24,7 +24,7 @@ func (ws *WebService) Start() {
 	// the individual views without a full page reload.
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
-		case "/", "/bertstats", "/bertstats/", "/vote", "/vote/", "/panel", "/panel/":
+		case "/", "/bertstats", "/bertstats/", "/quotes", "/quotes/", "/docs", "/docs/", "/vote", "/vote/", "/panel", "/panel/":
 			http.ServeFile(w, r, "./web/public/shell.html")
 		case "/berts", "/berts/":
 			http.Redirect(w, r, "/bertstats", http.StatusMovedPermanently)
@@ -39,6 +39,8 @@ func (ws *WebService) Start() {
 	http.HandleFunc("/api/channel", enableCORS(ws.handleChannelStats))
 	http.HandleFunc("/api/user", enableCORS(ws.handleUserStats))
 	http.HandleFunc("/api/emotes", enableCORS(ws.handleChannelEmotes))
+	http.HandleFunc("/api/quotes", enableCORS(ws.handleQuotes))
+	http.HandleFunc("/api/docs", enableCORS(ws.handleDocs))
 	http.HandleFunc("/api/activity/global", enableCORS(ws.handleActivityGlobal))
 	http.HandleFunc("/api/activity/channel", enableCORS(ws.handleActivityChannel))
 	http.HandleFunc("/api/activity/user", enableCORS(ws.handleActivityUser))
