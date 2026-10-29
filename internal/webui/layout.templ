@@ -13,8 +13,7 @@ templ Layout(title string, route string, active string, page string, content tem
 			<link rel="preconnect" href="https://fonts.googleapis.com"/>
 			<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 			<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&amp;family=DM+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
-			<link rel="stylesheet" href="/css/base.css"/>
-			<link rel="stylesheet" href={ "/css/" + page + ".css" }/>
+			<link rel="stylesheet" href="/css/site.css"/>
 			if page == "berts" {
 				<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 			}

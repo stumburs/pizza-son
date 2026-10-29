@@ -5,20 +5,31 @@ CGO_ENABLED := 0
 BUILD_DIR := build
 BINARY := $(BUILD_DIR)/pizza-son
 
-ifeq ($(OS),Windows_NT)
-BUILD_ENV = set CGO_ENABLED=$(CGO_ENABLED)&& set GOOS=$(GOOS)&& set GOARCH=$(GOARCH)&&
-CLEAN = if exist $(BUILD_DIR) rmdir /S /Q $(BUILD_DIR)
-else
+ifneq ($(OS),Windows_NT)
 BUILD_ENV = CGO_ENABLED=$(CGO_ENABLED) GOOS=$(GOOS) GOARCH=$(GOARCH)
 CLEAN = rm -rf $(BUILD_DIR)
+MKDIR_CSS = mkdir -p internal/webui/public/css
+else
+BUILD_ENV = set CGO_ENABLED=$(CGO_ENABLED)&& set GOOS=$(GOOS)&& set GOARCH=$(GOARCH)&&
+CLEAN = if exist $(BUILD_DIR) rmdir /S /Q $(BUILD_DIR)
+MKDIR_CSS = if not exist internal\webui\public\css mkdir internal\webui\public\css
 endif
 
-.PHONY: all build generate clean
+SASS := sass
+SASS_FLAGS := --style=compressed --sourcemap=none --no-cache
+CSS_SRC := internal/webui/styles/site.scss
+CSS_OUT := internal/webui/public/css/site.css
+
+.PHONY: all build css generate clean
 
 all: build
 
-build: generate
+build: css generate
 	$(BUILD_ENV) go build -ldflags "-s -w" -o $(BINARY) ./cmd/pizza-son/
+
+css:
+	$(MKDIR_CSS)
+	$(SASS) $(SASS_FLAGS) $(CSS_SRC) $(CSS_OUT)
 
 generate:
 	go generate ./internal/webui

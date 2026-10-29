@@ -36,8 +36,7 @@ func TestPagesRender(t *testing.T) {
 			}
 			for _, want := range []string{
 				`class="topbar"`,
-				"/css/base.css",
-				"/css/" + tc.name + ".css",
+				"/css/site.css",
 				"/js/" + tc.name + ".js",
 				`class="site-main page-` + tc.name + `"`,
 			} {

@@ -1,25 +1,4 @@
-:root {
-  color-scheme: dark;
-  --bg: #0b0b0d;
-  --surface: #131315;
-  --surface-1: #131315;
-  --surface-2: #19191c;
-  --surface-3: #232327;
-  --border: rgba(255, 255, 255, 0.09);
-  --border-strong: rgba(255, 255, 255, 0.16);
-  --text: #ededf0;
-  --text-primary: #ededf0;
-  --text-secondary: #b8b8c2;
-  --text-muted: #90909b;
-  --accent: #b7a6f5;
-  --accent-soft: rgba(183, 166, 245, 0.12);
-  --radius: 10px;
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
-  --header-height: 56px;
-}
-
+// Reset and the global page shell (topbar, main area).
 *,
 *::before,
 *::after {

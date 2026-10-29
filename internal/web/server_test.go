@@ -25,7 +25,7 @@ func TestSiteFSContainsEmbeddedUI(t *testing.T) {
 		t.Fatalf("siteFS: %v", err)
 	}
 
-	for _, name := range []string{"css/base.css", "css/bertle.css", "js/bertle.js", "js/kofi.js"} {
+	for _, name := range []string{"css/site.css", "js/bertle.js", "js/kofi.js"} {
 		file, err := staticFS.Open(name)
 		if err != nil {
 			t.Errorf("%s is not embedded: %v", name, err)
@@ -57,7 +57,7 @@ func TestSiteHandlerServesPagesAndAssets(t *testing.T) {
 		{"/docs", http.StatusOK, "text/html", "Docs"},
 		{"/vote", http.StatusOK, "text/html", "Bert vote"},
 		{"/panel", http.StatusOK, "text/html", "Control panel"},
-		{"/css/base.css", http.StatusOK, "text/css", ".topbar"},
+		{"/css/site.css", http.StatusOK, "text/css", ".page-berts"},
 		{"/js/bertle.js", http.StatusOK, "", "Bertle"},
 	}
 
