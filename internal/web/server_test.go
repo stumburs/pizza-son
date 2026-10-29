@@ -1,11 +1,14 @@
 package web
 
 import (
+	"context"
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"pizza-son/internal/services"
+	"pizza-son/internal/webui"
 	"strings"
 	"testing"
 )
@@ -92,6 +95,92 @@ func TestSiteHandlerServesPagesAndAssets(t *testing.T) {
 	}
 	if location := rec.Header().Get("Location"); location != "/bertstats" {
 		t.Errorf("/berts Location = %q, want %q", location, "/bertstats")
+	}
+}
+
+func TestSiteHandlerServes404Page(t *testing.T) {
+	t.Setenv("PIZZA_SON_DEV", "")
+
+	staticFS, err := siteFS()
+	if err != nil {
+		t.Fatalf("siteFS: %v", err)
+	}
+	handler := siteHandler(staticFS)
+
+	rec := httptest.NewRecorder()
+	handler.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, "/does-not-exist", nil))
+
+	if rec.Code != http.StatusNotFound {
+		t.Fatalf("status = %d, want %d", rec.Code, http.StatusNotFound)
+	}
+	body := rec.Body.String()
+	for _, want := range []string{
+		`class="site-main page-error"`,
+		`class="error-emote"`,
+		"404 — page not found",
+		`class="error-home"`,
+	} {
+		if !strings.Contains(body, want) {
+			t.Errorf("body does not contain %q", want)
+		}
+	}
+	if strings.Contains(body, "/js/error.js") {
+		t.Error("404 page should not load a page script")
+	}
+	if got := rec.Header().Get("Cache-Control"); got != "no-cache" {
+		t.Errorf("Cache-Control = %q, want no-cache", got)
+	}
+}
+
+func TestAssetCacheHeaders(t *testing.T) {
+	t.Setenv("PIZZA_SON_DEV", "")
+
+	staticFS, err := siteFS()
+	if err != nil {
+		t.Fatalf("siteFS: %v", err)
+	}
+	handler := siteHandler(staticFS)
+
+	old := webui.Version
+	webui.Version = "test123"
+	t.Cleanup(func() { webui.Version = old })
+
+	rec := httptest.NewRecorder()
+	handler.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, "/css/site.css?v=test123", nil))
+	if rec.Code != http.StatusOK {
+		t.Fatalf("versioned asset status = %d, want %d", rec.Code, http.StatusOK)
+	}
+	if got := rec.Header().Get("Cache-Control"); got != "public, max-age=31536000, immutable" {
+		t.Errorf("versioned Cache-Control = %q", got)
+	}
+
+	rec = httptest.NewRecorder()
+	handler.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, "/css/site.css", nil))
+	if got := rec.Header().Get("Cache-Control"); got != "no-cache" {
+		t.Errorf("unversioned Cache-Control = %q, want no-cache", got)
+	}
+}
+
+type failingComponent struct{}
+
+func (failingComponent) Render(context.Context, io.Writer) error {
+	return errors.New("boom")
+}
+
+func TestRenderPageFallsBackTo500(t *testing.T) {
+	rec := httptest.NewRecorder()
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+
+	renderPage(rec, req, failingComponent{}, http.StatusOK, webui.ErrorPage(http.StatusInternalServerError))
+
+	if rec.Code != http.StatusInternalServerError {
+		t.Fatalf("status = %d, want %d", rec.Code, http.StatusInternalServerError)
+	}
+	if got := rec.Header().Get("Content-Type"); !strings.HasPrefix(got, "text/html") {
+		t.Errorf("Content-Type = %q, want text/html", got)
+	}
+	if !strings.Contains(rec.Body.String(), "500 — something broke") {
+		t.Error("body does not contain the 500 page")
 	}
 }
 

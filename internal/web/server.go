@@ -1,6 +1,7 @@
 package web
 
 import (
+	"bytes"
 	"encoding/json"
 	"io/fs"
 	"log"
@@ -27,35 +28,36 @@ func (ws *WebService) Start() {
 	if err != nil {
 		log.Fatalf("[Web] Failed to load static files: %v", err)
 	}
-	http.Handle("/", siteHandler(staticFS))
+	mux := http.NewServeMux()
+	mux.Handle("/", siteHandler(staticFS))
 
 	// API endpoints
-	http.HandleFunc("/api/site/summary", enableCORS(ws.handleSiteSummary))
-	http.HandleFunc("/api/global", enableCORS(ws.handleGlobalStats))
-	http.HandleFunc("/api/channel", enableCORS(ws.handleChannelStats))
-	http.HandleFunc("/api/user", enableCORS(ws.handleUserStats))
-	http.HandleFunc("/api/emotes", enableCORS(ws.handleChannelEmotes))
-	http.HandleFunc("/api/quotes", enableCORS(ws.handleQuotes))
-	http.HandleFunc("/api/docs", enableCORS(ws.handleDocs))
-	http.HandleFunc("/api/activity/global", enableCORS(ws.handleActivityGlobal))
-	http.HandleFunc("/api/activity/channel", enableCORS(ws.handleActivityChannel))
-	http.HandleFunc("/api/activity/user", enableCORS(ws.handleActivityUser))
-	http.HandleFunc("/api/vote/submit", enableCORS(ws.handleVoteSubmit))
-	http.HandleFunc("/api/vote/results", enableCORS(ws.handleVoteResults))
-	http.HandleFunc("/api/live", enableCORS(services.LiveFeedInstance.HandleLiveFeed))
+	mux.HandleFunc("/api/site/summary", enableCORS(ws.handleSiteSummary))
+	mux.HandleFunc("/api/global", enableCORS(ws.handleGlobalStats))
+	mux.HandleFunc("/api/channel", enableCORS(ws.handleChannelStats))
+	mux.HandleFunc("/api/user", enableCORS(ws.handleUserStats))
+	mux.HandleFunc("/api/emotes", enableCORS(ws.handleChannelEmotes))
+	mux.HandleFunc("/api/quotes", enableCORS(ws.handleQuotes))
+	mux.HandleFunc("/api/docs", enableCORS(ws.handleDocs))
+	mux.HandleFunc("/api/activity/global", enableCORS(ws.handleActivityGlobal))
+	mux.HandleFunc("/api/activity/channel", enableCORS(ws.handleActivityChannel))
+	mux.HandleFunc("/api/activity/user", enableCORS(ws.handleActivityUser))
+	mux.HandleFunc("/api/vote/submit", enableCORS(ws.handleVoteSubmit))
+	mux.HandleFunc("/api/vote/results", enableCORS(ws.handleVoteResults))
+	mux.HandleFunc("/api/live", enableCORS(services.LiveFeedInstance.HandleLiveFeed))
 
 	// Panel API (auth + settings control)
-	http.HandleFunc("/api/auth/login", enableCORS(ws.handleAuthLogin))
-	http.HandleFunc("/api/auth/callback", enableCORS(ws.handleAuthCallback))
-	http.HandleFunc("/api/auth/logout", enableCORS(requireSession(ws.handleAuthLogout)))
-	http.HandleFunc("/api/auth/me", enableCORS(requireSession(ws.handleAuthMe)))
-	http.HandleFunc("/api/panel/commands", enableCORS(requireSession(ws.handlePanelCommands)))
-	http.HandleFunc("/api/panel/listeners", enableCORS(requireSession(ws.handlePanelListeners)))
-	http.HandleFunc("/api/panel/save", enableCORS(requireSession(ws.handlePanelSave)))
+	mux.HandleFunc("/api/auth/login", enableCORS(ws.handleAuthLogin))
+	mux.HandleFunc("/api/auth/callback", enableCORS(ws.handleAuthCallback))
+	mux.HandleFunc("/api/auth/logout", enableCORS(requireSession(ws.handleAuthLogout)))
+	mux.HandleFunc("/api/auth/me", enableCORS(requireSession(ws.handleAuthMe)))
+	mux.HandleFunc("/api/panel/commands", enableCORS(requireSession(ws.handlePanelCommands)))
+	mux.HandleFunc("/api/panel/listeners", enableCORS(requireSession(ws.handlePanelListeners)))
+	mux.HandleFunc("/api/panel/save", enableCORS(requireSession(ws.handlePanelSave)))
 
 	log.Printf("[Web] Starting local dashboard on http://localhost%s/\n", ws.port)
 	go func() {
-		if err := http.ListenAndServe(ws.port, nil); err != nil {
+		if err := http.ListenAndServe(ws.port, gzipMiddleware(mux)); err != nil {
 			log.Fatalf("[Web] Server failed: %v", err)
 		}
 	}()
@@ -71,7 +73,8 @@ func siteFS() (fs.FS, error) {
 	return fs.Sub(webui.Files, "public")
 }
 
-// siteHandler serves the templ-rendered pages and the embedded CSS/JS assets.
+// siteHandler serves the templ-rendered pages, embedded CSS/JS assets, and the
+// 404 page.
 func siteHandler(staticFS fs.FS) http.Handler {
 	fileServer := http.FileServerFS(staticFS)
 
@@ -84,32 +87,80 @@ func siteHandler(staticFS fs.FS) http.Handler {
 		"/vote":      webui.VotePage(),
 		"/panel":     webui.PanelPage(),
 	}
+	notFound := webui.ErrorPage(http.StatusNotFound)
+	serverError := webui.ErrorPage(http.StatusInternalServerError)
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Embedded files have no modification time, so make browsers revalidate
-		// instead of heuristically caching stale HTML/JS/CSS after a deploy.
-		w.Header().Set("Cache-Control", "no-cache")
-
 		path := r.URL.Path
-		if path != "/" {
-			path = strings.TrimSuffix(path, "/")
+		pagePath := path
+		if pagePath != "/" {
+			pagePath = strings.TrimSuffix(pagePath, "/")
 		}
 
-		if page, ok := pages[path]; ok {
-			w.Header().Set("Content-Type", "text/html; charset=utf-8")
-			if err := page.Render(r.Context(), w); err != nil {
-				log.Printf("[Web] Failed to render %s: %v", path, err)
-			}
+		if page, ok := pages[pagePath]; ok {
+			renderPage(w, r, page, http.StatusOK, serverError)
 			return
 		}
 
-		if path == "/berts" {
+		if pagePath == "/berts" {
 			http.Redirect(w, r, "/bertstats", http.StatusMovedPermanently)
 			return
 		}
 
-		fileServer.ServeHTTP(w, r)
+		if name := strings.TrimPrefix(path, "/"); name != "" {
+			if info, err := fs.Stat(staticFS, name); err == nil && !info.IsDir() {
+				setAssetCacheHeaders(w, r)
+				fileServer.ServeHTTP(w, r)
+				return
+			}
+		}
+
+		renderPage(w, r, notFound, http.StatusNotFound, nil)
 	})
+}
+
+// renderPage renders into a buffer first so a failed template cannot send a
+// half-written page or a 200 with an error body. Normal pages fall back to the
+// 500 page; the error pages themselves fall back to plain text.
+func renderPage(w http.ResponseWriter, r *http.Request, page templ.Component, status int, fallback templ.Component) {
+	w.Header().Set("Cache-Control", "no-cache")
+
+	var buf bytes.Buffer
+	if err := page.Render(r.Context(), &buf); err != nil {
+		log.Printf("[Web] Failed to render %s: %v", r.URL.Path, err)
+		if fallback == nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+		buf.Reset()
+		status = http.StatusInternalServerError
+		if err := fallback.Render(r.Context(), &buf); err != nil {
+			log.Printf("[Web] Failed to render 500 page: %v", err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+	}
+
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	w.WriteHeader(status)
+	_, _ = buf.WriteTo(w)
+}
+
+// setAssetCacheHeaders gives versioned asset URLs a long immutable cache. The
+// embedded filesystem has no modification times, so unversioned requests have
+// to revalidate or they could never be cached safely.
+func setAssetCacheHeaders(w http.ResponseWriter, r *http.Request) {
+	if webui.Version == "" || webui.Version == "dev" || os.Getenv("PIZZA_SON_DEV") != "" {
+		w.Header().Set("Cache-Control", "no-cache")
+		return
+	}
+
+	if r.URL.Query().Get("v") == webui.Version {
+		w.Header().Set("Cache-Control", "public, max-age=31536000, immutable")
+		return
+	}
+
+	w.Header().Set("Cache-Control", "no-cache")
 }
 
 // All channels, all users

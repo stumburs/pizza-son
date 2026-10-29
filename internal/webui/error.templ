@@ -1,0 +1,20 @@
+package webui
+
+templ ErrorPage(status int) {
+	@Layout(errorDocumentTitle(status), "/", "", "error", errorContent(status))
+}
+
+templ errorContent(status int) {
+	<div class="error-inner">
+		<img
+			class="error-emote"
+			src="https://cdn.7tv.app/emote/01K6B3Y3SG5ZBAWXXVKX7BKBE5/4x.webp"
+			alt="pizza-son emote"
+			width="160"
+			height="160"
+		/>
+		<h1>{ errorHeading(status) }</h1>
+		<p>{ errorMessage(status) }</p>
+		<a class="error-home" href="/">take me home</a>
+	</div>
+}

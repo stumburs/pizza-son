@@ -5,6 +5,13 @@ CGO_ENABLED := 0
 BUILD_DIR := build
 BINARY := $(BUILD_DIR)/pizza-son
 
+# Asset cache-busting version. Falls back to "dev" outside a git checkout.
+VERSION := $(shell git describe --always --dirty)
+ifeq ($(strip $(VERSION)),)
+VERSION := dev
+endif
+LDFLAGS := -s -w -X pizza-son/internal/webui.Version=$(VERSION)
+
 ifneq ($(OS),Windows_NT)
 BUILD_ENV = CGO_ENABLED=$(CGO_ENABLED) GOOS=$(GOOS) GOARCH=$(GOARCH)
 CLEAN = rm -rf $(BUILD_DIR)
@@ -25,7 +32,7 @@ CSS_OUT := internal/webui/public/css/site.css
 all: build
 
 build: css generate
-	$(BUILD_ENV) go build -ldflags "-s -w" -o $(BINARY) ./cmd/pizza-son/
+	$(BUILD_ENV) go build -ldflags "$(LDFLAGS)" -o $(BINARY) ./cmd/pizza-son/
 
 css:
 	$(MKDIR_CSS)

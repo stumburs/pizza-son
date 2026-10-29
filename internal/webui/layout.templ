@@ -13,7 +13,7 @@ templ Layout(title string, route string, active string, page string, content tem
 			<link rel="preconnect" href="https://fonts.googleapis.com"/>
 			<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 			<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&amp;family=DM+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
-			<link rel="stylesheet" href="/css/site.css"/>
+			<link rel="stylesheet" href={ "/css/site.css?v=" + Version }/>
 			if page == "berts" {
 				<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 			}
@@ -23,7 +23,9 @@ templ Layout(title string, route string, active string, page string, content tem
 			<main class={ "site-main page-" + page }>
 				@content
 			</main>
-			<script src={ "/js/" + page + ".js" }></script>
+			if page != "error" {
+				<script src={ "/js/" + page + ".js?v=" + Version }></script>
+			}
 			<script src="https://storage.ko-fi.com/cdn/scripts/overlay-widget.js"></script>
 			<script src="/js/kofi.js"></script>
 		</body>
