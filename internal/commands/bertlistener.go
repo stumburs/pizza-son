@@ -54,26 +54,13 @@ func init() {
 		Description: "Responds with a random bert",
 		Cooldown:    69 * time.Second,
 		Matcher: func(ctx bot.CommandContext) bool {
-			msg := strings.ToLower(ctx.Message.Text)
-			return !strings.HasPrefix(msg, "!") && strings.Contains(msg, "bertcheck") && !strings.Contains(msg, "bertcheckcheck")
+			// Only the exact single word, lowercase, and nothing else.
+			return strings.TrimSpace(ctx.Message.Text) == "bertcheck"
 		},
 		OnCooldown: func(ctx bot.CommandContext, remaining time.Duration) {
 			services.TwitchServiceInstance.Timeout(ctx.Message.Channel, ctx.Message.User.ID, 69, "overberting smh")
 		},
 		Handler: func(ctx bot.CommandContext) bool {
-			msg := strings.ToLower(ctx.Message.Text)
-
-			// Ignore if command like !bertstats or !bertcheck add
-			if strings.HasPrefix(msg, "!") || !strings.Contains(msg, "bertcheck") {
-				return false
-			}
-
-			// bertcheckcheck funnies
-			if strings.Contains(msg, "bertcheckcheck") {
-				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "bertcheck")
-				return true
-			}
-
 			available := services.BertServiceInstance.GetBerts(ctx.Message.Channel)
 
 			baseResponse := pickBertResponse(ctx.Message.User.Name, available, ctx.Message.Channel)
