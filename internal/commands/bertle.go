@@ -12,10 +12,10 @@ func init() {
 		Category:    bot.CategoryFun,
 		Permission:  bot.All,
 		Examples: []bot.CommandExample{
-			{Input: "!bertle", Output: "Play bertle here: https://stumburs.id.lv"},
+			{Input: "!bertle", Output: "Play bertle here: https://pizzason.stumburs.id.lv/bertle"},
 		},
 		Handler: func(ctx bot.CommandContext) {
-			ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "Play bertle here: https://stumburs.id.lv")
+			ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "Play bertle here: https://pizzason.stumburs.id.lv/bertle")
 		},
 	})
 }

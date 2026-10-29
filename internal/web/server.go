@@ -24,7 +24,7 @@ func (ws *WebService) Start() {
 	// the individual views without a full page reload.
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
-		case "/", "/bertstats", "/bertstats/", "/quotes", "/quotes/", "/docs", "/docs/", "/vote", "/vote/", "/panel", "/panel/":
+		case "/", "/bertstats", "/bertstats/", "/bertle", "/bertle/", "/quotes", "/quotes/", "/docs", "/docs/", "/vote", "/vote/", "/panel", "/panel/":
 			http.ServeFile(w, r, "./web/public/shell.html")
 		case "/berts", "/berts/":
 			http.Redirect(w, r, "/bertstats", http.StatusMovedPermanently)

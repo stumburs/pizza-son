@@ -6,6 +6,7 @@
   var routes = {
     "/": "overview",
     "/bertstats": "berts",
+    "/bertle": "bertle",
     // Old location kept working for existing links.
     "/berts": "berts",
     "/quotes": "quotes",

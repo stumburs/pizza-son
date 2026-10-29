@@ -147,6 +147,7 @@
       <nav class="tabs" aria-label="Main">
         <a class="tab" href="/" data-tab="overview">Overview</a>
         <a class="tab" href="/bertstats" data-tab="berts">Bert stats</a>
+        <a class="tab" href="/bertle" data-tab="bertle">Bertle</a>
         <a class="tab" href="/quotes" data-tab="quotes">Quotes</a>
         <a class="tab" href="/docs" data-tab="docs">Docs</a>
         <a class="tab" href="/vote" data-tab="vote">Vote</a>
@@ -160,6 +161,7 @@
       const views = {
         overview: { src: "/views/overview.html", route: "/", title: "pizza-son" },
         berts: { src: "/views/berts.html", route: "/bertstats", title: "Bert stats · pizza-son" },
+        bertle: { src: "/views/bertle.html", route: "/bertle", title: "Bertle · pizza-son" },
         quotes: { src: "/views/quotes.html", route: "/quotes", title: "Quotes · pizza-son" },
         docs: { src: "/views/docs.html", route: "/docs", title: "Docs · pizza-son" },
         vote: { src: "/views/vote.html", route: "/vote", title: "Vote · pizza-son" },
@@ -173,6 +175,7 @@
       function tabFromPath(pathname) {
         const path = pathname.replace(/\/+$/, "") || "/";
         if (path === "/bertstats") return "berts";
+        if (path === "/bertle") return "bertle";
         if (path === "/quotes") return "quotes";
         if (path === "/docs") return "docs";
         if (path === "/vote") return "vote";
