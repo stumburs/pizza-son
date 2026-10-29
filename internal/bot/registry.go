@@ -103,6 +103,8 @@ func (r *Registry) Dispatch(client Sender, msg models.Message) {
 		}
 	}
 
+	// Remove whitespace including characters used to bypass message duplication checks by Twitch
+	msg.Text = SanitizeText(msg.Text)
 	message := strings.TrimSpace(msg.Text)
 
 	// Trim leading @mention if this is a reply
