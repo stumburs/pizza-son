@@ -1,0 +1,60 @@
+package webui
+
+templ DocsPage() {
+	@Layout("Docs · pizza-son", "/docs", "docs", "docs", docsContent())
+}
+
+templ docsContent() {
+	<div class="page">
+		<header class="intro">
+			<div class="title-row">
+				<h1>Docs</h1>
+				<span class="header-sub">commands &amp; listeners</span>
+			</div>
+			<p>
+				All the commands and passive listeners pizza-son supports.
+			</p>
+		</header>
+
+		<nav class="section-tabs" aria-label="Documentation sections">
+			<button class="section-tab active" type="button" data-section="commands" aria-selected="true">
+				<span>Commands</span>
+				<span class="count" id="commandCount">—</span>
+			</button>
+			<button class="section-tab" type="button" data-section="listeners" aria-selected="false">
+				<span>Listeners</span>
+				<span class="count" id="listenerCount">—</span>
+			</button>
+		</nav>
+
+		<section id="commandsPanel">
+			<div class="controls">
+				<label class="search">
+					<span class="sr-only">Search commands</span>
+					<input id="commandSearch" type="search" placeholder="Search commands…" autocomplete="off"/>
+				</label>
+				<select class="category" id="categoryFilter" aria-label="Command category">
+					<option value="all">All categories</option>
+				</select>
+			</div>
+			<div class="status" id="commandStatus" role="status">Loading commands…</div>
+			<div id="commandGroups"></div>
+		</section>
+
+		<section id="listenersPanel" hidden>
+			<div class="controls">
+				<label class="search">
+					<span class="sr-only">Search listeners</span>
+					<input id="listenerSearch" type="search" placeholder="Search listeners…" autocomplete="off"/>
+				</label>
+			</div>
+			<div class="status" id="listenerStatus" role="status">Loading listeners…</div>
+			<div id="listenerList"></div>
+		</section>
+
+		<details class="perm-help" id="permissionHelp">
+			<summary>Permission levels</summary>
+			<div class="perm-rows" id="permissionRows"></div>
+		</details>
+	</div>
+}

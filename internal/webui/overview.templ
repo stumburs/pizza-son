@@ -1,0 +1,127 @@
+package webui
+
+templ OverviewPage() {
+	@Layout("pizza-son", "/", "overview", "overview", overviewContent())
+}
+
+templ overviewContent() {
+	<div class="page">
+		<section class="intro">
+			<p>
+				Live status of the channels pizza-son runs in, plus chat and bert totals.
+			</p>
+			<p class="data-note">
+				Stats started being logged on 25 October 2026, so totals only cover
+				from then onward.
+			</p>
+		</section>
+
+		<section class="stats-grid" aria-label="Totals">
+			<div class="stat">
+				<span class="stat-label">Twitch channels</span>
+				<span class="stat-value" id="statChannels">—</span>
+			</div>
+			<div class="stat">
+				<span class="stat-label">Discord channels</span>
+				<span class="stat-value" id="statDiscord">—</span>
+			</div>
+			<div class="stat live">
+				<span class="stat-label">Live now</span>
+				<span class="stat-value" id="statLive">—</span>
+			</div>
+			<div class="stat">
+				<span class="stat-label">Hours streamed</span>
+				<span class="stat-value" id="statStreamed">—</span>
+			</div>
+			<div class="stat">
+				<span class="stat-label">Messages</span>
+				<span class="stat-value" id="statMessages">—</span>
+			</div>
+			<div class="stat">
+				<span class="stat-label">Commands</span>
+				<span class="stat-value" id="statCommands">—</span>
+			</div>
+			<div class="stat">
+				<span class="stat-label">Listener hits</span>
+				<span class="stat-value" id="statListeners">—</span>
+			</div>
+			<div class="stat">
+				<span class="stat-label">Chatters</span>
+				<span class="stat-value" id="statUsers">—</span>
+			</div>
+			<div class="stat">
+				<span class="stat-label">Berts checked</span>
+				<span class="stat-value" id="statBerts">—</span>
+			</div>
+		</section>
+
+		<section class="section">
+			<div class="section-head">
+				<h2>Live now</h2>
+				<span id="liveCount"></span>
+			</div>
+			<div class="live-grid" id="liveGrid">
+				<div class="empty">Looking for live channels…</div>
+			</div>
+		</section>
+
+		<section class="section">
+			<div class="section-head">
+				<h2>Channels</h2>
+				<span>activity recorded by pizza-son</span>
+			</div>
+			<div class="table-wrap">
+				<table class="channel-table">
+					<thead>
+						<tr>
+							<th>Channel</th>
+							<th>Messages</th>
+							<th>Commands</th>
+							<th>Listener hits</th>
+							<th>Chatters</th>
+							<th>Berts</th>
+							<th>Streamed</th>
+						</tr>
+					</thead>
+					<tbody id="channelBody">
+						<tr>
+							<td colspan="7" style="text-align: center; color: var(--text-secondary)">
+								Loading channels…
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</section>
+
+		<section class="section">
+			<div class="leaderboard-grid">
+				<div class="leaderboard">
+					<h3>Top berts</h3>
+					<div id="topBerts"></div>
+				</div>
+				<div class="leaderboard">
+					<h3>Top commands</h3>
+					<div id="topCommands"></div>
+				</div>
+				<div class="leaderboard">
+					<h3>Top listeners</h3>
+					<div id="topListeners"></div>
+				</div>
+			</div>
+		</section>
+
+		<footer class="site-footer">
+			<span>pizza-son · <span id="updatedAt">loading</span></span>
+			<span class="footer-links">
+				<a href="/bertstats">Bert stats</a>
+				<a href="/api/site/summary" target="_blank" rel="noopener">API</a>
+				<a href="https://twitch.tv/pizza_tm" target="_blank" rel="noopener">Twitch</a>
+			</span>
+		</footer>
+
+		<p class="ai-note">
+			This site was generated with AI. <a href="https://stumburs.github.io/ai" target="_blank" rel="noopener">Read my rant about it</a>.
+		</p>
+	</div>
+}

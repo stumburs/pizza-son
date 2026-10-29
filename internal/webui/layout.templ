@@ -1,0 +1,51 @@
+package webui
+
+templ Layout(title string, route string, active string, page string, content templ.Component) {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<title>{ title }</title>
+			<link rel="icon" type="image/webp" href="https://cdn.7tv.app/emote/01K6B3Y3SG5ZBAWXXVKX7BKBE5/4x.webp"/>
+			<link rel="canonical" href={ "https://pizzason.stumburs.id.lv" + route }/>
+			<meta name="theme-color" content="#0b0b0d"/>
+			<link rel="preconnect" href="https://fonts.googleapis.com"/>
+			<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+			<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&amp;family=DM+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+			<link rel="stylesheet" href="/css/base.css"/>
+			<link rel="stylesheet" href={ "/css/" + page + ".css" }/>
+			if page == "berts" {
+				<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+			}
+		</head>
+		<body>
+			@Topbar(active)
+			<main class={ "site-main page-" + page }>
+				@content
+			</main>
+			<script src={ "/js/" + page + ".js" }></script>
+			<script src="https://storage.ko-fi.com/cdn/scripts/overlay-widget.js"></script>
+			<script src="/js/kofi.js"></script>
+		</body>
+	</html>
+}
+
+templ Topbar(active string) {
+	<header class="topbar">
+		<a class="brand" href="/">pizza-son</a>
+		<nav class="tabs" aria-label="Main">
+			@navTab("/", "overview", "Overview", active)
+			@navTab("/bertstats", "berts", "Bert stats", active)
+			@navTab("/bertle", "bertle", "Bertle", active)
+			@navTab("/quotes", "quotes", "Quotes", active)
+			@navTab("/docs", "docs", "Docs", active)
+			@navTab("/vote", "vote", "Vote", active)
+			@navTab("/panel", "panel", "Panel", active)
+		</nav>
+	</header>
+}
+
+templ navTab(href string, name string, label string, active string) {
+	<a class={ "tab", templ.KV("active", name == active) } href={ href }>{ label }</a>
+}

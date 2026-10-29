@@ -10,6 +10,8 @@ import (
 	"pizza-son/internal/webui"
 	"strings"
 	"time"
+
+	"github.com/a-h/templ"
 )
 
 type WebService struct {
@@ -25,28 +27,7 @@ func (ws *WebService) Start() {
 	if err != nil {
 		log.Fatalf("[Web] Failed to load static files: %v", err)
 	}
-	if _, err := fs.Stat(staticFS, "shell.html"); err != nil {
-		log.Fatalf("[Web] Missing shell.html: %v", err)
-	}
-
-	fileServer := http.FileServerFS(staticFS)
-
-	// All human-facing routes load the same shell. Tabs inside the shell load
-	// the individual views without a full page reload.
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		// Embedded files have no modification time, so make browsers revalidate
-		// instead of heuristically caching stale HTML/JS/CSS after a deploy.
-		w.Header().Set("Cache-Control", "no-cache")
-
-		switch r.URL.Path {
-		case "/", "/bertstats", "/bertstats/", "/bertle", "/bertle/", "/quotes", "/quotes/", "/docs", "/docs/", "/vote", "/vote/", "/panel", "/panel/":
-			http.ServeFileFS(w, r, staticFS, "shell.html")
-		case "/berts", "/berts/":
-			http.Redirect(w, r, "/bertstats", http.StatusMovedPermanently)
-		default:
-			fileServer.ServeHTTP(w, r)
-		}
-	})
+	http.Handle("/", siteHandler(staticFS))
 
 	// API endpoints
 	http.HandleFunc("/api/site/summary", enableCORS(ws.handleSiteSummary))
@@ -81,12 +62,54 @@ func (ws *WebService) Start() {
 }
 
 // siteFS returns the embedded UI in production. PIZZA_SON_DEV=1 serves the
-// files from disk instead so HTML/CSS changes do not require a rebuild.
+// files from disk instead so CSS and JS changes do not require a rebuild.
+// Templ pages always need a rebuild because they are compiled into the binary.
 func siteFS() (fs.FS, error) {
 	if os.Getenv("PIZZA_SON_DEV") != "" {
 		return os.DirFS("./internal/webui/public"), nil
 	}
 	return fs.Sub(webui.Files, "public")
+}
+
+// siteHandler serves the templ-rendered pages and the embedded CSS/JS assets.
+func siteHandler(staticFS fs.FS) http.Handler {
+	fileServer := http.FileServerFS(staticFS)
+
+	pages := map[string]templ.Component{
+		"/":          webui.OverviewPage(),
+		"/bertstats": webui.BertsPage(),
+		"/bertle":    webui.BertlePage(),
+		"/quotes":    webui.QuotesPage(),
+		"/docs":      webui.DocsPage(),
+		"/vote":      webui.VotePage(),
+		"/panel":     webui.PanelPage(),
+	}
+
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Embedded files have no modification time, so make browsers revalidate
+		// instead of heuristically caching stale HTML/JS/CSS after a deploy.
+		w.Header().Set("Cache-Control", "no-cache")
+
+		path := r.URL.Path
+		if path != "/" {
+			path = strings.TrimSuffix(path, "/")
+		}
+
+		if page, ok := pages[path]; ok {
+			w.Header().Set("Content-Type", "text/html; charset=utf-8")
+			if err := page.Render(r.Context(), w); err != nil {
+				log.Printf("[Web] Failed to render %s: %v", path, err)
+			}
+			return
+		}
+
+		if path == "/berts" {
+			http.Redirect(w, r, "/bertstats", http.StatusMovedPermanently)
+			return
+		}
+
+		fileServer.ServeHTTP(w, r)
+	})
 }
 
 // All channels, all users

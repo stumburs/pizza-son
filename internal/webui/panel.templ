@@ -1,0 +1,48 @@
+package webui
+
+templ PanelPage() {
+	@Layout("Panel · pizza-son", "/panel", "panel", "panel", panelContent())
+}
+
+templ panelContent() {
+	<div class="main" id="app">
+		<div id="loginScreen" class="login-screen">
+			<h1>Control panel</h1>
+			<p id="loginDesc">Log in with your Twitch account to manage commands and listeners.</p>
+			<button class="login-btn" id="loginBtn" onclick="login()">
+				<svg viewBox="0 0 24 24"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.428l-3 3v-3H6.857V1.714h13.714Z"/></svg>
+				<span id="loginBtnText">Log in with Twitch</span>
+			</button>
+			<div id="loginLoading" class="loading-text hidden"><span class="spinner"></span> Completing login...</div>
+		</div>
+
+		<div id="panelView" class="hidden">
+			<div class="header">
+				<h1>Control panel</h1>
+				<div class="user-info">
+					<span id="userDisplay"></span>
+					<button class="logout-btn" onclick="logout()">Log out</button>
+				</div>
+			</div>
+
+			<div class="channel-bar" id="channelBar"></div>
+
+			<div id="channelContent">
+				<div class="panel-box">
+					<h2>Commands <span id="cmdCount"></span></h2>
+					<div id="commandsList" class="loading">Loading commands...</div>
+				</div>
+
+				<div class="panel-box">
+					<h2>Listeners <span id="listenerCount"></span></h2>
+					<div id="listenersList" class="loading">Loading listeners...</div>
+				</div>
+
+				<div class="save-bar">
+					<div id="saveStatus"></div>
+					<button class="save-btn" id="saveBtn" onclick="saveChanges()">Save Changes</button>
+				</div>
+			</div>
+		</div>
+	</div>
+}

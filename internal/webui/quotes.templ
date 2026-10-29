@@ -1,0 +1,36 @@
+package webui
+
+templ QuotesPage() {
+	@Layout("Quotes · pizza-son", "/quotes", "quotes", "quotes", quotesContent())
+}
+
+templ quotesContent() {
+	<div class="page">
+		<header class="intro">
+			<div class="title-row">
+				<h1>Quotes</h1>
+				<span class="header-sub" id="quoteTotal"></span>
+			</div>
+			<p>
+				Things people said in chat, saved with <code>!quote</code>.
+			</p>
+		</header>
+
+		<div class="controls">
+			<label class="search">
+				<span class="sr-only">Search quotes</span>
+				<input id="search" type="search" placeholder="Search quotes or names…" autocomplete="off"/>
+			</label>
+			<button class="refresh" id="refresh" type="button">Refresh</button>
+			<div class="status" id="status" role="status">Loading quotes…</div>
+		</div>
+
+		<nav class="channel-tabs" id="channelTabs" aria-label="Quote channels"></nav>
+
+		<section class="quote-list" id="quoteList" aria-live="polite">
+			<div class="empty">Loading quotes…</div>
+		</section>
+
+		<p class="refresh-note">Refreshes automatically while this tab is open.</p>
+	</div>
+}

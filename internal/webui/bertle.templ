@@ -1,0 +1,64 @@
+package webui
+
+templ BertlePage() {
+	@Layout("Bertle · pizza-son", "/bertle", "bertle", "bertle", bertleContent())
+}
+
+templ bertleContent() {
+	<div class="page">
+		<header class="intro">
+			<div class="title-row">
+				<h1>Bertle</h1>
+				<span class="header-sub">Bert guessing game</span>
+			</div>
+			<p>
+				Guess the name of a bert from <span id="channelLabel">a channel</span>.
+				Daily gives you one bert per channel per day; Endless keeps going and tracks your streak.
+			</p>
+			<p class="legend-line">
+				<span class="legend"><span class="legend-square correct"></span> right letter, right spot</span>
+				<span class="legend"><span class="legend-square present"></span> right letter, wrong spot</span>
+			</p>
+		</header>
+
+		<div class="game">
+			<div class="controls">
+				<label class="field">
+					<span>Channel</span>
+					<select id="channelSelect" disabled>
+						<option>Loading…</option>
+					</select>
+				</label>
+				<div class="mode-toggle" role="group" aria-label="Game mode">
+					<button type="button" class="mode-btn active" data-mode="daily" disabled>Daily</button>
+					<button type="button" class="mode-btn" data-mode="endless" disabled>Endless</button>
+				</div>
+				<div class="game-status" id="gameStatus">Loading channels…</div>
+			</div>
+
+			<div class="message" id="message" role="status" aria-live="polite"></div>
+
+			<div class="board" id="board" aria-label="Bertle guess board"></div>
+			<div class="empty-state" id="emptyState" hidden></div>
+
+			<div class="result" id="result" hidden>
+				<div class="result-emote" id="resultEmote"></div>
+				<div class="result-body">
+					<h2 class="result-title" id="resultTitle"></h2>
+					<p class="result-name">
+						<strong id="resultName"></strong>
+						<span id="resultChannel"></span>
+					</p>
+				</div>
+			</div>
+
+			<div class="actions">
+				<button type="button" class="action-btn" id="giveUpBtn" disabled>Give up</button>
+				<button type="button" class="action-btn" id="nextBtn" hidden>Next bert</button>
+				<button type="button" class="action-btn" id="shareBtn" disabled>Copy result</button>
+			</div>
+
+			<div class="keyboard" id="keyboard" aria-label="On-screen keyboard"></div>
+		</div>
+	</div>
+}

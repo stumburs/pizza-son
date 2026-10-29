@@ -1,0 +1,190 @@
+package webui
+
+templ BertsPage() {
+	@Layout("Bert stats · pizza-son", "/bertstats", "berts", "berts", bertsContent())
+}
+
+templ bertsContent() {
+	<div id="bertBgContainer" style="position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0;transition:opacity 0.4s;overflow:hidden;background:#0b0b0d;"></div>
+	<div class="top-bar">
+		<div class="tabs">
+			<button class="tab active" onclick="switchTab('global', this); loadGlobal();">Global</button>
+			<button class="tab" onclick="switchTab('channel', this)">Channel</button>
+			<button class="tab" onclick="switchTab('user', this)">User</button>
+			<button class="tab" onclick="switchTab('goldenzaza', this); loadGoldenzaza();">Goldenzaza</button>
+		</div>
+		<div class="header-controls">
+			<button class="fun-toggle" id="funToggle" onclick="toggleFunMode()" title="for fun">
+				<img src="https://cdn.7tv.app/emote/01K6B3Y3SG5ZBAWXXVKX7BKBE5/4x.webp" alt=":)"/>
+			</button>
+		</div>
+	</div>
+
+	<div class="main-layout">
+		<div class="container">
+			<!-- GLOBAL -->
+			<div id="global" class="panel active">
+				<h2>Global Stats</h2>
+				<p class="stat-line">
+					<strong id="gTotal">0</strong> berts checked
+					<span class="stat-sep">·</span>
+					<span id="gChans">0</span> channels
+					<span class="stat-sep">·</span>
+					<span id="gZazas"></span>
+					<span class="stat-sep">·</span>
+					<span id="gZazaLs"></span>
+					<span class="stat-sep">·</span>
+					<span id="gDoubleZazas"></span>
+				</p>
+				<div class="grid">
+					<div class="box">
+						<h3>Top Berters</h3>
+						<div id="gUsers">Loading...</div>
+					</div>
+					<div class="box">
+						<h3>Most Popular Berts</h3>
+						<div id="gBerts">Loading...</div>
+					</div>
+				</div>
+				<div class="chart-container">
+					<h3>Global Top Berts</h3>
+					<canvas id="globalChart" style="max-height: 280px; width: 100%"></canvas>
+				</div>
+				<div class="full-width-chart">
+					<h3>Total Berts Globally (hourly)</h3>
+					<canvas id="globalHourlyCumulativeChart" style="max-height: 260px; width: 100%"></canvas>
+				</div>
+				<div class="full-width-chart" style="margin-top: 14px">
+					<h3>First to Discover</h3>
+					<div id="gFirstDiscover">Loading...</div>
+				</div>
+			</div>
+
+			<!-- CHANNEL -->
+			<div id="channel" class="panel">
+				<h2>Channel Lookup</h2>
+				<div class="search-row">
+					<input type="text" id="chInput" placeholder="channel name…" autocomplete="off" oninput="filterChannelAutocomplete()" onfocus="filterChannelAutocomplete()" onkeydown="handleChannelKeydown(event)"/>
+					<button class="clear-btn" onclick="clearInput('chInput', 'chAutocomplete', filterChannelAutocomplete)" title="Clear">×</button>
+					<div class="ch-autocomplete" id="chAutocomplete"></div>
+				</div>
+				<div id="chResults" style="display: none">
+					<h3 id="chTitle"></h3>
+					<p class="stat-line">
+						<strong id="chTotal">0</strong> berts in this channel
+						<span class="stat-sep">·</span>
+						<span id="chZazas"></span>
+						<span class="stat-sep">·</span>
+						<span id="chZazaLs"></span>
+						<span class="stat-sep">·</span>
+						<span id="chDoubleZazas"></span>
+					</p>
+					<div class="grid">
+						<div class="box">
+							<h3>Top Berters Here</h3>
+							<div id="chUsers"></div>
+						</div>
+						<div class="box">
+							<h3>Channel Bert List</h3>
+							<div id="chBertsList"></div>
+						</div>
+					</div>
+					<div class="grid" style="margin-top: 14px">
+						<div class="box">
+							<h3>Channel Daily Timeline</h3>
+							<canvas id="channelChart" style="max-height: 220px; width: 100%"></canvas>
+						</div>
+						<div class="box">
+							<h3>Last 24h Activity</h3>
+							<canvas id="channelHourlyChart" style="max-height: 220px; width: 100%"></canvas>
+						</div>
+					</div>
+					<div class="full-width-chart">
+						<h3>Total Berts (hourly)</h3>
+						<canvas id="channelHourlyCumulativeChart" style="max-height: 260px; width: 100%"></canvas>
+					</div>
+					<div class="full-width-chart" style="margin-top: 14px">
+						<h3>First to Discover</h3>
+						<div id="chFirstDiscover"></div>
+					</div>
+				</div>
+			</div>
+
+			<!-- USER -->
+			<div id="user" class="panel">
+				<h2>User Lookup</h2>
+				<div class="search-row">
+					<input type="text" id="uInput" placeholder="username…" autocomplete="off" oninput="filterUserAutocomplete()" onfocus="filterUserAutocomplete()" onkeydown="handleUserKeydown(event)"/>
+					<button class="clear-btn" onclick="clearInput('uInput', 'uAutocomplete', filterUserAutocomplete)" title="Clear">×</button>
+					<div class="u-autocomplete" id="uAutocomplete"></div>
+				</div>
+				<div id="uResults" style="display: none">
+					<h3 id="uTitle"></h3>
+					<p class="stat-line">
+						<strong id="uTotal">0</strong> berts across all channels
+						<span class="stat-sep">·</span>
+						<span id="uZazas"></span>
+						<span class="stat-sep">·</span>
+						<span id="uZazaLs"></span>
+						<span class="stat-sep">·</span>
+						<span id="uDoubleZazas"></span>
+					</p>
+					<div class="search-row">
+						<input type="text" id="uChannelInput" placeholder="channel name…" autocomplete="off" oninput="filterUserChannelAutocomplete()" onfocus="filterUserChannelAutocomplete()" onkeydown="handleUserChannelKeydown(event)"/>
+						<button class="clear-btn" onclick="clearInput('uChannelInput', 'uChannelAutocomplete', filterUserChannelAutocomplete)" title="Clear">×</button>
+						<div class="ch-autocomplete" id="uChannelAutocomplete"></div>
+					</div>
+					<div class="grid">
+						<div class="box">
+							<h3>Collected Here</h3>
+							<div id="uCollected"></div>
+						</div>
+						<div class="box">
+							<h3>Missing Here</h3>
+							<div id="uMissing"></div>
+						</div>
+					</div>
+					<div class="grid" style="margin-top: 14px">
+						<div class="box">
+							<h3>Total Berts (daily)</h3>
+							<canvas id="userChart" style="max-height: 220px; width: 100%"></canvas>
+						</div>
+						<div class="box">
+							<h3>Last 24h Activity</h3>
+							<canvas id="userHourlyChart" style="max-height: 220px; width: 100%"></canvas>
+						</div>
+					</div>
+					<div class="full-width-chart">
+						<h3>Total Berts (hourly)</h3>
+						<canvas id="userHourlyCumulativeChart" style="max-height: 260px; width: 100%"></canvas>
+					</div>
+				</div>
+			</div>
+
+			<!-- GOLDENZAZA -->
+			<div id="goldenzaza" class="panel">
+				<h2>Goldenzazabert Hall of Fame</h2>
+				<p class="stat-line">
+					<span style="color: var(--gold-text);">0.005% chance in sir_lysergium</span>
+				</p>
+				<div id="gzResults" style="display: none">
+					<div id="gzGlobalHall"></div>
+				</div>
+				<div id="gzEmpty" style="color: var(--text-muted); font-style: italic;">Loading...</div>
+			</div>
+		</div>
+
+		<!-- SIDEBAR -->
+		<div class="sidebar-wrapper">
+			<div class="sidebar">
+				<div class="sidebar-header">
+					<div class="live-dot"></div>
+					<span class="sidebar-title">Live Feed</span>
+				</div>
+				<div id="liveFeedList" class="feed-list">
+					<div class="feed-empty" id="feedEmptyText">Waiting for bertchecks…</div>
+				</div>
+			</div>
+		</div>
+	</div>
+}

@@ -1,0 +1,139 @@
+:root {
+  color-scheme: dark;
+  --bg: #0b0b0d;
+  --surface: #131315;
+  --surface-1: #131315;
+  --surface-2: #19191c;
+  --surface-3: #232327;
+  --border: rgba(255, 255, 255, 0.09);
+  --border-strong: rgba(255, 255, 255, 0.16);
+  --text: #ededf0;
+  --text-primary: #ededf0;
+  --text-secondary: #b8b8c2;
+  --text-muted: #90909b;
+  --accent: #b7a6f5;
+  --accent-soft: rgba(183, 166, 245, 0.12);
+  --radius: 10px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --header-height: 56px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "DM Sans", system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  height: var(--header-height);
+  padding: 0 24px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.topbar .brand {
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.topbar .brand:hover {
+  color: var(--accent);
+}
+
+.topbar .tabs {
+  display: flex;
+  align-items: stretch;
+  align-self: stretch;
+  gap: 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.topbar .tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.topbar .tab {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 14px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.topbar .tab:hover {
+  color: var(--text);
+}
+
+.topbar .tab.active {
+  color: var(--text);
+  border-bottom-color: var(--accent);
+}
+
+.site-main {
+  min-height: calc(100vh - var(--header-height));
+}
+
+.site-main.page-berts {
+  padding: 20px 20px 32px;
+}
+
+.site-main.page-panel,
+.site-main.page-vote {
+  padding: 22px 20px 48px;
+}
+
+@media (max-width: 640px) {
+  .topbar {
+    gap: 16px;
+    padding: 0 14px;
+  }
+
+  .topbar .tab {
+    padding: 0 10px;
+    font-size: 0.86rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .site-main.page-berts,
+  .site-main.page-panel {
+    padding: 14px 12px;
+  }
+}

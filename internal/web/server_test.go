@@ -2,9 +2,11 @@ package web
 
 import (
 	"encoding/json"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"pizza-son/internal/services"
+	"strings"
 	"testing"
 )
 
@@ -23,13 +25,73 @@ func TestSiteFSContainsEmbeddedUI(t *testing.T) {
 		t.Fatalf("siteFS: %v", err)
 	}
 
-	for _, name := range []string{"shell.html", "view.js", "views/bertle.html"} {
+	for _, name := range []string{"css/base.css", "css/bertle.css", "js/bertle.js", "js/kofi.js"} {
 		file, err := staticFS.Open(name)
 		if err != nil {
 			t.Errorf("%s is not embedded: %v", name, err)
 			continue
 		}
 		file.Close()
+	}
+}
+
+func TestSiteHandlerServesPagesAndAssets(t *testing.T) {
+	t.Setenv("PIZZA_SON_DEV", "")
+
+	staticFS, err := siteFS()
+	if err != nil {
+		t.Fatalf("siteFS: %v", err)
+	}
+	handler := siteHandler(staticFS)
+
+	tests := []struct {
+		path        string
+		status      int
+		contentType string
+		contains    string
+	}{
+		{"/", http.StatusOK, "text/html", "class=\"topbar\""},
+		{"/bertstats/", http.StatusOK, "text/html", "Bert stats"},
+		{"/bertle", http.StatusOK, "text/html", "Bertle"},
+		{"/quotes", http.StatusOK, "text/html", "Quotes"},
+		{"/docs", http.StatusOK, "text/html", "Docs"},
+		{"/vote", http.StatusOK, "text/html", "Bert vote"},
+		{"/panel", http.StatusOK, "text/html", "Control panel"},
+		{"/css/base.css", http.StatusOK, "text/css", ".topbar"},
+		{"/js/bertle.js", http.StatusOK, "", "Bertle"},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.path, func(t *testing.T) {
+			rec := httptest.NewRecorder()
+			handler.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, tc.path, nil))
+
+			if rec.Code != tc.status {
+				t.Fatalf("status = %d, want %d", rec.Code, tc.status)
+			}
+			if tc.contentType != "" {
+				if got := rec.Header().Get("Content-Type"); !strings.HasPrefix(got, tc.contentType) {
+					t.Errorf("Content-Type = %q, want prefix %q", got, tc.contentType)
+				}
+			}
+
+			body, err := io.ReadAll(rec.Body)
+			if err != nil {
+				t.Fatalf("read body: %v", err)
+			}
+			if !strings.Contains(string(body), tc.contains) {
+				t.Errorf("body does not contain %q", tc.contains)
+			}
+		})
+	}
+
+	rec := httptest.NewRecorder()
+	handler.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, "/berts", nil))
+	if rec.Code != http.StatusMovedPermanently {
+		t.Errorf("/berts status = %d, want %d", rec.Code, http.StatusMovedPermanently)
+	}
+	if location := rec.Header().Get("Location"); location != "/bertstats" {
+		t.Errorf("/berts Location = %q, want %q", location, "/bertstats")
 	}
 }
 

@@ -1,0 +1,66 @@
+package webui
+
+templ VotePage() {
+	@Layout("Vote · pizza-son", "/vote", "vote", "vote", voteContent())
+}
+
+templ voteContent() {
+	<div class="main">
+		<div class="page-header">
+			<h1>Bert vote</h1>
+			<span class="header-sub">sir_lysergium</span>
+		</div>
+		<p class="lede">
+			Enter a display name, then rank 5 random berts per round, best at the top and worst at the bottom.
+			Scoring uses Borda count: 1st place gets 4 points, then 3, 2, 1, and last place gets 0.
+			Every submitted round is saved in this browser (localStorage) and, when the server
+			backend is reachable, also sent to the shared tally.
+		</p>
+
+		<div class="card">
+			<h2>Your ballot</h2>
+			<p class="hint">Use the up/down buttons or drag rows to order them. Top = best, bottom = worst.</p>
+			<div class="row" style="margin-bottom: 14px;">
+				<label class="field">Display name (required)
+					<input type="text" id="voterInput" placeholder="e.g. pizza_tm" autocomplete="off" maxlength="40" required/>
+				</label>
+			</div>
+			<div id="loadingLabel" class="status">Loading berts and emotes…</div>
+			<ol class="rank-list" id="rankList"></ol>
+			<div class="row">
+				<button class="primary" id="submitBtn" disabled>Submit ranking + continue voting</button>
+				<button id="skipBtn" disabled>Skip these 5</button>
+			</div>
+			<div class="status" id="roundStatus"></div>
+		</div>
+
+		<div class="cols">
+			<div class="card">
+				<h2>Your standings (Borda)</h2>
+				<p class="stat-line"><strong id="myRounds">0</strong> rounds submitted · <strong id="mySeen">0</strong> berts ranked</p>
+				<div id="myTable"><span class="muted">No votes yet.</span></div>
+				<div class="row" style="margin-top: 14px;">
+					<button class="small" id="resetBtn">Reset my votes</button>
+				</div>
+			</div>
+			<div class="card">
+				<h2>Shared standings (all voters)</h2>
+				<p class="stat-line"><strong id="sharedRounds">–</strong> rounds counted server-side</p>
+				<div id="sharedTable"><span class="muted">Loading shared tally…</span></div>
+				<div class="row" style="margin-top: 14px;">
+					<button class="small" id="refreshSharedBtn">Refresh shared tally</button>
+				</div>
+			</div>
+		</div>
+
+		<div class="card">
+			<h2>How scoring works</h2>
+			<p class="hint">
+				Each round you rank 5 berts. The top bert gets 4 points, then 3, 2, 1, and the
+				bottom bert gets 0. Points are added up across all rounds and all voters.
+				Bert seen in more rounds can score more, which is expected: regular appearances
+				near the top are what makes a bert the best overall.
+			</p>
+		</div>
+	</div>
+}
