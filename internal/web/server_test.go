@@ -15,6 +15,24 @@ func setupBertService(t *testing.T, data map[string]*services.ChannelData) {
 	t.Cleanup(func() { services.BertServiceInstance = old })
 }
 
+func TestSiteFSContainsEmbeddedUI(t *testing.T) {
+	t.Setenv("PIZZA_SON_DEV", "")
+
+	staticFS, err := siteFS()
+	if err != nil {
+		t.Fatalf("siteFS: %v", err)
+	}
+
+	for _, name := range []string{"shell.html", "view.js", "views/bertle.html"} {
+		file, err := staticFS.Open(name)
+		if err != nil {
+			t.Errorf("%s is not embedded: %v", name, err)
+			continue
+		}
+		file.Close()
+	}
+}
+
 func getJSON(t *testing.T, handler http.HandlerFunc, url string, out any) {
 	t.Helper()
 	rec := httptest.NewRecorder()

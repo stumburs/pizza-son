@@ -2,9 +2,12 @@ package web
 
 import (
 	"encoding/json"
+	"io/fs"
 	"log"
 	"net/http"
+	"os"
 	"pizza-son/internal/services"
+	"pizza-son/internal/webui"
 	"strings"
 	"time"
 )
@@ -18,18 +21,30 @@ func NewWebService(port string) *WebService {
 }
 
 func (ws *WebService) Start() {
-	fs := http.FileServer(http.Dir("./web/public"))
+	staticFS, err := siteFS()
+	if err != nil {
+		log.Fatalf("[Web] Failed to load static files: %v", err)
+	}
+	if _, err := fs.Stat(staticFS, "shell.html"); err != nil {
+		log.Fatalf("[Web] Missing shell.html: %v", err)
+	}
+
+	fileServer := http.FileServerFS(staticFS)
 
 	// All human-facing routes load the same shell. Tabs inside the shell load
 	// the individual views without a full page reload.
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		// Embedded files have no modification time, so make browsers revalidate
+		// instead of heuristically caching stale HTML/JS/CSS after a deploy.
+		w.Header().Set("Cache-Control", "no-cache")
+
 		switch r.URL.Path {
 		case "/", "/bertstats", "/bertstats/", "/bertle", "/bertle/", "/quotes", "/quotes/", "/docs", "/docs/", "/vote", "/vote/", "/panel", "/panel/":
-			http.ServeFile(w, r, "./web/public/shell.html")
+			http.ServeFileFS(w, r, staticFS, "shell.html")
 		case "/berts", "/berts/":
 			http.Redirect(w, r, "/bertstats", http.StatusMovedPermanently)
 		default:
-			fs.ServeHTTP(w, r)
+			fileServer.ServeHTTP(w, r)
 		}
 	})
 
@@ -63,6 +78,15 @@ func (ws *WebService) Start() {
 			log.Fatalf("[Web] Server failed: %v", err)
 		}
 	}()
+}
+
+// siteFS returns the embedded UI in production. PIZZA_SON_DEV=1 serves the
+// files from disk instead so HTML/CSS changes do not require a rebuild.
+func siteFS() (fs.FS, error) {
+	if os.Getenv("PIZZA_SON_DEV") != "" {
+		return os.DirFS("./internal/webui/public"), nil
+	}
+	return fs.Sub(webui.Files, "public")
 }
 
 // All channels, all users
