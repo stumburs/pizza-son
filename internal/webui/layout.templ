@@ -26,8 +26,6 @@ templ Layout(title string, route string, active string, page string, content tem
 			if page != "error" {
 				<script src={ "/js/" + page + ".js?v=" + Version }></script>
 			}
-			<script src="https://storage.ko-fi.com/cdn/scripts/overlay-widget.js"></script>
-			<script src="/js/kofi.js"></script>
 		</body>
 	</html>
 }
@@ -44,6 +42,10 @@ templ Topbar(active string) {
 			@navTab("/vote", "vote", "Vote", active)
 			@navTab("/panel", "panel", "Panel", active)
 		</nav>
+		<div class="support">
+			<script type="text/javascript" src="https://storage.ko-fi.com/cdn/widget/Widget_2.js"></script>
+			<script type="text/javascript">kofiwidget2.init('Support me on Ko-fi', '#b7a6f5', 'R6R11VC7ZJ');kofiwidget2.draw();</script>
+		</div>
 	</header>
 }
 

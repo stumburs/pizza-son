@@ -28,7 +28,7 @@ func TestSiteFSContainsEmbeddedUI(t *testing.T) {
 		t.Fatalf("siteFS: %v", err)
 	}
 
-	for _, name := range []string{"css/site.css", "js/bertle.js", "js/kofi.js"} {
+	for _, name := range []string{"css/site.css", "js/bertle.js", "js/berts.js"} {
 		file, err := staticFS.Open(name)
 		if err != nil {
 			t.Errorf("%s is not embedded: %v", name, err)

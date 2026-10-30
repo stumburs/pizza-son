@@ -55,6 +55,7 @@ body {
   align-items: stretch;
   align-self: stretch;
   gap: 2px;
+  min-width: 0;
   overflow-x: auto;
   scrollbar-width: none;
 }
@@ -83,6 +84,38 @@ body {
 .topbar .tab.active {
   color: var(--text);
   border-bottom-color: var(--accent);
+}
+
+// Ko-fi button injected by Widget_2.js at the far right of the topbar.
+.topbar .support {
+  display: flex;
+  align-items: center;
+  flex: none;
+  margin-left: auto;
+}
+
+.topbar .support .btn-container {
+  min-width: 0 !important;
+  white-space: nowrap;
+}
+
+.topbar .support a.kofi-button {
+  min-width: 0;
+  padding: 2px 12px !important;
+  border-radius: var(--radius-sm);
+  font-size: 13px !important;
+  line-height: 32px !important;
+  box-shadow: none;
+}
+
+.topbar .support span.kofitext {
+  line-height: 32px !important;
+}
+
+.topbar .support img.kofiimg {
+  height: 13px !important;
+  width: 20px !important;
+  margin-bottom: 2px !important;
 }
 
 .site-main {
