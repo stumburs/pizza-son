@@ -210,6 +210,23 @@ func (s *TwitchService) GetStreamInfoFreshErr(channel string) (StreamInfo, error
 	return s.GetStreamInfoErr(channel)
 }
 
+// IsChannelLive reports whether a channel is currently streaming. Discord
+// channels have no Twitch stream state, and an unreachable Twitch API is
+// treated as live so a temporary failure never looks like the stream ended.
+func IsChannelLive(channel string) bool {
+	if IsDiscordChannel(channel) {
+		return true
+	}
+	if TwitchServiceInstance == nil {
+		return true
+	}
+	info, err := TwitchServiceInstance.GetStreamInfoErr(channel)
+	if err != nil {
+		return true
+	}
+	return !info.StartedAt.IsZero()
+}
+
 // GetLiveStreams fetches live status for many channels in a single Helix
 // request. Results are cached briefly so the public site can poll freely. The
 // returned map is keyed by lowercase channel login and only contains channels

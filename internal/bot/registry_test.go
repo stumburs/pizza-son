@@ -144,6 +144,72 @@ func TestDispatchLogsMessagesCommandsAndListeners(t *testing.T) {
 	}
 }
 
+func TestDispatchUsesDynamicCooldown(t *testing.T) {
+	t.Chdir(t.TempDir())
+
+	if err := os.WriteFile("config.toml", []byte("[bot]\nprefix = \"!\"\nchannels = [\"testchannel\"]\n"), 0644); err != nil {
+		t.Fatalf("write config: %v", err)
+	}
+	config.Load("config.toml")
+
+	oldActivity := services.ActivityServiceInstance
+	services.NewActivityService()
+	t.Cleanup(func() {
+		services.ActivityServiceInstance.Close()
+		services.ActivityServiceInstance = oldActivity
+	})
+
+	oldSettings := services.ChannelSettingsInstance
+	services.NewChannelSettingsService()
+	t.Cleanup(func() { services.ChannelSettingsInstance = oldSettings })
+
+	registry := bot.NewRegistry("!")
+
+	handled := make(chan struct{}, 2)
+	registry.RegisterListener(bot.ListenerEntry{
+		Name:     "test-dynamic-cooldown",
+		Cooldown: time.Millisecond,
+		CooldownFor: func(ctx bot.CommandContext) time.Duration {
+			return time.Hour
+		},
+		Handler: func(ctx bot.CommandContext) bool {
+			handled <- struct{}{}
+			return true
+		},
+	})
+
+	msg := models.Message{
+		ID:       "msg-1",
+		Channel:  "testchannel",
+		Platform: models.PlatformTwitch,
+		Text:     "bertcheck",
+		User: models.MessageUser{
+			ID:   "user-1",
+			Name: "Alice",
+		},
+	}
+
+	registry.Dispatch(testSender{}, msg)
+	waitForSignal(t, handled, "dynamic-cooldown listener")
+
+	// The handler runs before the cooldown is recorded, so wait until the
+	// dispatch goroutine has actually stored it.
+	deadline := time.Now().Add(2 * time.Second)
+	for !bot.GlobalCooldowns.IsOnCooldown("test-dynamic-cooldown", "testchannel", "user-1", time.Hour) {
+		if time.Now().After(deadline) {
+			t.Fatal("dynamic cooldown was not recorded")
+		}
+		time.Sleep(time.Millisecond)
+	}
+
+	registry.Dispatch(testSender{}, msg)
+	select {
+	case <-handled:
+		t.Fatal("listener ran again while its dynamic cooldown was active")
+	case <-time.After(100 * time.Millisecond):
+	}
+}
+
 func waitForSignal(t *testing.T, ch <-chan struct{}, name string) {
 	t.Helper()
 	select {

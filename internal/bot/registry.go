@@ -60,6 +60,10 @@ type ListenerEntry struct {
 	Description string
 	Permission  Permission
 	Cooldown    time.Duration
+	// CooldownFor, when set, overrides Cooldown with a duration calculated for
+	// the current message. It runs after the matcher, so expensive checks only
+	// happen when the listener actually matches.
+	CooldownFor func(ctx CommandContext) time.Duration
 	Matcher     func(ctx CommandContext) bool
 	OnCooldown  func(ctx CommandContext, remaining time.Duration)
 	Handler     Listener
@@ -146,11 +150,16 @@ func (r *Registry) Dispatch(client Sender, msg models.Message) {
 				return
 			}
 
+			cooldown := l.Cooldown
+			if l.CooldownFor != nil {
+				cooldown = l.CooldownFor(ctx)
+			}
+
 			// cooldown
-			if l.Cooldown > 0 {
-				if GlobalCooldowns.IsOnCooldown(l.Name, msg.Channel, msg.User.ID, l.Cooldown) {
+			if cooldown > 0 {
+				if GlobalCooldowns.IsOnCooldown(l.Name, msg.Channel, msg.User.ID, cooldown) {
 					if l.OnCooldown != nil {
-						remaining := GlobalCooldowns.Remaining(l.Name, msg.Channel, msg.User.ID, l.Cooldown)
+						remaining := GlobalCooldowns.Remaining(l.Name, msg.Channel, msg.User.ID, cooldown)
 						l.OnCooldown(ctx, remaining)
 					}
 					return
@@ -160,7 +169,7 @@ func (r *Registry) Dispatch(client Sender, msg models.Message) {
 			if handled && !l.Passive {
 				services.ActivityServiceInstance.LogListener(msg, l.Name)
 			}
-			if l.Cooldown > 0 {
+			if cooldown > 0 {
 				GlobalCooldowns.Set(l.Name, msg.Channel, msg.User.ID)
 			}
 		}(ctx)

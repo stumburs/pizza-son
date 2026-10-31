@@ -46,13 +46,32 @@ func isTrollEnabled(channel string) bool {
 	return enabled
 }
 
-const zazaChance = 0.05
+const (
+	zazaChance = 0.05
+
+	bertcheckOnlineCooldown  = 69 * time.Second
+	bertcheckOfflineCooldown = 10 * time.Minute
+	goldenzazabertChance     = 0.00005
+)
+
+// bertcheckCooldown picks the cooldown for the current stream state. Streams
+// keep the fast chat-friendly cooldown; offline channels slow down so people
+// cannot farm berts around the clock.
+func bertcheckCooldown(live bool) time.Duration {
+	if live {
+		return bertcheckOnlineCooldown
+	}
+	return bertcheckOfflineCooldown
+}
 
 func init() {
 	RegisterListener(bot.ListenerEntry{
 		Name:        "bertcheck",
 		Description: "Responds with a random bert",
-		Cooldown:    69 * time.Second,
+		Cooldown:    bertcheckOnlineCooldown,
+		CooldownFor: func(ctx bot.CommandContext) time.Duration {
+			return bertcheckCooldown(services.IsChannelLive(ctx.Message.Channel))
+		},
 		Matcher: func(ctx bot.CommandContext) bool {
 			// Only the exact single word, lowercase, and nothing else.
 			return strings.TrimSpace(ctx.Message.Text) == "bertcheck"
@@ -63,7 +82,8 @@ func init() {
 		Handler: func(ctx bot.CommandContext) bool {
 			available := services.BertServiceInstance.GetBerts(ctx.Message.Channel)
 
-			baseResponse := pickBertResponse(ctx.Message.User.Name, available, ctx.Message.Channel)
+			allowGolden := ctx.Message.Channel == "sir_lysergium" && services.IsChannelLive(ctx.Message.Channel)
+			baseResponse := pickBertResponse(ctx.Message.User.Name, available, ctx.Message.Channel, allowGolden)
 
 			if baseResponse == "" {
 				ctx.Client.Reply(ctx.Message.Channel, ctx.Message.ID, "No berts on this channel :(")
@@ -304,7 +324,7 @@ func init() {
 	})
 }
 
-func pickBertResponse(user string, availableBerts []string, channel string) string {
+func pickBertResponse(user string, availableBerts []string, channel string, allowGolden bool) string {
 	// we do a bit of trolling
 	if isTrollEnabled(channel) {
 		for _, rule := range trollRules {
@@ -314,8 +334,9 @@ func pickBertResponse(user string, availableBerts []string, channel string) stri
 		}
 	}
 
-	// goldenzazabert - 0.005% chance in sir_lysergium
-	if channel == "sir_lysergium" && rand.Float64() < 0.00005 {
+	// goldenzazabert - 0.005% chance in sir_lysergium, but only while the
+	// channel is live.
+	if allowGolden && channel == "sir_lysergium" && rand.Float64() < goldenzazabertChance {
 		return "goldenzazabert"
 	}
 
