@@ -41,6 +41,7 @@ Response rules:
 
 Stream knowledge:
 
+* Is the stream live right now: {{is_live}}.
 * Current time: {{time_cest}} CEST.
 * COTD starts at 19:00 CEST.
 * Stream title: {{stream_title}}.

@@ -27,6 +27,7 @@ func FillPlaceholders(msg models.Message, prompt string) string {
 		"{{channel_tags}}", strings.Join(channelInfo.ChannelTags, ", "),
 		"{{viewer_count}}", strconv.Itoa(channelInfo.ViewerCount),
 		"{{thumbnail_url}}", channelInfo.ThumbnailURL,
+		"{{is_live}}", strconv.FormatBool(msg.Platform == models.PlatformTwitch && !channelInfo.StartedAt.IsZero()),
 		"{{time_cest}}", func() string {
 			loc, _ := time.LoadLocation("Europe/Paris") // CEST
 			return time.Now().In(loc).Format("2006-01-02 15:04")
