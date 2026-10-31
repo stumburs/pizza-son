@@ -4,6 +4,7 @@ import (
 	"path/filepath"
 	"pizza-son/internal/store"
 	"testing"
+	"time"
 )
 
 func bertTestData() map[string]*ChannelData {
@@ -96,5 +97,33 @@ func TestRegisterActivationReturnsSiteGlobalTotal(t *testing.T) {
 	}
 	if got := s.GlobalTotalLocked(); got != 2 {
 		t.Errorf("GlobalTotalLocked() = %d, want 2", got)
+	}
+}
+
+func TestRegisterActivationLogsEveryActivation(t *testing.T) {
+	st := store.New(filepath.Join(t.TempDir(), "stats.json"), &map[string]*ChannelData{})
+	if err := st.EnsureDir(); err != nil {
+		t.Fatal(err)
+	}
+	s := &BertService{store: st, Data: *st.Data()}
+
+	before := time.Now().Add(-time.Second)
+	s.RegisterActivation("sir_lysergium", "alice", "bertnard", true, false, false)
+	s.RegisterActivation("sir_lysergium", "bob", "beert", false, true, false)
+
+	log := s.Data["sir_lysergium"].ActivationLog
+	if len(log) != 2 {
+		t.Fatalf("activation log has %d entries, want 2", len(log))
+	}
+	if log[0].Username != "alice" || log[0].Bert != "bertnard" || !log[0].IsZaza || log[0].IsZazaL || log[0].DoubleZaza {
+		t.Errorf("first activation = %+v", log[0])
+	}
+	if log[1].Username != "bob" || log[1].Bert != "beert" || log[1].IsZaza || !log[1].IsZazaL || log[1].DoubleZaza {
+		t.Errorf("second activation = %+v", log[1])
+	}
+	for _, activation := range log {
+		if activation.Timestamp.Before(before) {
+			t.Errorf("activation timestamp %s is too old", activation.Timestamp)
+		}
 	}
 }

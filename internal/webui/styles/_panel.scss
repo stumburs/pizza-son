@@ -329,9 +329,273 @@
     display: none !important;
   }
 
+  .panel-tabs {
+    display: flex;
+    gap: 2px;
+    margin-bottom: 18px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .panel-tab {
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    padding: 9px 14px;
+    color: var(--text-muted);
+    font-family: "DM Sans", sans-serif;
+    font-size: 0.88rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: color 0.14s, border-color 0.14s;
+  }
+
+  .panel-tab:hover {
+    color: var(--text-primary);
+  }
+
+  .panel-tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  .hint {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin: 8px 0;
+    line-height: 1.5;
+  }
+
+  .hint.warn {
+    color: var(--yellow);
+  }
+
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .stat {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .stat span {
+    font-size: 0.68rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .stat strong {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .bert-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 12px;
+  }
+
+  .bert-chip {
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-family: "DM Mono", monospace;
+    font-size: 0.72rem;
+    color: var(--text-secondary);
+  }
+
+  .bert-controls {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .field select,
+  .field input {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    padding: 8px 10px;
+    font-family: "DM Sans", sans-serif;
+    font-size: 0.85rem;
+    min-width: 190px;
+  }
+
+  .field select:focus,
+  .field input:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  .check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 12px 0;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+  }
+
+  .check input {
+    accent-color: var(--accent);
+  }
+
+  .check input:disabled {
+    opacity: 0.4;
+  }
+
+  .check:has(input:disabled) {
+    color: var(--text-muted);
+  }
+
+  .bert-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    padding: 8px 16px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+    font-family: "DM Sans", sans-serif;
+    font-size: 0.82rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: color 0.14s, border-color 0.14s, opacity 0.14s;
+  }
+
+  .btn:hover {
+    color: var(--text-primary);
+    border-color: var(--border-hover);
+  }
+
+  .btn.primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    font-weight: 600;
+  }
+
+  .btn.primary:hover {
+    opacity: 0.9;
+    color: #fff;
+  }
+
+  .btn.danger {
+    color: var(--red-text);
+    border-color: rgba(239, 68, 68, 0.3);
+    background: var(--red-dim);
+  }
+
+  .btn.danger:hover {
+    color: #fff;
+    border-color: var(--red);
+  }
+
+  .bert-status {
+    margin-top: 14px;
+    font-size: 0.85rem;
+    color: var(--green);
+    line-height: 1.6;
+  }
+
+  .bert-status.error {
+    color: var(--red);
+  }
+
+  .bert-user-head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-top: 12px;
+  }
+
+  .bert-user-head strong {
+    font-family: "DM Mono", monospace;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+  }
+
+  .bert-user-head span {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+  }
+
+  #bertRecords,
+  #bertLog {
+    overflow-x: auto;
+  }
+
+  .bert-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 0.78rem;
+  }
+
+  .bert-table th {
+    text-align: left;
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.64rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+  }
+
+  .bert-table td {
+    padding: 7px 8px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-secondary);
+    white-space: nowrap;
+  }
+
+  .bert-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .bert-table .bert-name {
+    color: var(--text-primary);
+    font-family: "DM Mono", monospace;
+    white-space: normal;
+  }
+
   @media (max-width: 600px) {
     .panel-box { padding: 14px 16px; }
     .header { flex-direction: column; align-items: flex-start; }
     .user-info { margin-left: 0; }
+    .stat-grid { grid-template-columns: 1fr 1fr; }
+    .bert-controls { flex-direction: column; align-items: stretch; }
+    .field select, .field input { width: 100%; min-width: 0; }
   }
 }

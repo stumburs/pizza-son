@@ -27,7 +27,12 @@ templ panelContent() {
 
 			<div class="channel-bar" id="channelBar"></div>
 
-			<div id="channelContent">
+			<div class="panel-tabs" role="tablist" aria-label="Panel sections">
+				<button class="panel-tab active" id="tabBtnSettings" role="tab" aria-selected="true" onclick="selectPanelTab('settings')">Commands and listeners</button>
+				<button class="panel-tab" id="tabBtnBertcheck" role="tab" aria-selected="false" onclick="selectPanelTab('bertcheck')">Bertcheck</button>
+			</div>
+
+			<div id="settingsTab" class="panel-tab-view">
 				<div class="panel-box">
 					<h2>Commands <span id="cmdCount"></span></h2>
 					<div id="commandsList" class="loading">Loading commands...</div>
@@ -41,6 +46,63 @@ templ panelContent() {
 				<div class="save-bar">
 					<div id="saveStatus"></div>
 					<button class="save-btn" id="saveBtn" onclick="saveChanges()">Save Changes</button>
+				</div>
+			</div>
+
+			<div id="bertcheckTab" class="panel-tab-view hidden">
+				<div class="panel-box">
+					<h2>Channel overview <span id="bertOverviewMeta"></span></h2>
+					<div id="bertOverview" class="loading">Loading bertcheck data...</div>
+				</div>
+
+				<div class="panel-box">
+					<h2>User activity</h2>
+					<div class="bert-controls">
+						<label class="field">
+							<span>User</span>
+							<select id="bertUserSelect"></select>
+						</label>
+						<button class="btn" onclick="loadBertUser()">Inspect user</button>
+						<button class="btn" onclick="loadBertOverview()">Refresh</button>
+					</div>
+					<div id="bertUserSummary"></div>
+					<div id="bertRecords"></div>
+					<div id="bertLog"></div>
+				</div>
+
+				<div class="panel-box">
+					<h2>Purge activations</h2>
+					<p class="hint">Deletes the selected user's bertchecks in the range and updates every total, record and timeline. The activation log must cover the range unless partial removal is allowed. Use the approximate option for older data that predates the log.</p>
+					<div class="bert-controls">
+						<label class="field">
+							<span>From</span>
+							<input type="datetime-local" id="bertFrom"/>
+						</label>
+						<label class="field">
+							<span>Until</span>
+							<input type="datetime-local" id="bertUntil"/>
+						</label>
+						<label class="field">
+							<span>Berts to remove</span>
+							<input type="number" id="bertCount" min="1" step="1" placeholder="Estimate from activity" disabled/>
+						</label>
+					</div>
+					<label class="check">
+						<input type="checkbox" id="bertPartial"/>
+						Allow partial range (the activation log starts later)
+					</label>
+					<label class="check">
+						<input type="checkbox" id="bertApproximate" onchange="toggleBertApproximate()"/>
+						Approximate purge for data before the activation log (randomly removes berts)
+					</label>
+					<p class="hint">Leave "Berts to remove" blank to estimate the count from the user's hourly activity.</p>
+					<div class="bert-actions">
+						<button class="btn" onclick="setBertLastHours(2)">Set last 2h</button>
+						<button class="btn" onclick="setBertLastHours(24)">Set last 24h</button>
+						<button class="btn primary" onclick="purgeBertUser()">Purge range</button>
+						<button class="btn danger" onclick="deleteBertUser()">Delete user entirely</button>
+					</div>
+					<div id="bertActionStatus" class="bert-status"></div>
 				</div>
 			</div>
 		</div>

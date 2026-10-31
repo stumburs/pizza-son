@@ -9,6 +9,28 @@ import (
 	"github.com/a-h/templ"
 )
 
+func TestPanelPageHasBertcheckTab(t *testing.T) {
+	var buf bytes.Buffer
+	if err := PanelPage().Render(context.Background(), &buf); err != nil {
+		t.Fatalf("render: %v", err)
+	}
+
+	html := buf.String()
+	for _, want := range []string{
+		`id="tabBtnBertcheck"`,
+		`id="bertcheckTab"`,
+		`id="bertUserSelect"`,
+		`id="bertFrom"`,
+		`id="bertUntil"`,
+		`id="bertApproximate"`,
+		`id="bertCount"`,
+	} {
+		if !strings.Contains(html, want) {
+			t.Errorf("missing %q", want)
+		}
+	}
+}
+
 func TestPagesRender(t *testing.T) {
 	pages := []struct {
 		name string

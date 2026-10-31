@@ -25,17 +25,29 @@ func IsDiscordBert(name string) bool {
 }
 
 type BertRecord struct {
-	Count          int       `json:"count"`
-	ZazaCount      int       `json:"zaza_count"`
-	ZazaLCount     int       `json:"zaza_l_count"`
-	DoubleZazaCount int      `json:"double_zaza_count"`
-	FirstSeen      time.Time `json:"first_seen"`
-	LastSeen       time.Time `json:"last_seen"`
+	Count           int       `json:"count"`
+	ZazaCount       int       `json:"zaza_count"`
+	ZazaLCount      int       `json:"zaza_l_count"`
+	DoubleZazaCount int       `json:"double_zaza_count"`
+	FirstSeen       time.Time `json:"first_seen"`
+	LastSeen        time.Time `json:"last_seen"`
 }
 
 type GoldenzazabertEvent struct {
 	Username  string    `json:"username"`
 	Timestamp time.Time `json:"timestamp"`
+}
+
+// BertActivation is one individual bertcheck. Activations are kept in
+// ChannelData.ActivationLog so administration tools can roll back a user's
+// activity without having to guess from the hourly aggregates.
+type BertActivation struct {
+	Username   string    `json:"username"`
+	Bert       string    `json:"bert"`
+	Timestamp  time.Time `json:"timestamp"`
+	IsZaza     bool      `json:"is_zaza,omitempty"`
+	IsZazaL    bool      `json:"is_zaza_l,omitempty"`
+	DoubleZaza bool      `json:"double_zaza,omitempty"`
 }
 
 type UserStats struct {
@@ -50,11 +62,12 @@ type UserStats struct {
 }
 
 type ChannelData struct {
-	Berts                  []string                `json:"berts"`
-	UserStats              map[string]UserStats    `json:"user_stats"`
-	DailyActivations       map[string]int          `json:"daily_activations"`
-	HourlyActivations      map[string]int          `json:"hourly_activations"`
-	GoldenzazabertEvents   []GoldenzazabertEvent   `json:"goldenzazabert_events,omitempty"`
+	Berts                []string              `json:"berts"`
+	UserStats            map[string]UserStats  `json:"user_stats"`
+	DailyActivations     map[string]int        `json:"daily_activations"`
+	HourlyActivations    map[string]int        `json:"hourly_activations"`
+	GoldenzazabertEvents []GoldenzazabertEvent `json:"goldenzazabert_events,omitempty"`
+	ActivationLog        []BertActivation      `json:"activation_log,omitempty"`
 }
 
 type BertService struct {
@@ -120,8 +133,8 @@ func (s *BertService) RegisterActivation(channel, user, bert string, isZaza, isZ
 	s.ensureChannel(channel)
 
 	now := time.Now()
-	dateStr := now.Format("2006-01-02")
-	hourStr := now.Format("2006-01-02 15:00")
+	dateStr := bertDayKey(now)
+	hourStr := bertHourKey(now)
 
 	chData := s.Data[channel]
 
@@ -175,6 +188,16 @@ func (s *BertService) RegisterActivation(channel, user, bert string, isZaza, isZ
 	stats.HourlyActivations[hourStr]++
 
 	chData.UserStats[user] = stats
+
+	// keep a per-activation log so admin tools can undo individual events
+	chData.ActivationLog = append(chData.ActivationLog, BertActivation{
+		Username:   user,
+		Bert:       bert,
+		Timestamp:  now,
+		IsZaza:     isZaza,
+		IsZazaL:    isZazaL,
+		DoubleZaza: bothZaza,
+	})
 
 	// record goldenzazabert event
 	if bert == "goldenzazabert" {
@@ -301,6 +324,9 @@ func (s *BertService) ensureChannel(channel string) {
 }
 
 func (s *BertService) save() {
+	if s.store == nil {
+		return
+	}
 	_ = s.store.Save()
 }
 

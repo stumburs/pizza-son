@@ -54,6 +54,10 @@ func (ws *WebService) Start() {
 	mux.HandleFunc("/api/panel/commands", enableCORS(requireSession(ws.handlePanelCommands)))
 	mux.HandleFunc("/api/panel/listeners", enableCORS(requireSession(ws.handlePanelListeners)))
 	mux.HandleFunc("/api/panel/save", enableCORS(requireSession(ws.handlePanelSave)))
+	mux.HandleFunc("/api/panel/bert/overview", enableCORS(requireSession(ws.handlePanelBertOverview)))
+	mux.HandleFunc("/api/panel/bert/user", enableCORS(requireSession(ws.handlePanelBertUser)))
+	mux.HandleFunc("/api/panel/bert/purge", enableCORS(requireSession(ws.handlePanelBertPurge)))
+	mux.HandleFunc("/api/panel/bert/delete-user", enableCORS(requireSession(ws.handlePanelBertDeleteUser)))
 
 	log.Printf("[Web] Starting local dashboard on http://localhost%s/\n", ws.port)
 	go func() {
