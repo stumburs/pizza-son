@@ -210,11 +210,7 @@ func init() {
 			{Input: "!bertstats", Output: "View all bert stats at " + bertStatsURL},
 		},
 		Handler: func(ctx bot.CommandContext) {
-			target := ctx.Message.User.Name
-			args := strings.Fields(ctx.Message.Text)
-			if len(args) > 1 {
-				target = strings.ToLower(strings.TrimPrefix(args[1], target))
-			}
+			target := bertStatsTarget(ctx.Message.Text, ctx.Message.User.Name)
 
 			stats := services.BertServiceInstance.GetUserStats(ctx.Message.Channel, target)
 			if stats.TotalBertchecks == 0 {
@@ -322,6 +318,17 @@ func init() {
 			}
 		},
 	})
+}
+
+// bertStatsTarget pulls the username out of a !bertstats message. Without an
+// argument it falls back to the caller's own name. The leading "@" is optional
+// so both "!bertstats some_user" and "!bertstats @some_user" work.
+func bertStatsTarget(text, fallback string) string {
+	args := strings.Fields(text)
+	if len(args) < 2 {
+		return strings.ToLower(fallback)
+	}
+	return strings.ToLower(strings.TrimPrefix(args[1], "@"))
 }
 
 func pickBertResponse(user string, availableBerts []string, channel string, allowGolden bool) string {

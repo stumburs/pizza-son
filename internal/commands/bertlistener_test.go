@@ -14,6 +14,26 @@ func TestBertcheckCooldownFollowsStreamState(t *testing.T) {
 	}
 }
 
+func TestBertStatsTarget(t *testing.T) {
+	cases := []struct {
+		text     string
+		fallback string
+		want     string
+	}{
+		{"!bertstats some_user", "caller", "some_user"},
+		{"!bertstats @some_user", "caller", "some_user"},
+		{"!bertstats @Some_User", "caller", "some_user"},
+		{"!bertstats", "caller", "caller"},
+		{"!bertstats   ", "caller", "caller"},
+	}
+
+	for _, tc := range cases {
+		if got := bertStatsTarget(tc.text, tc.fallback); got != tc.want {
+			t.Errorf("bertStatsTarget(%q, %q) = %q, want %q", tc.text, tc.fallback, got, tc.want)
+		}
+	}
+}
+
 func TestPickBertResponseGoldenOnlyWhenAllowed(t *testing.T) {
 	available := []string{"beert", "goldenzazabert"}
 
