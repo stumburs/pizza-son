@@ -112,8 +112,10 @@ func (s *OllamaService) GenerateChatResponse(msg models.Message, opts ...ChatOpt
 		s.contexts[contextKey] = pc
 	}
 	filled := FillPlaceholders(msg, pc.template)
-	sysRole := "system"
-	chatMsgs = append(chatMsgs, ollama.Message{Role: &sysRole, Content: &filled})
+	if strings.TrimSpace(filled) != "" {
+		sysRole := "system"
+		chatMsgs = append(chatMsgs, ollama.Message{Role: &sysRole, Content: &filled})
+	}
 
 	// ambient context (general chat messages)
 	if ambient, ok := s.ambient[msg.Channel]; ok {
