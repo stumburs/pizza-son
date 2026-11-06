@@ -16,6 +16,7 @@ type promptMeta struct {
 	Permission  string               `json:"permission"`
 	Cooldown    string               `json:"cooldown"`
 	Category    string               `json:"category"`
+	Model       string               `json:"model"`
 	MarkovInput bool                 `json:"markov_input"`
 	Hidden      bool                 `json:"hidden"`
 	Examples    []bot.CommandExample `json:"examples"`
@@ -84,6 +85,7 @@ func buildCommand(name string, meta promptMeta) bot.Command {
 
 	isMarkovInput := meta.MarkovInput
 	cmdName := name
+	model := meta.Model
 
 	return bot.Command{
 		Name:        cmdName,
@@ -101,7 +103,15 @@ func buildCommand(name string, meta promptMeta) bot.Command {
 				prompt = strings.Join(ctx.Args, " ")
 			}
 
-			res, err := services.OllamaServiceInstance.GenerateChatResponse(ctx.Message, services.WithPrompt(prompt), services.WithCommand(cmdName))
+			chatOpts := []services.ChatOption{
+				services.WithPrompt(prompt),
+				services.WithCommand(cmdName),
+			}
+			if model != "" {
+				chatOpts = append(chatOpts, services.WithModel(model))
+			}
+
+			res, err := services.OllamaServiceInstance.GenerateChatResponse(ctx.Message, chatOpts...)
 			if err != nil {
 				log.Println("[Ollama]", cmdName, err)
 				return
