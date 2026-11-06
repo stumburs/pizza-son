@@ -15,10 +15,11 @@ import (
 )
 
 type chatOptions struct {
-	prompt  string
-	command string
-	model   string
-	options *ollama.Options
+	prompt    string
+	command   string
+	model     string
+	options   *ollama.Options
+	stateless bool
 }
 
 type ChatOption func(*chatOptions)
@@ -37,6 +38,13 @@ func WithModel(m string) ChatOption {
 
 func WithOptions(opts *ollama.Options) ChatOption {
 	return func(o *chatOptions) { o.options = opts }
+}
+
+// WithoutHistory disables both the stored conversation and the ambient chat
+// context. The response is generated from the system prompt and current prompt
+// only, and the exchange is not saved.
+func WithoutHistory() ChatOption {
+	return func(o *chatOptions) { o.stateless = true }
 }
 
 type promptContext struct {
@@ -109,7 +117,9 @@ func (s *OllamaService) GenerateChatResponse(msg models.Message, opts ...ChatOpt
 	if !exists {
 		raw := s.GetPromptByCommand(command)
 		pc = &promptContext{template: raw}
-		s.contexts[contextKey] = pc
+		if !cfg.stateless {
+			s.contexts[contextKey] = pc
+		}
 	}
 	filled := FillPlaceholders(msg, pc.template)
 	if strings.TrimSpace(filled) != "" {
@@ -118,12 +128,14 @@ func (s *OllamaService) GenerateChatResponse(msg models.Message, opts ...ChatOpt
 	}
 
 	// ambient context (general chat messages)
-	if ambient, ok := s.ambient[msg.Channel]; ok {
-		chatMsgs = append(chatMsgs, ambient...)
-	}
+	if !cfg.stateless {
+		if ambient, ok := s.ambient[msg.Channel]; ok {
+			chatMsgs = append(chatMsgs, ambient...)
+		}
 
-	// command history
-	chatMsgs = append(chatMsgs, pc.messages...)
+		// command history
+		chatMsgs = append(chatMsgs, pc.messages...)
+	}
 
 	// current user prompt
 	userRole := "user"
@@ -156,16 +168,18 @@ func (s *OllamaService) GenerateChatResponse(msg models.Message, opts ...ChatOpt
 	}
 
 	// store the exchange in command context history
-	pc.messages = append(pc.messages, currentMsg, res.Message)
+	if !cfg.stateless {
+		pc.messages = append(pc.messages, currentMsg, res.Message)
 
-	// trim to max history (each entry is a 2 message)
-	maxHistory := config.Get().Ollama.MaxHistory
-	if maxHistory <= 0 {
-		maxHistory = 80
-	}
-	maxStored := maxHistory * 2
-	if len(pc.messages) > maxStored {
-		pc.messages = pc.messages[len(pc.messages)-maxStored:]
+		// trim to max history (each entry is a 2 message)
+		maxHistory := config.Get().Ollama.MaxHistory
+		if maxHistory <= 0 {
+			maxHistory = 80
+		}
+		maxStored := maxHistory * 2
+		if len(pc.messages) > maxStored {
+			pc.messages = pc.messages[len(pc.messages)-maxStored:]
+		}
 	}
 
 	return res, nil

@@ -85,6 +85,7 @@
   "lark": {
     "description": "Reinterprets a Markov-generated message using an LLM.",
     "usage": "!lark",
+    "store_history": false,
     "examples": [
       {
         "input": "!lark",
@@ -129,7 +130,8 @@
   "dummy": {
     "description": "Responds using a tiny model that's quite dumb, but funny.",
     "usage": "!dummy <text>",
-    "model": "qwen2:0.5b-instruct-q4_K_M",
+    "model": "qwen:0.5b",
+    "store_history": false,
     "examples": [
       {
         "input": "!dummy what's the sum of 10+10",

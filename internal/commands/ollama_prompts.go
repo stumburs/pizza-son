@@ -11,15 +11,16 @@ import (
 )
 
 type promptMeta struct {
-	Description string               `json:"description"`
-	Usage       string               `json:"usage"`
-	Permission  string               `json:"permission"`
-	Cooldown    string               `json:"cooldown"`
-	Category    string               `json:"category"`
-	Model       string               `json:"model"`
-	MarkovInput bool                 `json:"markov_input"`
-	Hidden      bool                 `json:"hidden"`
-	Examples    []bot.CommandExample `json:"examples"`
+	Description  string               `json:"description"`
+	Usage        string               `json:"usage"`
+	Permission   string               `json:"permission"`
+	Cooldown     string               `json:"cooldown"`
+	Category     string               `json:"category"`
+	Model        string               `json:"model"`
+	MarkovInput  bool                 `json:"markov_input"`
+	Hidden       bool                 `json:"hidden"`
+	StoreHistory *bool                `json:"store_history"`
+	Examples     []bot.CommandExample `json:"examples"`
 }
 
 func init() {
@@ -84,6 +85,7 @@ func buildCommand(name string, meta promptMeta) bot.Command {
 	}
 
 	isMarkovInput := meta.MarkovInput
+	storeHistory := meta.StoreHistory == nil || *meta.StoreHistory
 	cmdName := name
 	model := meta.Model
 
@@ -109,6 +111,9 @@ func buildCommand(name string, meta promptMeta) bot.Command {
 			}
 			if model != "" {
 				chatOpts = append(chatOpts, services.WithModel(model))
+			}
+			if !storeHistory {
+				chatOpts = append(chatOpts, services.WithoutHistory())
 			}
 
 			res, err := services.OllamaServiceInstance.GenerateChatResponse(ctx.Message, chatOpts...)
